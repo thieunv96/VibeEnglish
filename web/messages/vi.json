@@ -82,7 +82,8 @@
       "login_after_register_failed": "Đăng nhập thất bại sau khi đăng ký"
     },
     "successRedirecting": "Thành công! Đang chuyển trang...",
-    "terms": "Bằng việc {action}, bạn đồng ý với Điều khoản & Chính sách của Vibe English.",
+    "agreeTos": "Tôi đồng ý với <link>Điều khoản & Chính sách</link> của Vibe English",
+    "agreeTosRequired": "Vui lòng đồng ý với Điều khoản & Chính sách",
     "brandingTitle": "Tự do học,",
     "brandingTitle2": "tự tin nói.",
     "brandingDesc": "Học tiếng Anh từ video thực tế, AI chấm và điều chỉnh lộ trình theo trình độ + mục tiêu của bạn.",
@@ -90,5 +91,25 @@
     "feature2": "AI chấm & feedback tức thì",
     "feature3": "Theo dõi tiến độ rõ ràng",
     "feature4": "Session ngắn 5-30 phút"
+  },
+  "terms": {
+    "title": "Điều khoản & Chính sách",
+    "lastUpdated": "Cập nhật lần cuối: {date}",
+    "backToAuth": "Quay lại",
+    "contact": "Mọi thắc mắc vui lòng liên hệ:",
+    "s1Title": "1. Chấp nhận điều khoản",
+    "s1Body": "Bằng việc đăng ký tài khoản và sử dụng Vibe English, bạn đồng ý tuân thủ các điều khoản dưới đây. Nếu bạn không đồng ý, vui lòng không tạo tài khoản hoặc ngừng sử dụng dịch vụ.",
+    "s2Title": "2. Tài khoản người dùng",
+    "s2Body": "Bạn chịu trách nhiệm bảo mật thông tin đăng nhập của mình. Vibe English có quyền tạm khoá hoặc xoá tài khoản vi phạm điều khoản (spam, hành vi gian lận, xâm phạm bản quyền nội dung khoá học...).",
+    "s3Title": "3. Sử dụng nội dung",
+    "s3Body": "Toàn bộ video, transcript, bài tập và feedback do AI tạo trên Vibe English thuộc bản quyền của platform. Bạn được sử dụng cho mục đích học tập cá nhân; nghiêm cấm sao chép, phân phối lại, hoặc dùng cho mục đích thương mại nếu không có sự đồng ý bằng văn bản.",
+    "s4Title": "4. Dữ liệu cá nhân",
+    "s4Body": "Chúng tôi thu thập email, họ tên, năm sinh, giới tính, mục tiêu học và lịch sử bài học để cá nhân hoá lộ trình. Dữ liệu được lưu trữ an toàn và không chia sẻ với bên thứ ba ngoại trừ các yêu cầu pháp lý. Bạn có quyền yêu cầu xoá toàn bộ dữ liệu cá nhân bất kỳ lúc nào.",
+    "s5Title": "5. AI và Feedback",
+    "s5Body": "Vibe English sử dụng các mô hình AI để chấm điểm, sinh bài tập và gợi ý lộ trình. Kết quả AI có thể không chính xác tuyệt đối — bạn nên tham khảo thêm giáo viên hoặc nguồn khác cho các kỳ thi quan trọng (TOEIC, IELTS).",
+    "s6Title": "6. Thay đổi điều khoản",
+    "s6Body": "Vibe English có quyền cập nhật điều khoản khi cần thiết. Người dùng sẽ được thông báo qua email hoặc trong app trước khi điều khoản mới có hiệu lực.",
+    "s7Title": "7. Giới hạn trách nhiệm",
+    "s7Body": "Vibe English cung cấp dịch vụ \"as-is\". Chúng tôi không chịu trách nhiệm cho bất kỳ thiệt hại gián tiếp nào phát sinh từ việc sử dụng dịch vụ ngoài phạm vi học tập tiếng Anh thông thường."
   }
 }

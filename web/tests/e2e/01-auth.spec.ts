@@ -85,6 +85,8 @@ test.describe("Màn 1 — Auth (CONTEXT.md §5)", () => {
     await page.getByLabel("Mật khẩu", { exact: true }).fill("password123");
     await page.getByLabel("Nhập lại mật khẩu").fill("password123");
     await page.getByLabel("Mã xác thực").fill("1");
+    // Need to accept ToS to enable submit button
+    await page.getByLabel("terms-agreement").click();
     await page.locator('form button[type="submit"]').click();
     // Browser-native email validation will block submit; URL stays on /auth
     await expect(page).toHaveURL(/\/auth/);
@@ -109,5 +111,50 @@ test.describe("Màn 1 — Auth (CONTEXT.md §5)", () => {
     // CSS uppercases display only; accessible name is lowercase
     await expect(page.getByRole("button", { name: /^vi$/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /^en$/i })).toBeVisible();
+  });
+
+  test('"Quên mật khẩu?" link appears BELOW Sign-in button (login mode)', async ({ page }) => {
+    await page.goto("/auth");
+    const submitBtn = page.locator('form button[type="submit"]');
+    const forgot = page.getByRole("button", { name: /Quên mật khẩu/ });
+    // Both visible
+    await expect(submitBtn).toBeVisible();
+    await expect(forgot).toBeVisible();
+    // Forgot is positioned below the submit button (Y coordinate larger)
+    const submitBox = await submitBtn.boundingBox();
+    const forgotBox = await forgot.boundingBox();
+    expect(submitBox && forgotBox && forgotBox.y > submitBox.y).toBeTruthy();
+  });
+
+  test('Trailing "By signing in, you agree..." text removed in login mode', async ({ page }) => {
+    await page.goto("/auth");
+    await expect(page.getByText(/By .*you agree|Bằng việc/).first()).toHaveCount(0);
+  });
+
+  test('Register: ToS checkbox blocks submit until checked', async ({ page }) => {
+    await page.goto("/auth?mode=register");
+    const submitBtn = page.getByRole("button", { name: "Tạo tài khoản" });
+    // Initially the submit button is disabled because checkbox unchecked
+    await expect(submitBtn).toBeDisabled();
+    // Check the ToS checkbox
+    await page.getByLabel("terms-agreement").click();
+    await expect(submitBtn).toBeEnabled();
+  });
+
+  test('Register: ToS link → /terms', async ({ page }) => {
+    await page.goto("/auth?mode=register");
+    // The link is inside the agree-ToS sentence
+    const tosLink = page.getByRole("link", { name: /Điều khoản & Chính sách|Terms & Policy/ });
+    await expect(tosLink).toBeVisible();
+    await expect(tosLink).toHaveAttribute("href", "/terms");
+  });
+});
+
+test.describe("Terms & Policy page", () => {
+  test("/terms is public and renders content", async ({ page }) => {
+    await page.goto("/terms");
+    await expect(page.getByRole("heading", { name: /Điều khoản & Chính sách|Terms & Policy/ })).toBeVisible();
+    // Should have multiple sections
+    await expect(page.getByRole("heading", { name: /1\./ })).toBeVisible();
   });
 });

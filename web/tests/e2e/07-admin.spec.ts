@@ -7,33 +7,41 @@ test.describe("Màn 10 — Admin Panel (CONTEXT.md §5)", () => {
     await page.goto("/admin");
   });
 
-  test("Top navbar: 11 nav items + logo + account menu", async ({ page }) => {
-    const header = page.locator("header");
+  test("Sidebar: 11 nav items + logo + account menu inside; no topbar header", async ({ page }) => {
+    const sidebar = page.locator("aside");
     // Logo + brand text
-    await expect(header.getByText("Vibe Admin")).toBeVisible();
-    // All 11 nav items
+    await expect(sidebar.getByText("Vibe Admin")).toBeVisible();
+    // All 11 nav items inside the sidebar
     for (const label of [
       "Dashboard",
-      "Queue",
+      "Lesson Queue",
       "Tạo bài học",
-      "Videos",
-      "Intel",
+      "Video Manager",
+      "Content Intelligence",
       "Reports",
-      "Feedback",
+      "User Feedback",
       "Analytics",
-      "Help CMS",
+      "Help Content",
       "Users",
       "AI Settings",
     ]) {
-      await expect(header.getByRole("link", { name: new RegExp(label) }).first()).toBeVisible();
+      await expect(sidebar.getByRole("link", { name: new RegExp(label) })).toBeVisible();
     }
-    // Account menu trigger (avatar dropdown)
-    await expect(header.getByTitle("Tài khoản")).toBeVisible();
+    // Account menu trigger lives inside the sidebar (no separate header)
+    await expect(sidebar.getByTitle("Tài khoản")).toBeVisible();
+    // No top header
+    await expect(page.locator("body > div > header")).toHaveCount(0);
+  });
+
+  test("Admin sidebar is fixed (does not scroll with main content)", async ({ page }) => {
+    const sidebar = page.locator("aside");
+    // Fixed positioning verified via class — Tailwind 'fixed' class
+    await expect(sidebar).toHaveClass(/fixed/);
   });
 
   test("Admin logo click → /admin", async ({ page }) => {
     await page.goto("/admin/users");
-    await page.locator("header").getByRole("link", { name: /Vibe Admin/ }).click();
+    await page.locator("aside").getByRole("link", { name: /Vibe Admin/ }).first().click();
     await page.waitForURL(/\/admin$/);
   });
 

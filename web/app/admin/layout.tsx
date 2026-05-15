@@ -45,16 +45,41 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     .from(feedback)
     .where(eq(feedback.status, "new"));
 
-  const nav: { href: string; label: string; icon: React.ComponentType<{ className?: string }>; badge?: { count: number; color: "red" | "amber" } }[] = [
+  const nav: {
+    href: string;
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
+    badge?: { count: number; color: "red" | "amber" };
+  }[] = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/admin/queue", label: "Queue", icon: ListChecks, badge: queueCount?.c ? { count: Number(queueCount.c), color: "red" } : undefined },
+    {
+      href: "/admin/queue",
+      label: "Lesson Queue",
+      icon: ListChecks,
+      badge: queueCount?.c ? { count: Number(queueCount.c), color: "red" } : undefined,
+    },
     { href: "/admin/create", label: "Tạo bài học", icon: PlusCircle },
-    { href: "/admin/videos", label: "Videos", icon: Film },
-    { href: "/admin/intel", label: "Intel", icon: Brain, badge: intelCount?.c ? { count: Number(intelCount.c), color: "amber" } : undefined },
-    { href: "/admin/reports", label: "Reports", icon: Flag, badge: reportCount?.c ? { count: Number(reportCount.c), color: "red" } : undefined },
-    { href: "/admin/feedback", label: "Feedback", icon: MessageSquare, badge: feedbackCount?.c ? { count: Number(feedbackCount.c), color: "amber" } : undefined },
+    { href: "/admin/videos", label: "Video Manager", icon: Film },
+    {
+      href: "/admin/intel",
+      label: "Content Intelligence",
+      icon: Brain,
+      badge: intelCount?.c ? { count: Number(intelCount.c), color: "amber" } : undefined,
+    },
+    {
+      href: "/admin/reports",
+      label: "Reports",
+      icon: Flag,
+      badge: reportCount?.c ? { count: Number(reportCount.c), color: "red" } : undefined,
+    },
+    {
+      href: "/admin/feedback",
+      label: "User Feedback",
+      icon: MessageSquare,
+      badge: feedbackCount?.c ? { count: Number(feedbackCount.c), color: "amber" } : undefined,
+    },
     { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
-    { href: "/admin/help", label: "Help CMS", icon: HelpCircle },
+    { href: "/admin/help", label: "Help Content", icon: HelpCircle },
     { href: "/admin/users", label: "Users", icon: Users },
     { href: "/admin/ai-settings", label: "AI Settings", icon: Settings },
   ];
@@ -65,64 +90,34 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 flex flex-col">
-      <header className="sticky top-0 z-40 bg-white border-b border-stone-200">
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 h-14 flex items-center gap-3">
-          <Link href="/admin" className="flex items-center gap-2.5 shrink-0" title="Trang chủ admin">
-            <Logo size="sm" withText={false} />
-            <div>
-              <div className="font-bold text-sm leading-none">Vibe Admin</div>
-              <div className="text-[10px] text-stone-400 mt-0.5">Quản lý nội dung & người dùng</div>
-            </div>
-          </Link>
-
-          <nav className="hidden md:flex items-center gap-0.5 ml-2 overflow-x-auto scrollbar-thin text-sm flex-1">
-            {nav.map(({ href, label, icon: Icon, badge }) => (
-              <Link
-                key={href}
-                href={href}
-                className="group flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-stone-600 hover:bg-stone-100 hover:text-stone-900 transition relative whitespace-nowrap"
-              >
-                <Icon className="size-4 text-stone-400 group-hover:text-stone-600" />
-                <span>{label}</span>
-                {badge && (
-                  <span
-                    className={`text-[10px] px-1.5 py-px rounded-full font-medium ${
-                      badge.color === "red" ? "bg-red-500 text-white" : "bg-amber-500 text-white"
-                    }`}
-                  >
-                    {badge.count}
-                  </span>
-                )}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="ml-auto flex items-center gap-3">
-            <AccountMenu
-              name={user?.name ?? session.user.email}
-              email={session.user.email}
-              avatarSrc={user?.avatarData ?? user?.image ?? null}
-              locale={(user?.locale ?? "vi") as "vi" | "en"}
-              isAdmin
-              signOutAction={handleSignOut}
-            />
+    <div className="min-h-screen bg-stone-50 flex">
+      <aside className="w-64 bg-stone-900 text-stone-100 fixed top-0 left-0 h-screen flex flex-col shrink-0 z-30">
+        {/* Logo: click → /admin */}
+        <Link
+          href="/admin"
+          className="p-4 border-b border-stone-700 flex items-center gap-2.5 hover:bg-stone-800 transition shrink-0"
+          title="Vibe Admin home"
+        >
+          <Logo size="sm" withText={false} className="[&_div]:bg-white/15" />
+          <div className="leading-tight">
+            <div className="font-bold text-sm">Vibe Admin</div>
+            <div className="text-[10px] text-stone-400">Learn freely, speak confidently</div>
           </div>
-        </div>
+        </Link>
 
-        {/* Mobile nav: horizontal scroll row beneath the title row */}
-        <nav className="md:hidden border-t border-stone-100 flex items-center gap-0.5 px-3 py-2 overflow-x-auto scrollbar-thin text-xs">
+        {/* Nav items — scrolls within the sidebar only if list overflows */}
+        <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5 text-sm scrollbar-thin">
           {nav.map(({ href, label, icon: Icon, badge }) => (
             <Link
               key={href}
               href={href}
-              className="flex items-center gap-1 px-2 py-1.5 rounded-md text-stone-600 hover:bg-stone-100 transition whitespace-nowrap"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-md hover:bg-stone-800 transition relative"
             >
-              <Icon className="size-3.5" />
-              <span>{label}</span>
+              <Icon className="size-4 text-stone-400" />
+              <span className="flex-1">{label}</span>
               {badge && (
                 <span
-                  className={`text-[9px] px-1 rounded-full font-medium ${
+                  className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
                     badge.color === "red" ? "bg-red-500 text-white" : "bg-amber-500 text-white"
                   }`}
                 >
@@ -132,9 +127,25 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </Link>
           ))}
         </nav>
-      </header>
 
-      <main className="flex-1 max-w-[1920px] w-full mx-auto">{children}</main>
+        {/* Account / AccountMenu at the bottom of the sidebar */}
+        <div className="border-t border-stone-700 p-3 flex items-center gap-3 shrink-0">
+          <AccountMenu
+            name={user?.name ?? session.user.email}
+            email={session.user.email}
+            avatarSrc={user?.avatarData ?? user?.image ?? null}
+            locale={(user?.locale ?? "vi") as "vi" | "en"}
+            isAdmin
+            signOutAction={handleSignOut}
+          />
+          <div className="min-w-0">
+            <div className="font-semibold text-xs truncate">{user?.name ?? session.user.email}</div>
+            <div className="text-[10px] text-stone-400 truncate">{session.user.email}</div>
+          </div>
+        </div>
+      </aside>
+
+      <main className="flex-1 ml-64 min-w-0 overflow-x-auto">{children}</main>
     </div>
   );
 }

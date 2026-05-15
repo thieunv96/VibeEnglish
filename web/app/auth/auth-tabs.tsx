@@ -2,10 +2,12 @@
 
 import { useState, useTransition, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { loginAction, registerAction } from "./actions";
 import { cn } from "@/lib/utils";
 import { Loader2, RefreshCw } from "lucide-react";
@@ -25,6 +27,7 @@ export function AuthTabs({
   const [mode, setMode] = useState<"login" | "register">(defaultMode);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [tosAccepted, setTosAccepted] = useState(false);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -53,6 +56,10 @@ export function AuthTabs({
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+    if (mode === "register" && !tosAccepted) {
+      setError(t("agreeTosRequired"));
+      return;
+    }
     const formData = new FormData(e.currentTarget);
     if (mode === "register") {
       formData.set("captchaQuestion", `${captcha.a}+${captcha.b}`);
@@ -157,14 +164,7 @@ export function AuthTabs({
         )}
 
         <div className="space-y-1.5">
-          <div className="flex justify-between items-center">
-            <Label htmlFor="password">{t("password")}</Label>
-            {mode === "login" && (
-              <button type="button" className="text-xs text-brand-600 hover:underline">
-                {t("forgotPassword")}
-              </button>
-            )}
-          </div>
+          <Label htmlFor="password">{t("password")}</Label>
           <Input
             id="password"
             name="password"
@@ -218,6 +218,27 @@ export function AuthTabs({
           </>
         )}
 
+        {/* Register mode: ToS checkbox is required BEFORE the submit button */}
+        {mode === "register" && (
+          <label className="flex items-start gap-2.5 cursor-pointer select-none">
+            <Checkbox
+              checked={tosAccepted}
+              onCheckedChange={(c) => setTosAccepted(c === true)}
+              className="mt-0.5"
+              aria-label="terms-agreement"
+            />
+            <span className="text-sm text-stone-700 leading-snug">
+              {t.rich("agreeTos", {
+                link: (chunks) => (
+                  <Link href="/terms" target="_blank" className="text-brand-600 hover:underline font-medium">
+                    {chunks}
+                  </Link>
+                ),
+              })}
+            </span>
+          </label>
+        )}
+
         {error && (
           <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
             {error}
@@ -229,15 +250,25 @@ export function AuthTabs({
           </p>
         )}
 
-        <Button type="submit" size="lg" className="w-full" disabled={pending}>
+        <Button
+          type="submit"
+          size="lg"
+          className="w-full"
+          disabled={pending || (mode === "register" && !tosAccepted)}
+        >
           {pending && <Loader2 className="animate-spin size-4" />}
           {mode === "login" ? t("login") : t("createAccount")}
         </Button>
-      </form>
 
-      <p className="text-center text-xs text-stone-400">
-        {t("terms", { action: mode === "login" ? t("login").toLowerCase() : t("register").toLowerCase() })}
-      </p>
+        {/* Login mode: "Forgot password?" link below the Sign-in button */}
+        {mode === "login" && (
+          <div className="text-center">
+            <button type="button" className="text-sm text-brand-600 hover:underline">
+              {t("forgotPassword")}
+            </button>
+          </div>
+        )}
+      </form>
     </div>
   );
 }

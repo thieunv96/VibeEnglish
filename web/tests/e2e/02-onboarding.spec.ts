@@ -17,6 +17,8 @@ async function registerNewUser(page: Page, firstName: string, lastName: string) 
   if (!m) throw new Error("Captcha format not recognized: " + captchaQ);
   const sum = parseInt(m[1], 10) + parseInt(m[2], 10);
   await page.getByLabel("Mã xác thực").fill(String(sum));
+  // Accept ToS (required for submit button to enable)
+  await page.getByLabel("terms-agreement").click();
   await page.getByRole("button", { name: "Tạo tài khoản" }).click();
   await page.waitForURL("/onboarding", { timeout: 15_000 });
 }
