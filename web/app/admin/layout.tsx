@@ -1,11 +1,12 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
-import { lessons, reports, contentIntelSuggestions, feedback } from "@/db/schema";
+import { lessons, reports, contentIntelSuggestions, feedback, users } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
 import Link from "next/link";
 import { signOut } from "@/auth";
 import { Logo } from "@/components/brand/logo";
+import { AccountMenu } from "@/components/account-menu";
 import {
   LayoutDashboard,
   ListChecks,
@@ -18,7 +19,6 @@ import {
   HelpCircle,
   Users,
   Settings,
-  LogOut,
 } from "lucide-react";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -26,7 +26,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!session?.user) redirect("/auth");
   if (session.user.role !== "admin") redirect("/");
 
-  // Badge counts
+  const [user] = await db.select().from(users).where(eq(users.id, session.user.id)).limit(1);
+
   const [queueCount] = await db
     .select({ c: sql<number>`count(*)` })
     .from(lessons)
@@ -46,40 +47,82 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   const nav: { href: string; label: string; icon: React.ComponentType<{ className?: string }>; badge?: { count: number; color: "red" | "amber" } }[] = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/admin/queue", label: "Lesson Queue", icon: ListChecks, badge: queueCount?.c ? { count: Number(queueCount.c), color: "red" } : undefined },
+    { href: "/admin/queue", label: "Queue", icon: ListChecks, badge: queueCount?.c ? { count: Number(queueCount.c), color: "red" } : undefined },
     { href: "/admin/create", label: "Tạo bài học", icon: PlusCircle },
-    { href: "/admin/videos", label: "Video Manager", icon: Film },
-    { href: "/admin/intel", label: "Content Intelligence", icon: Brain, badge: intelCount?.c ? { count: Number(intelCount.c), color: "amber" } : undefined },
+    { href: "/admin/videos", label: "Videos", icon: Film },
+    { href: "/admin/intel", label: "Intel", icon: Brain, badge: intelCount?.c ? { count: Number(intelCount.c), color: "amber" } : undefined },
     { href: "/admin/reports", label: "Reports", icon: Flag, badge: reportCount?.c ? { count: Number(reportCount.c), color: "red" } : undefined },
-    { href: "/admin/feedback", label: "User Feedback", icon: MessageSquare, badge: feedbackCount?.c ? { count: Number(feedbackCount.c), color: "amber" } : undefined },
+    { href: "/admin/feedback", label: "Feedback", icon: MessageSquare, badge: feedbackCount?.c ? { count: Number(feedbackCount.c), color: "amber" } : undefined },
     { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
-    { href: "/admin/help", label: "Help Content", icon: HelpCircle },
+    { href: "/admin/help", label: "Help CMS", icon: HelpCircle },
     { href: "/admin/users", label: "Users", icon: Users },
     { href: "/admin/ai-settings", label: "AI Settings", icon: Settings },
   ];
 
+  async function handleSignOut() {
+    "use server";
+    await signOut({ redirectTo: "/auth" });
+  }
+
   return (
-    <div className="min-h-screen flex bg-stone-50">
-      <aside className="w-64 bg-stone-900 text-stone-100 sticky top-0 h-screen flex flex-col">
-        <Link href="/admin" className="p-4 border-b border-stone-700 flex items-center gap-2 hover:bg-stone-800 transition">
-          <Logo size="sm" withText={false} className="[&_div]:bg-white/15" />
-          <div>
-            <div className="font-bold text-sm">Vibe Admin</div>
-            <div className="text-[10px] text-stone-400">{session.user.email}</div>
+    <div className="min-h-screen bg-stone-50 flex flex-col">
+      <header className="sticky top-0 z-40 bg-white border-b border-stone-200">
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 h-14 flex items-center gap-3">
+          <Link href="/admin" className="flex items-center gap-2.5 shrink-0" title="Trang chủ admin">
+            <Logo size="sm" withText={false} />
+            <div>
+              <div className="font-bold text-sm leading-none">Vibe Admin</div>
+              <div className="text-[10px] text-stone-400 mt-0.5">Quản lý nội dung & người dùng</div>
+            </div>
+          </Link>
+
+          <nav className="hidden md:flex items-center gap-0.5 ml-2 overflow-x-auto scrollbar-thin text-sm flex-1">
+            {nav.map(({ href, label, icon: Icon, badge }) => (
+              <Link
+                key={href}
+                href={href}
+                className="group flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-stone-600 hover:bg-stone-100 hover:text-stone-900 transition relative whitespace-nowrap"
+              >
+                <Icon className="size-4 text-stone-400 group-hover:text-stone-600" />
+                <span>{label}</span>
+                {badge && (
+                  <span
+                    className={`text-[10px] px-1.5 py-px rounded-full font-medium ${
+                      badge.color === "red" ? "bg-red-500 text-white" : "bg-amber-500 text-white"
+                    }`}
+                  >
+                    {badge.count}
+                  </span>
+                )}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="ml-auto flex items-center gap-3">
+            <AccountMenu
+              name={user?.name ?? session.user.email}
+              email={session.user.email}
+              avatarSrc={user?.avatarData ?? user?.image ?? null}
+              locale={(user?.locale ?? "vi") as "vi" | "en"}
+              isAdmin
+              signOutAction={handleSignOut}
+            />
           </div>
-        </Link>
-        <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5 text-sm">
+        </div>
+
+        {/* Mobile nav: horizontal scroll row beneath the title row */}
+        <nav className="md:hidden border-t border-stone-100 flex items-center gap-0.5 px-3 py-2 overflow-x-auto scrollbar-thin text-xs">
           {nav.map(({ href, label, icon: Icon, badge }) => (
             <Link
               key={href}
               href={href}
-              className="flex items-center gap-2.5 px-3 py-2 rounded-md hover:bg-stone-800 transition relative"
+              className="flex items-center gap-1 px-2 py-1.5 rounded-md text-stone-600 hover:bg-stone-100 transition whitespace-nowrap"
             >
-              <Icon className="size-4 text-stone-400" />
-              <span className="flex-1">{label}</span>
+              <Icon className="size-3.5" />
+              <span>{label}</span>
               {badge && (
                 <span
-                  className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
+                  className={`text-[9px] px-1 rounded-full font-medium ${
                     badge.color === "red" ? "bg-red-500 text-white" : "bg-amber-500 text-white"
                   }`}
                 >
@@ -89,20 +132,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </Link>
           ))}
         </nav>
-        <form
-          action={async () => {
-            "use server";
-            await signOut({ redirectTo: "/" });
-          }}
-          className="p-2 border-t border-stone-700"
-        >
-          <button className="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-stone-800 transition text-sm">
-            <LogOut className="size-4" /> Đăng xuất
-          </button>
-        </form>
-      </aside>
+      </header>
 
-      <main className="flex-1 min-w-0 overflow-x-auto">{children}</main>
+      <main className="flex-1 max-w-[1920px] w-full mx-auto">{children}</main>
     </div>
   );
 }

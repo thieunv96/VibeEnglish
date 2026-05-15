@@ -7,26 +7,34 @@ test.describe("Màn 10 — Admin Panel (CONTEXT.md §5)", () => {
     await page.goto("/admin");
   });
 
-  test("Sidebar: 11 nav items + badges + logo", async ({ page }) => {
-    const sidebar = page.locator("aside");
-    // All required items
+  test("Top navbar: 11 nav items + logo + account menu", async ({ page }) => {
+    const header = page.locator("header");
+    // Logo + brand text
+    await expect(header.getByText("Vibe Admin")).toBeVisible();
+    // All 11 nav items
     for (const label of [
       "Dashboard",
-      "Lesson Queue",
+      "Queue",
       "Tạo bài học",
-      "Video Manager",
-      "Content Intelligence",
+      "Videos",
+      "Intel",
       "Reports",
-      "User Feedback",
+      "Feedback",
       "Analytics",
-      "Help Content",
+      "Help CMS",
       "Users",
       "AI Settings",
     ]) {
-      await expect(sidebar.getByRole("link", { name: new RegExp(label) })).toBeVisible();
+      await expect(header.getByRole("link", { name: new RegExp(label) }).first()).toBeVisible();
     }
-    // Logout button at bottom
-    await expect(sidebar.getByRole("button", { name: /Đăng xuất/ })).toBeVisible();
+    // Account menu trigger (avatar dropdown)
+    await expect(header.getByTitle("Tài khoản")).toBeVisible();
+  });
+
+  test("Admin logo click → /admin", async ({ page }) => {
+    await page.goto("/admin/users");
+    await page.locator("header").getByRole("link", { name: /Vibe Admin/ }).click();
+    await page.waitForURL(/\/admin$/);
   });
 
   test("Dashboard: 4 metric cards + 2 preview panels", async ({ page }) => {

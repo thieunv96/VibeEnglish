@@ -47,7 +47,7 @@ export default async function HomePage() {
     <div className="min-h-screen bg-stone-50">
       <TopNav active="home" />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+      <main className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Hero */}
         <section className="rounded-2xl brand-gradient text-white p-6 md:p-8 relative overflow-hidden">
           <div className="absolute inset-0 dotted-bg opacity-20" />

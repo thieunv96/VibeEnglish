@@ -64,7 +64,7 @@ export function LessonView({ data, next }: { data: LessonData; next: Lesson | nu
   return (
     <div className="min-h-screen flex flex-col bg-stone-50">
       <header className="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-stone-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center gap-4">
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center gap-4">
           <Link href="/" className="flex items-center gap-2 text-sm font-medium text-stone-600 hover:text-stone-900">
             <ArrowLeft className="size-4" /> <span className="hidden sm:inline">Thư viện</span>
           </Link>
