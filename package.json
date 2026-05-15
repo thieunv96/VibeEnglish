@@ -1,0 +1,20 @@
+{
+  "name": "vibeenglish",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build",
+    "start": "pnpm --filter web start",
+    "lint": "pnpm --filter web lint",
+    "db:push": "pnpm --filter web db:push",
+    "db:studio": "pnpm --filter web db:studio",
+    "db:seed": "pnpm --filter web db:seed",
+    "db:up": "docker compose up -d mariadb",
+    "db:down": "docker compose down"
+  },
+  "packageManager": "pnpm@11.1.1",
+  "engines": {
+    "node": ">=20"
+  }
+}

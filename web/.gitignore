@@ -1,0 +1,18 @@
+node_modules/
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+.env
+.env.local
+.env.*.local
+!.env.example
+.DS_Store
+.drizzle/
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+.playwright/
