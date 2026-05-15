@@ -11,7 +11,7 @@ import { revalidatePath } from "next/cache";
 const avatarSchema = z.object({
   dataUri: z
     .string()
-    .max(20_000) // ~64x64 PNG fits well under 20KB
+    .max(80_000) // 128x128 PNG fits well under 80KB
     .regex(/^data:image\/(png|jpeg|webp);base64,/, "Invalid image data URI"),
 });
 

@@ -19,11 +19,10 @@ import {
   Megaphone,
   Cog,
   FolderOpen,
+  Tag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Icon map — passed as string from the server component to avoid sending
-// function components across the RSC boundary.
 const ICONS = {
   LayoutDashboard,
   ListChecks,
@@ -39,6 +38,7 @@ const ICONS = {
   Megaphone,
   Cog,
   FolderOpen,
+  Tag,
 } as const;
 export type IconName = keyof typeof ICONS;
 

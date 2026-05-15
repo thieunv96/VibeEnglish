@@ -71,7 +71,7 @@ export function AvatarCropper({ open, onOpenChange }: { open: boolean; onOpenCha
         <DialogHeader>
           <DialogTitle>Đổi ảnh đại diện</DialogTitle>
           <DialogDescription>
-            Chọn ảnh, kéo để chọn vùng crop và zoom. Lưu thành 64×64.
+            Chọn ảnh, kéo để chọn vùng crop và zoom. Lưu thành 128×128.
           </DialogDescription>
         </DialogHeader>
 
@@ -151,7 +151,7 @@ async function resizeCroppedTo64(srcDataUri: string, area: Area): Promise<string
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
-      const SIZE = 64;
+      const SIZE = 128;
       const canvas = document.createElement("canvas");
       canvas.width = SIZE;
       canvas.height = SIZE;

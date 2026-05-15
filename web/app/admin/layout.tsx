@@ -56,6 +56,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         },
         { href: "/admin/create", label: "Tạo bài học", icon: "PlusCircle" },
         { href: "/admin/videos", label: "Video Manager", icon: "Film" },
+        { href: "/admin/categories", label: "Categories", icon: "Tag" },
         {
           href: "/admin/intel",
           label: "Content Intelligence",

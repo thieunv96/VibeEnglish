@@ -2,9 +2,12 @@ import { test, expect } from "@playwright/test";
 import { DEMO_USER, loginViaApi } from "./_helpers";
 
 async function gotoStandupLesson(page: import("@playwright/test").Page) {
+  // Navigate via preview → click "Bắt đầu học" → study mode
   await page.goto("/");
   await page.getByText("Stand-up meeting: introduction & blockers").first().click();
-  await page.waitForURL(/\/lessons\//);
+  await page.waitForURL(/\/lessons\/[^/]+$/);
+  await page.getByRole("link", { name: /Bắt đầu học|Tiếp tục học|Học lại/ }).first().click();
+  await page.waitForURL(/\/lessons\/[^/]+\/study/);
 }
 
 test.describe("Màn 4 — Lesson Detail (CONTEXT.md §5)", () => {

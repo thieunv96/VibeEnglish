@@ -8,6 +8,7 @@ import {
   videos,
   transcriptSegments,
   series,
+  categories,
   lessons,
   exercises,
   quizQuestions,
@@ -30,7 +31,7 @@ async function clear() {
   await db.execute(sql`SET FOREIGN_KEY_CHECKS=0`);
   const tables = [
     "feedback", "reports", "user_badges", "badges", "exercise_responses",
-    "lesson_attempts", "quiz_questions", "exercises", "lessons", "series",
+    "lesson_attempts", "quiz_questions", "exercises", "lessons", "categories", "series",
     "transcript_segments", "videos", "skill_scores", "user_progress",
     "onboarding_profiles", "help_votes", "help_articles", "help_categories",
     "content_intel_suggestions", "ai_jobs", "verification_tokens",
@@ -97,6 +98,25 @@ async function main() {
     { userId, skill: "listening", score: 55 },
   ]);
 
+  // ----- Categories -----
+  console.log("Creating categories...");
+  const categoryDefs = [
+    { slug: "business", title: "Kinh doanh & Công sở", icon: "💼", description: "Email công việc, meeting, presentation" },
+    { slug: "communication", title: "Giao tiếp đời sống", icon: "💬", description: "Tiếng Anh hàng ngày, hội thoại tự nhiên" },
+    { slug: "tech", title: "Công nghệ", icon: "💻", description: "IT, lập trình, sản phẩm số" },
+    { slug: "food", title: "Ẩm thực", icon: "🍜", description: "Đồ ăn, nhà hàng, công thức nấu ăn" },
+    { slug: "culture", title: "Văn hoá", icon: "🎭", description: "Lễ hội, phong tục, lifestyle quốc tế" },
+    { slug: "travel", title: "Du lịch", icon: "✈️", description: "Đặt vé, sân bay, hỏi đường, trải nghiệm" },
+    { slug: "entertainment", title: "Giải trí", icon: "🎬", description: "Phim ảnh, âm nhạc, thể thao" },
+    { slug: "academic", title: "Học thuật", icon: "🎓", description: "TOEIC, IELTS, học thuật chuẩn quốc tế" },
+  ];
+  const categoryIds: Record<string, string> = {};
+  for (let i = 0; i < categoryDefs.length; i++) {
+    const id = uid();
+    categoryIds[categoryDefs[i].slug] = id;
+    await db.insert(categories).values({ id, ...categoryDefs[i], order: i });
+  }
+
   // ----- Series + Videos + Lessons -----
   console.log("Creating content...");
   const seriesId = uid();
@@ -142,6 +162,8 @@ async function main() {
     level: "A1" | "A2" | "B1" | "B2" | "C1";
     videoId?: string;
     seriesId?: string;
+    categorySlug?: string;
+    description?: string;
     orderInSeries?: number;
     duration: number;
     quiz?: { q: string; opts: string[]; correct: number; skill: "vocabulary" | "grammar" | "reading" | "listening" }[];
@@ -156,6 +178,8 @@ async function main() {
       level: "B1",
       videoId,
       seriesId,
+      categorySlug: "business",
+      description: "Học cách dẫn dắt cuộc họp stand-up hàng ngày — chia sẻ tiến độ, focus và blockers theo phong cách chuyên nghiệp.",
       orderInSeries: 1,
       duration: 360,
       quiz: [
@@ -173,6 +197,8 @@ async function main() {
       title: "Daily English: greeting colleagues",
       type: "quiz",
       level: "A2",
+      categorySlug: "communication",
+      description: "Chào hỏi đồng nghiệp tự nhiên — các cụm thường gặp trong môi trường công sở quốc tế.",
       duration: 240,
       quiz: [
         { q: "Best response to 'How's it going?':", opts: ["I'm 25 years old.", "Pretty good, thanks!", "Yes please.", "Goodbye!"], correct: 1, skill: "vocabulary" },
@@ -185,6 +211,8 @@ async function main() {
       title: "Email opener templates for B1",
       type: "writing",
       level: "B1",
+      categorySlug: "business",
+      description: "Các mẫu mở đầu email công việc chuyên nghiệp — request, follow-up, introduction.",
       duration: 300,
       writing: { prompt: "Write a professional email opening (2-3 sentences) to a colleague asking for a status update on Project X.", minWords: 30 },
       published: true,
@@ -193,6 +221,8 @@ async function main() {
       title: "Pronunciation: business idioms",
       type: "speaking",
       level: "B2",
+      categorySlug: "business",
+      description: "Luyện phát âm các idioms phổ biến nơi công sở — touch base, circle back, action items.",
       duration: 180,
       speaking: { target: "Let's touch base after the meeting to circle back on the action items." },
       published: true,
@@ -201,6 +231,8 @@ async function main() {
       title: "Conditional sentences in business context",
       type: "quiz",
       level: "B2",
+      categorySlug: "business",
+      description: "Câu điều kiện loại 1/2/3 trong ngữ cảnh đàm phán và lập kế hoạch dự án.",
       duration: 360,
       quiz: [
         { q: "If we ___ the deadline, the client would be upset.", opts: ["miss", "missed", "had missed", "will miss"], correct: 1, skill: "grammar" },
@@ -213,6 +245,8 @@ async function main() {
       title: "Listening: airport announcements",
       type: "audio_quiz",
       level: "A2",
+      categorySlug: "travel",
+      description: "Nghe và hiểu thông báo tại sân bay — boarding, gate, delay, flight info.",
       duration: 240,
       quiz: [
         { q: "'Now boarding' means:", opts: ["Plane is delayed", "You can enter the plane", "Plane has arrived", "Flight is cancelled"], correct: 1, skill: "listening" },
@@ -224,6 +258,8 @@ async function main() {
       title: "IELTS Speaking: describe a recent trip",
       type: "speaking",
       level: "B2",
+      categorySlug: "academic",
+      description: "Đề bài Speaking IELTS Part 2 — mô tả chuyến đi gần nhất (cue card 2 phút).",
       duration: 240,
       speaking: { target: "I'd like to talk about a recent trip I took to the countryside last summer." },
       queued: true,
@@ -232,6 +268,8 @@ async function main() {
       title: "Reading: a startup press release",
       type: "quiz",
       level: "B2",
+      categorySlug: "tech",
+      description: "Đọc hiểu một press release của startup công nghệ — funding, product launch, terminology.",
       duration: 360,
       quiz: [
         { q: "A 'Series A' typically refers to:", opts: ["TV show", "Funding round", "Product version", "Stock ticker"], correct: 1, skill: "reading" },
@@ -248,10 +286,12 @@ async function main() {
     await db.insert(lessons).values({
       id,
       title: def.title,
+      description: def.description ?? null,
       type: def.type,
       level: def.level,
       videoId: def.videoId ?? null,
       seriesId: def.seriesId ?? null,
+      categoryId: def.categorySlug ? categoryIds[def.categorySlug] : null,
       orderInSeries: def.orderInSeries ?? null,
       durationSec: def.duration,
       tags: [def.level.toLowerCase(), def.type],

@@ -5,7 +5,6 @@ import { onboardingProfiles } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { TopNav } from "@/components/top-nav";
 import { LibrarySections } from "./_library/sections";
-import { Badge } from "@/components/ui/badge";
 import { LEVEL_INFO } from "@/lib/constants";
 import { greeting } from "@/lib/utils";
 import {
@@ -13,10 +12,15 @@ import {
   getPublishedLessons,
   getRecommendedLessons,
   getUserContext,
+  getAllCategories,
 } from "@/lib/data";
 import { Flame, Trophy, Target } from "lucide-react";
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
   const session = await auth();
   if (!session?.user?.id) redirect("/auth");
   if (session.user.role === "admin") redirect("/admin");
@@ -28,11 +32,13 @@ export default async function HomePage() {
     .limit(1);
   if (!profile?.completedAt) redirect("/onboarding");
 
+  const sp = await searchParams;
   const ctx = await getUserContext(session.user.id);
-  const [all, recommended, completed] = await Promise.all([
+  const [all, recommended, completed, categories] = await Promise.all([
     getPublishedLessons(),
     getRecommendedLessons(session.user.id, profile.level, 3),
     getCompletedLessons(session.user.id),
+    getAllCategories(),
   ]);
 
   const firstName = session.user.name?.split(" ").slice(-1)[0] || "bạn";
@@ -45,41 +51,78 @@ export default async function HomePage() {
       <TopNav />
 
       <main className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Compact hero strip */}
-        <section className="rounded-xl brand-gradient text-white px-5 py-3 flex items-center gap-5 flex-wrap relative overflow-hidden">
-          <div className="absolute inset-0 dotted-bg opacity-15 pointer-events-none" />
-          <div className="relative flex items-baseline gap-2 min-w-0">
-            <span className="text-sm text-white/80 truncate">{greeting()},</span>
-            <span className="font-bold text-base md:text-lg truncate">{firstName} 👋</span>
+        {/* Plain hero — greeting + level summary + big stat cards */}
+        <section className="space-y-4">
+          <div>
+            <p className="text-sm text-stone-500">{greeting()},</p>
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-stone-900">
+              {firstName} <span aria-hidden>👋</span>
+            </h1>
+            <p className="mt-1.5 text-sm text-stone-500">
+              Mục tiêu hôm nay: học khoảng{" "}
+              <span className="font-semibold text-stone-700">
+                {Math.max(1, Math.round(profile.dailyMinutes / 8))} bài
+              </span>{" "}
+              · Level{" "}
+              <span className="font-semibold text-brand-700">{profile.level}</span>{" "}
+              ({info.name}) → mục tiêu{" "}
+              <span className="font-semibold text-brand-700">{profile.targetLevel}</span>
+            </p>
           </div>
-          <Badge className="relative bg-white/15 text-white border-white/20" variant="outline">
-            <span className="font-bold">{profile.level}</span>
-            <span className="opacity-80 ml-1.5">· {info.name}</span>
-          </Badge>
-          <div className="relative ml-auto flex items-center gap-4 text-xs text-white/90">
-            <HeroChip icon={<Trophy className="size-3.5" />}>
-              <span className="opacity-80">Đã học:</span> <b className="text-white">{ctx.progress?.totalLessons ?? 0}</b>
-            </HeroChip>
-            <HeroChip icon={<Flame className="size-3.5" />}>
-              <span className="opacity-80">Streak:</span> <b className="text-white">{ctx.progress?.streakDays ?? 0}</b>
-            </HeroChip>
-            <HeroChip icon={<Target className="size-3.5" />}>
-              <span className="opacity-80">Tuần:</span> <b className="text-white">{weeklyDone}/{weeklyTarget}</b>
-            </HeroChip>
+
+          <div className="grid grid-cols-3 gap-3 sm:gap-4 max-w-2xl">
+            <BigStat
+              icon={<Trophy className="size-5 text-brand-600" />}
+              label="Đã học"
+              value={String(ctx.progress?.totalLessons ?? 0)}
+              hint="bài"
+            />
+            <BigStat
+              icon={<Flame className="size-5 text-orange-500" />}
+              label="Streak"
+              value={String(ctx.progress?.streakDays ?? 0)}
+              hint="ngày liên tiếp"
+            />
+            <BigStat
+              icon={<Target className="size-5 text-emerald-600" />}
+              label="Tuần này"
+              value={`${weeklyDone}/${weeklyTarget}`}
+              hint={`mục tiêu ${weeklyTarget} bài`}
+            />
           </div>
         </section>
 
-        <LibrarySections all={all} recommended={recommended} completed={completed} />
+        <LibrarySections
+          all={all}
+          recommended={recommended}
+          completed={completed}
+          categories={categories}
+          initialSearch={sp.q ?? ""}
+        />
       </main>
     </div>
   );
 }
 
-function HeroChip({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+function BigStat({
+  icon,
+  label,
+  value,
+  hint,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  hint: string;
+}) {
   return (
-    <span className="flex items-center gap-1.5 whitespace-nowrap">
-      {icon}
-      {children}
-    </span>
+    <div className="rounded-xl border border-stone-200 bg-white px-4 py-3 sm:px-5 sm:py-4">
+      <div className="flex items-center gap-2 text-xs text-stone-500 mb-1.5 font-medium">
+        {icon}
+        {label}
+      </div>
+      <div className="text-2xl sm:text-3xl font-bold leading-none text-stone-900 tabular-nums">{value}</div>
+      <div className="text-[11px] text-stone-400 mt-1">{hint}</div>
+    </div>
   );
 }

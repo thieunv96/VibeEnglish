@@ -4,6 +4,7 @@ import {
   lessons,
   videos,
   series,
+  categories,
   onboardingProfiles,
   userProgress,
   skillScores,
@@ -16,6 +17,10 @@ import {
 } from "@/db/schema";
 import { and, eq, desc, sql, inArray } from "drizzle-orm";
 import type { CefrLevel } from "@/lib/constants";
+
+export async function getAllCategories() {
+  return db.select().from(categories).orderBy(categories.order);
+}
 
 export async function getUserContext(userId: string) {
   const [profile] = await db
@@ -84,6 +89,54 @@ export async function getCompletedLessons(userId: string) {
     const lesson = ls.find((l) => l.id === a.lessonId)!;
     return { ...lesson, score: a.score, completedAt: a.completedAt };
   });
+}
+
+export async function getInProgressAttempt(userId: string, lessonId: string) {
+  const rows = await db
+    .select()
+    .from(lessonAttempts)
+    .where(
+      and(
+        eq(lessonAttempts.userId, userId),
+        eq(lessonAttempts.lessonId, lessonId),
+        eq(lessonAttempts.status, "in_progress")
+      )
+    )
+    .orderBy(desc(lessonAttempts.startedAt))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
+export async function getLastCompletedAttempt(userId: string, lessonId: string) {
+  const rows = await db
+    .select()
+    .from(lessonAttempts)
+    .where(
+      and(
+        eq(lessonAttempts.userId, userId),
+        eq(lessonAttempts.lessonId, lessonId),
+        eq(lessonAttempts.status, "completed")
+      )
+    )
+    .orderBy(desc(lessonAttempts.completedAt))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
+export async function getLessonPreview(lessonId: string) {
+  const [lesson] = await db.select().from(lessons).where(eq(lessons.id, lessonId)).limit(1);
+  if (!lesson) return null;
+  const video = lesson.videoId
+    ? (await db.select().from(videos).where(eq(videos.id, lesson.videoId)).limit(1))[0] ?? null
+    : null;
+  const exs = await db.select().from(exercises).where(eq(exercises.lessonId, lessonId)).orderBy(exercises.order);
+  const seriesRow = lesson.seriesId
+    ? (await db.select().from(series).where(eq(series.id, lesson.seriesId)).limit(1))[0]
+    : null;
+  const category = lesson.categoryId
+    ? (await db.select().from(categories).where(eq(categories.id, lesson.categoryId)).limit(1))[0]
+    : null;
+  return { lesson, video, exercises: exs, series: seriesRow, category };
 }
 
 export async function getLessonFull(lessonId: string) {

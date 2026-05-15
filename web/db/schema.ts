@@ -177,6 +177,16 @@ export const series = mysqlTable("series", {
   createdAt: timestamp("created_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
+export const categories = mysqlTable("categories", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  slug: varchar("slug", { length: 64 }).notNull().unique(),
+  title: varchar("title", { length: 128 }).notNull(),
+  icon: varchar("icon", { length: 32 }),
+  description: text("description"),
+  order: int("order").notNull().default(0),
+  createdAt: timestamp("created_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
+});
+
 export const lessons = mysqlTable(
   "lessons",
   {
@@ -187,6 +197,7 @@ export const lessons = mysqlTable(
     level: mysqlEnum("level", ["A1", "A2", "B1", "B2", "C1"]).notNull(),
     videoId: varchar("video_id", { length: 36 }),
     seriesId: varchar("series_id", { length: 36 }),
+    categoryId: varchar("category_id", { length: 36 }),
     orderInSeries: int("order_in_series"),
     durationSec: int("duration_sec").notNull().default(0),
     tags: json("tags").$type<string[]>().notNull().default([]),
@@ -200,6 +211,7 @@ export const lessons = mysqlTable(
   (t) => [
     index("status_level_idx").on(t.status, t.level),
     index("series_order_idx").on(t.seriesId, t.orderInSeries),
+    index("category_idx").on(t.categoryId),
   ]
 );
 
@@ -427,6 +439,8 @@ export type Exercise = typeof exercises.$inferSelect;
 export type QuizQuestion = typeof quizQuestions.$inferSelect;
 export type TranscriptSegment = typeof transcriptSegments.$inferSelect;
 export type Series = typeof series.$inferSelect;
+export type Category = typeof categories.$inferSelect;
+export type NewCategory = typeof categories.$inferInsert;
 export type LessonAttempt = typeof lessonAttempts.$inferSelect;
 export type OnboardingProfile = typeof onboardingProfiles.$inferSelect;
 export type SkillScore = typeof skillScores.$inferSelect;

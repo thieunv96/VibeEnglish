@@ -16,6 +16,14 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
 
+/** Idempotent: ensure an in_progress attempt exists for (user, lesson). */
+export async function startAttemptAction(input: { lessonId: string }) {
+  const session = await auth();
+  if (!session?.user?.id) return { ok: false as const };
+  const id = await ensureAttempt(session.user.id, input.lessonId);
+  return { ok: true as const, attemptId: id };
+}
+
 async function ensureAttempt(userId: string, lessonId: string) {
   const existing = await db
     .select()

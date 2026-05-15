@@ -7,12 +7,16 @@ test.describe("Màn 5 — Lesson Result (CONTEXT.md §5)", () => {
   });
 
   test("Result page renders for a completed attempt", async ({ page }) => {
-    // Pick the most recently completed lesson from /profile's history section
+    // Pick a completed history item (those have a score badge next to the link).
     await page.goto("/profile");
     const historySection = page.locator("section").filter({ hasText: /Lịch sử gần đây/ });
-    const firstLessonLink = historySection.locator('a[href^="/lessons/"]').first();
-    await expect(firstLessonLink).toBeVisible();
-    const href = await firstLessonLink.getAttribute("href");
+    // Each row contains a badge showing the score for completed attempts; in_progress have no badge.
+    const completedRow = historySection
+      .locator('a[href^="/lessons/"]')
+      .filter({ has: page.locator("span", { hasText: /^\d+$/ }) })
+      .first();
+    await expect(completedRow).toBeVisible();
+    const href = await completedRow.getAttribute("href");
     const lessonId = href!.split("/lessons/")[1];
 
     await page.goto(`/lessons/${lessonId}/result`);

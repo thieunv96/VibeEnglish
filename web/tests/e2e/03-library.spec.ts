@@ -19,13 +19,24 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
     await expect(page.locator("header").getByTitle("Tài khoản")).toBeVisible();
   });
 
-  test("Compact hero: greeting + name + level pill + 3 inline stat chips", async ({ page }) => {
+  test("Plain hero: greeting + big stat cards (no gradient bg)", async ({ page }) => {
     await expect(page.getByText(/Chào buổi/)).toBeVisible();
-    const heroSection = page.locator("section").first();
-    await expect(heroSection.getByText(/^B1/)).toBeVisible();
-    await expect(heroSection.getByText(/Đã học:/)).toBeVisible();
-    await expect(heroSection.getByText(/Streak:/)).toBeVisible();
-    await expect(heroSection.getByText(/Tuần:/)).toBeVisible();
+    // Greeting heading (firstname + 👋)
+    await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
+    // 3 BigStat cards (Đã học / Streak / Tuần này)
+    await expect(page.getByText("Đã học", { exact: true })).toBeVisible();
+    await expect(page.getByText("Streak", { exact: true })).toBeVisible();
+    await expect(page.getByText("Tuần này", { exact: true })).toBeVisible();
+    // Level → target mention in subtitle
+    await expect(page.getByText(/Level/).first()).toBeVisible();
+  });
+
+  test('"Khám phá theo chủ đề" categories chips visible', async ({ page }) => {
+    await expect(page.getByRole("heading", { name: /Khám phá theo chủ đề/ })).toBeVisible();
+    const catSection = page.locator("section").filter({ hasText: /Khám phá theo chủ đề/ });
+    // Seed has 8 categories
+    await expect(catSection.getByRole("button", { name: /Kinh doanh/ })).toBeVisible();
+    await expect(catSection.getByRole("button", { name: /Ẩm thực/ })).toBeVisible();
   });
 
   test('Section "Gợi ý cho bạn" with up to 3 recommended cards', async ({ page }) => {
@@ -39,12 +50,11 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
 
   test('Section "Tất cả bài học" with filter chips + grid/list toggle', async ({ page }) => {
     await expect(page.getByRole("heading", { name: /Tất cả bài học/ })).toBeVisible();
-    // Filter chips ("Tất cả" exact distinguishes from "Xem tất cả" links above)
-    await expect(page.getByRole("button", { name: "Tất cả", exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Video → Quiz/ })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Quiz$/ }).first()).toBeVisible();
-    await expect(page.getByRole("button", { name: /Speaking/ }).first()).toBeVisible();
-    await expect(page.getByRole("button", { name: /Writing/ }).first()).toBeVisible();
+    const allSection = page.locator("section").filter({ hasText: /Tất cả bài học/ });
+    await expect(allSection.getByRole("button", { name: "Tất cả", exact: true })).toBeVisible();
+    await expect(allSection.getByRole("button", { name: /Video → Quiz/ })).toBeVisible();
+    await expect(allSection.getByRole("button", { name: /Speaking/ }).first()).toBeVisible();
+    await expect(allSection.getByRole("button", { name: /Writing/ }).first()).toBeVisible();
   });
 
   test("Filter chip narrows lessons in realtime", async ({ page }) => {
@@ -52,16 +62,29 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
     const beforeCount = await allSection.locator('a[href^="/lessons/"]').count();
     expect(beforeCount).toBeGreaterThan(0);
 
-    // Apply a filter; count should drop or stay equal — never grow
-    await page.getByRole("button", { name: /Video → Quiz/ }).first().click();
+    await allSection.getByRole("button", { name: /Video → Quiz/ }).click();
     await page.waitForTimeout(200);
     const afterCount = await allSection.locator('a[href^="/lessons/"]').count();
     expect(afterCount).toBeLessThanOrEqual(beforeCount);
 
-    // Reset to "Tất cả" should restore count
-    await page.getByRole("button", { name: "Tất cả", exact: true }).click();
+    await allSection.getByRole("button", { name: "Tất cả", exact: true }).click();
     await page.waitForTimeout(200);
     expect(await allSection.locator('a[href^="/lessons/"]').count()).toEqual(beforeCount);
+  });
+
+  test("Category filter narrows lessons", async ({ page }) => {
+    const allSection = page.locator("section").filter({ hasText: /Tất cả bài học/ });
+    const beforeCount = await allSection.locator('a[href^="/lessons/"]').count();
+    // Filter by "Kinh doanh" (3 published lessons in seed are business)
+    await page
+      .locator("section")
+      .filter({ hasText: /Khám phá theo chủ đề/ })
+      .getByRole("button", { name: /Kinh doanh/ })
+      .click();
+    await page.waitForTimeout(200);
+    const afterCount = await allSection.locator('a[href^="/lessons/"]').count();
+    expect(afterCount).toBeLessThanOrEqual(beforeCount);
+    expect(afterCount).toBeGreaterThan(0);
   });
 
   test("Search input filters realtime by title", async ({ page }) => {
@@ -89,11 +112,44 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
     await expect(page.getByRole("heading", { name: /Đã hoàn thành/ })).toBeVisible();
   });
 
-  test("Click lesson card navigates to /lessons/[id]", async ({ page }) => {
+  test("Click lesson card navigates to preview /lessons/[id] (not /study)", async ({ page }) => {
     const firstCard = page.locator('a[href^="/lessons/"]').first();
     const href = await firstCard.getAttribute("href");
-    expect(href).toMatch(/^\/lessons\//);
+    expect(href).toMatch(/^\/lessons\/[^/]+$/);
     await firstCard.click();
-    await page.waitForURL(/\/lessons\//);
+    await page.waitForURL(/\/lessons\/[^/]+$/);
+  });
+
+  test("Topbar has global search + level→target chip", async ({ page }) => {
+    const header = page.locator("header");
+    await expect(header.getByPlaceholder(/Tìm bài học/)).toBeVisible();
+    // Level chip B1 → B2 (demo user from seed)
+    await expect(header.getByText(/B1/)).toBeVisible();
+    await expect(header.getByText("→").first()).toBeVisible();
+    await expect(header.getByText(/B2/)).toBeVisible();
+  });
+});
+
+test.describe("Lesson preview (Coursera-style)", () => {
+  test.beforeEach(async ({ page }) => {
+    await loginViaApi(page, DEMO_USER);
+    await page.goto("/");
+  });
+
+  test("Preview shows lesson info + Bắt đầu học CTA → /study", async ({ page }) => {
+    const firstCard = page.locator('a[href^="/lessons/"]').first();
+    const href = (await firstCard.getAttribute("href"))!;
+    await page.goto(href);
+
+    // Preview elements
+    await expect(page.getByRole("heading", { name: /Stand-up meeting|Daily English|Email opener|Pronunciation|Conditional|Listening|Reading/ }).first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Về bài học này/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Bạn sẽ luyện/ })).toBeVisible();
+
+    // CTA link to /study
+    const cta = page.getByRole("link", { name: /Bắt đầu học|Tiếp tục học|Học lại/ }).first();
+    await expect(cta).toBeVisible();
+    await cta.click();
+    await page.waitForURL(/\/lessons\/[^/]+\/study/);
   });
 });
