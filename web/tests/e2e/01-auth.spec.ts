@@ -75,14 +75,39 @@ test.describe("Màn 1 — Auth (CONTEXT.md §5)", () => {
     await expect(page).toHaveURL(/\/auth/);
   });
 
-  test("Register validates email format", async ({ page }) => {
+  test("Register validates email format (browser HTML5)", async ({ page }) => {
     await page.goto("/auth?mode=register");
+    await page.getByLabel("Email", { exact: true }).fill("not-an-email");
     await page.getByLabel("Họ").fill("Test");
     await page.getByLabel("Tên").fill("User");
-    await page.getByLabel("Email").fill("not-an-email");
-    await page.getByLabel("Mật khẩu").fill("password123");
+    await page.getByLabel("Năm sinh").selectOption({ index: 1 });
+    await page.getByLabel("Giới tính").selectOption("male");
+    await page.getByLabel("Mật khẩu", { exact: true }).fill("password123");
+    await page.getByLabel("Nhập lại mật khẩu").fill("password123");
+    await page.getByLabel("Mã xác thực").fill("1");
     await page.locator('form button[type="submit"]').click();
     // Browser-native email validation will block submit; URL stays on /auth
     await expect(page).toHaveURL(/\/auth/);
+  });
+
+  test("Register has all required new fields + captcha", async ({ page }) => {
+    await page.goto("/auth?mode=register");
+    await expect(page.getByLabel("Email", { exact: true })).toBeVisible();
+    await expect(page.getByLabel("Họ")).toBeVisible();
+    await expect(page.getByLabel("Tên")).toBeVisible();
+    await expect(page.getByLabel("Năm sinh")).toBeVisible();
+    await expect(page.getByLabel("Giới tính")).toBeVisible();
+    await expect(page.getByLabel("Mật khẩu", { exact: true })).toBeVisible();
+    await expect(page.getByLabel("Nhập lại mật khẩu")).toBeVisible();
+    await expect(page.getByLabel("Mã xác thực")).toBeVisible();
+    // Captcha question display
+    await expect(page.getByText(/\d+ \+ \d+ = \?/)).toBeVisible();
+  });
+
+  test("Locale switcher visible on auth page (VI / EN)", async ({ page }) => {
+    await page.goto("/auth");
+    // CSS uppercases display only; accessible name is lowercase
+    await expect(page.getByRole("button", { name: /^vi$/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /^en$/i })).toBeVisible();
   });
 });

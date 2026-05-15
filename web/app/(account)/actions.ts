@@ -25,6 +25,14 @@ export async function updateAvatarAction(input: z.infer<typeof avatarSchema>) {
   return { ok: true as const };
 }
 
+export async function deleteAvatarAction() {
+  const session = await auth();
+  if (!session?.user?.id) return { ok: false as const, error: "Unauthorized" };
+  await db.update(users).set({ avatarData: null }).where(eq(users.id, session.user.id));
+  revalidatePath("/", "layout");
+  return { ok: true as const };
+}
+
 const localeSchema = z.enum(["vi", "en"]);
 
 export async function setLocaleAction(locale: "vi" | "en") {

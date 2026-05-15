@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Logo } from "@/components/brand/logo";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 import { AuthTabs } from "./auth-tabs";
 import { Sparkles, Brain, BarChart3, Zap } from "lucide-react";
 
@@ -56,10 +57,13 @@ export default async function AuthPage({
       </aside>
 
       {/* Right form panel */}
-      <main className="flex-1 flex items-center justify-center px-4 py-8 sm:px-8 bg-white">
+      <main className="flex-1 flex items-center justify-center px-4 py-8 sm:px-8 bg-white relative">
+        <div className="absolute top-4 right-4">
+          <LocaleSwitcher variant="light" />
+        </div>
         <div className="w-full max-w-md">
           <div className="lg:hidden mb-8 flex justify-center">
-            <Logo size="md" />
+            <Logo size="md" withSlogan />
           </div>
           <AuthTabs defaultMode={sp.mode === "register" ? "register" : "login"} nextPath={sp.next} />
         </div>

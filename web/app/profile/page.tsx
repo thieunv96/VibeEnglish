@@ -1,18 +1,17 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TopNav } from "@/components/top-nav";
 import { db } from "@/db";
-import { onboardingProfiles, lessonAttempts } from "@/db/schema";
+import { users, onboardingProfiles, lessonAttempts } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { getRecentAttempts, getUserBadges, getUserContext } from "@/lib/data";
 import { LEVEL_INFO, SKILL_LABELS, CEFR_LEVELS } from "@/lib/constants";
-import { initials } from "@/lib/utils";
-import { Flame, Trophy, Clock, Settings, Pencil } from "lucide-react";
+import { Flame, Trophy, Clock, Pencil } from "lucide-react";
 import { Heatmap } from "./heatmap";
+import { ProfileAvatar } from "./profile-avatar";
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -20,6 +19,7 @@ export default async function ProfilePage() {
   const [profile] = await db.select().from(onboardingProfiles).where(eq(onboardingProfiles.userId, session.user.id)).limit(1);
   if (!profile?.completedAt) redirect("/onboarding");
 
+  const [user] = await db.select().from(users).where(eq(users.id, session.user.id)).limit(1);
   const ctx = await getUserContext(session.user.id);
   const recent = await getRecentAttempts(session.user.id, 8);
   const badges = await getUserBadges(session.user.id);
@@ -51,18 +51,19 @@ export default async function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <TopNav active="profile" />
+      <TopNav />
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Hero */}
         <section className="rounded-2xl brand-gradient text-white p-6 md:p-8 relative overflow-hidden">
           <div className="absolute inset-0 dotted-bg opacity-15" />
           <div className="relative flex flex-col md:flex-row gap-6 items-start md:items-center">
             <div className="relative">
-              <Avatar className="size-24 ring-4 ring-white/30">
-                {session.user.image && <AvatarImage src={session.user.image} />}
-                <AvatarFallback className="text-2xl">{initials(session.user.name)}</AvatarFallback>
-              </Avatar>
+              <ProfileAvatar
+                name={user?.name ?? session.user.name ?? null}
+                email={session.user.email}
+                avatarSrc={user?.avatarData ?? user?.image ?? null}
+              />
               <Badge className="absolute -bottom-1 -right-1 bg-white text-brand-700 border-white">
                 {profile.level}
               </Badge>

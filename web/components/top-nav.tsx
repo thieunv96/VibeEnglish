@@ -9,9 +9,8 @@ import { eq } from "drizzle-orm";
 import { AccountMenu } from "@/components/account-menu";
 import { getTranslations } from "next-intl/server";
 
-export async function TopNav({ active }: { active?: "home" | "profile" }) {
+export async function TopNav() {
   const tNav = await getTranslations("nav");
-  const tCommon = await getTranslations("common");
   const session = await auth();
   if (!session?.user) return null;
   const [user] = await db.select().from(users).where(eq(users.id, session.user.id)).limit(1);
@@ -30,30 +29,10 @@ export async function TopNav({ active }: { active?: "home" | "profile" }) {
 
   return (
     <header className="sticky top-0 z-30 bg-white/85 backdrop-blur border-b border-stone-200">
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
-        <Link href={homeHref} className="flex items-center gap-3" title={tCommon("tagline")}>
-          <Logo size="sm" />
-          <span className="hidden md:block text-xs text-stone-400 ml-1">{tCommon("tagline")}</span>
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-4">
+        <Link href={homeHref} className="flex items-center" title="Vibe English">
+          <Logo size="sm" withSlogan />
         </Link>
-
-        <nav className="ml-6 hidden md:flex items-center gap-1 text-sm font-medium">
-          <Link
-            href="/"
-            className={`px-3 py-2 rounded-lg transition ${
-              active === "home" ? "text-brand-700 bg-brand-50" : "text-stone-600 hover:bg-stone-100"
-            }`}
-          >
-            {tNav("library")}
-          </Link>
-          <Link
-            href="/profile"
-            className={`px-3 py-2 rounded-lg transition ${
-              active === "profile" ? "text-brand-700 bg-brand-50" : "text-stone-600 hover:bg-stone-100"
-            }`}
-          >
-            {tNav("profile")}
-          </Link>
-        </nav>
 
         <div className="ml-auto flex items-center gap-3">
           <Link

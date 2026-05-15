@@ -7,28 +7,25 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
     await page.goto("/");
   });
 
-  test("TopNav: logo, streak chip, bell, avatar, nav links", async ({ page }) => {
-    // Logo + tagline
-    await expect(page.locator("header").getByText(/Vibe/).first()).toBeVisible();
-    await expect(page.getByText(/Tự do học/)).toBeVisible();
-
-    // Nav links Thư viện active, Hồ sơ
-    await expect(page.getByRole("link", { name: "Thư viện" })).toHaveClass(/text-brand-700/);
-    await expect(page.getByRole("link", { name: "Hồ sơ" })).toBeVisible();
-
+  test("TopNav: logo (+slogan) + streak chip + avatar; no Thư viện/Hồ sơ links", async ({ page }) => {
+    await expect(page.locator("header").getByText("Vibe English").first()).toBeVisible();
+    await expect(page.locator("header").getByText(/Learn freely, speak confidently/)).toBeVisible();
+    // Library/Profile nav links removed (logo serves as library home, profile in dropdown)
+    await expect(page.locator("header").getByRole("link", { name: "Thư viện" })).toHaveCount(0);
+    await expect(page.locator("header").getByRole("link", { name: "Hồ sơ" })).toHaveCount(0);
     // Streak chip (demo user has 4 day streak from seed)
-    await expect(page.locator("header").getByText(/4/)).toBeVisible();
+    await expect(page.locator("header").getByText("4").first()).toBeVisible();
+    // Avatar trigger
+    await expect(page.locator("header").getByTitle("Tài khoản")).toBeVisible();
   });
 
-  test("Hero: greeting + name + 3 stat cards + level badge", async ({ page }) => {
-    // Greeting (one of the time-of-day variations)
+  test("Compact hero: greeting + name + level pill + 3 inline stat chips", async ({ page }) => {
     await expect(page.getByText(/Chào buổi/)).toBeVisible();
-    // 3 stat cards
-    await expect(page.getByText(/Bài hoàn thành/)).toBeVisible();
-    await expect(page.getByText(/Cần luyện|Kỹ năng/)).toBeVisible();
-    await expect(page.getByText(/Tiến độ tuần/)).toBeVisible();
-    // Level badge (demo user is B1)
-    await expect(page.locator("header").locator("..").getByText("B1").first()).toBeVisible();
+    const heroSection = page.locator("section").first();
+    await expect(heroSection.getByText(/^B1/)).toBeVisible();
+    await expect(heroSection.getByText(/Đã học:/)).toBeVisible();
+    await expect(heroSection.getByText(/Streak:/)).toBeVisible();
+    await expect(heroSection.getByText(/Tuần:/)).toBeVisible();
   });
 
   test('Section "Gợi ý cho bạn" with up to 3 recommended cards', async ({ page }) => {

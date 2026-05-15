@@ -8,12 +8,38 @@ import { users, userProgress } from "@/db/schema";
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
 
-const registerSchema = z.object({
-  firstName: z.string().min(1).max(50),
-  lastName: z.string().min(1).max(50),
-  email: z.string().email(),
-  password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
-});
+const CURRENT_YEAR = new Date().getFullYear();
+
+const registerSchema = z
+  .object({
+    firstName: z.string().min(1, "first_name").max(50),
+    lastName: z.string().min(1, "last_name").max(50),
+    email: z.string().email("invalid_email"),
+    yearOfBirth: z
+      .coerce.number()
+      .int()
+      .min(1900, "invalid_year")
+      .max(CURRENT_YEAR - 5, "invalid_year"),
+    gender: z.enum(["male", "female", "other"]),
+    password: z.string().min(6, "password_short"),
+    confirmPassword: z.string(),
+    captchaQuestion: z.string(),
+    captchaAnswer: z.string().min(1, "captcha_required"),
+  })
+  .refine((d) => d.password === d.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "password_mismatch",
+  })
+  .refine(
+    (d) => {
+      // captchaQuestion format: "a+b" — verify captchaAnswer matches sum
+      const m = d.captchaQuestion.match(/^(\d{1,2})\+(\d{1,2})$/);
+      if (!m) return false;
+      const expected = parseInt(m[1], 10) + parseInt(m[2], 10);
+      return parseInt(d.captchaAnswer.trim(), 10) === expected;
+    },
+    { path: ["captchaAnswer"], message: "captcha_wrong" }
+  );
 
 export type ActionResult =
   | { ok: true }
@@ -24,17 +50,22 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
     firstName: formData.get("firstName"),
     lastName: formData.get("lastName"),
     email: formData.get("email"),
+    yearOfBirth: formData.get("yearOfBirth"),
+    gender: formData.get("gender"),
     password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
+    captchaQuestion: formData.get("captchaQuestion"),
+    captchaAnswer: formData.get("captchaAnswer"),
   });
   if (!parsed.success) {
     const first = parsed.error.issues[0];
     return { ok: false, error: first.message, field: first.path[0] as string };
   }
-  const { firstName, lastName, email, password } = parsed.data;
+  const { firstName, lastName, email, yearOfBirth, gender, password } = parsed.data;
 
   const existing = await db.select().from(users).where(eq(users.email, email)).limit(1);
   if (existing.length > 0) {
-    return { ok: false, error: "Email đã được sử dụng", field: "email" };
+    return { ok: false, error: "email_used", field: "email" };
   }
 
   const id = crypto.randomUUID();
@@ -45,6 +76,8 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
     id,
     email,
     name: `${firstName} ${lastName}`.trim(),
+    yearOfBirth,
+    gender,
     passwordHash,
     role: isAdmin ? "admin" : "user",
   });
@@ -53,7 +86,7 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
   try {
     await signIn("credentials", { email, password, redirect: false });
   } catch (e) {
-    if (e instanceof AuthError) return { ok: false, error: "Đăng nhập thất bại sau khi đăng ký" };
+    if (e instanceof AuthError) return { ok: false, error: "login_after_register_failed" };
     throw e;
   }
   return { ok: true };
@@ -70,7 +103,7 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
     password: formData.get("password"),
   });
   if (!parsed.success) {
-    return { ok: false, error: "Email hoặc mật khẩu không hợp lệ" };
+    return { ok: false, error: "bad_format" };
   }
   try {
     await signIn("credentials", {
@@ -82,9 +115,9 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
   } catch (e) {
     if (e instanceof AuthError) {
       if (e.type === "CredentialsSignin") {
-        return { ok: false, error: "Email hoặc mật khẩu không đúng" };
+        return { ok: false, error: "bad_credentials" };
       }
-      return { ok: false, error: "Lỗi đăng nhập" };
+      return { ok: false, error: "auth_error" };
     }
     throw e;
   }

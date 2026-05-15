@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
@@ -20,11 +20,12 @@ import { cn } from "@/lib/utils";
 
 type Step = 0 | 1 | 2 | 3 | 4 | 5;
 
+// Stored per-question: which option the user picked (and was it correct).
+// Index in array matches PLACEMENT_QUESTIONS index. undefined = unanswered.
+type AnswerRecord = { selected: number; correct: boolean };
 type QAState = {
   index: number;
-  answers: { questionId: string; correct: boolean; skill: string }[];
-  feedback: "idle" | "correct" | "wrong";
-  selectedOption: number | null;
+  records: (AnswerRecord | undefined)[];
 };
 
 export function OnboardingFlow({ userName }: { userName: string }) {
@@ -34,10 +35,12 @@ export function OnboardingFlow({ userName }: { userName: string }) {
   const [industries, setIndustries] = useState<string[]>([]);
   const [dailyMinutes, setDailyMinutes] = useState<number>(15);
   const [skipQuiz, setSkipQuiz] = useState(false);
-  const [qa, setQa] = useState<QAState>({ index: 0, answers: [], feedback: "idle", selectedOption: null });
+  const [qa, setQa] = useState<QAState>({
+    index: 0,
+    records: Array(PLACEMENT_QUESTIONS.length).fill(undefined),
+  });
   const [predictedLevel, setPredictedLevel] = useState<(typeof CEFR_LEVELS)[number]>("A1");
   const [skillBreakdown, setSkillBreakdown] = useState<Record<string, number>>({});
-  const [pending, startTransition] = useTransition();
 
   const totalSteps = 5;
   const progress = ((step + 1) / (totalSteps + 1)) * 100;
@@ -52,14 +55,16 @@ export function OnboardingFlow({ userName }: { userName: string }) {
     setter(arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
   };
 
-  // Computed skill scores from current answers
-  const computeSkillScores = (answers: QAState["answers"]) => {
+  // Computed skill scores from records
+  const computeSkillScores = (records: QAState["records"]) => {
     const skills = ["vocabulary", "grammar", "reading", "listening"] as const;
     const result: Record<string, number> = {};
     for (const s of skills) {
-      const subset = answers.filter((a) => a.skill === s);
+      const subset = records
+        .map((r, i) => (r ? { selected: r.selected, correct: r.correct, skill: String(PLACEMENT_QUESTIONS[i].skill) } : null))
+        .filter((r): r is { selected: number; correct: boolean; skill: string } => !!r && r.skill === s);
       if (subset.length === 0) {
-        result[s] = 50; // neutral default
+        result[s] = 50;
       } else {
         result[s] = Math.round((subset.filter((a) => a.correct).length / subset.length) * 100);
       }
@@ -68,35 +73,32 @@ export function OnboardingFlow({ userName }: { userName: string }) {
   };
 
   const handleAnswer = (idx: number) => {
-    if (qa.feedback !== "idle") return;
+    const currentRecord = qa.records[qa.index];
+    if (currentRecord !== undefined) return; // already answered this question
     const q = PLACEMENT_QUESTIONS[qa.index];
     const correct = idx === q.correctIndex;
-    setQa((s) => ({ ...s, feedback: correct ? "correct" : "wrong", selectedOption: idx }));
-    if (correct) {
-      // auto-advance after a beat
-      setTimeout(() => {
-        const newAnswers = [...qa.answers, { questionId: q.id, correct: true, skill: q.skill }];
-        if (qa.index + 1 >= PLACEMENT_QUESTIONS.length) {
-          finishQuiz(newAnswers);
-        } else {
-          setQa({ index: qa.index + 1, answers: newAnswers, feedback: "idle", selectedOption: null });
-        }
-      }, 700);
-    }
+    const newRecords = [...qa.records];
+    newRecords[qa.index] = { selected: idx, correct };
+    setQa({ index: qa.index, records: newRecords });
+
+    // Auto-advance — give user time to see the result. Correct → faster, wrong → longer to read.
+    const delayMs = correct ? 900 : 1800;
+    setTimeout(() => {
+      if (qa.index + 1 >= PLACEMENT_QUESTIONS.length) {
+        finishQuiz(newRecords);
+      } else {
+        setQa({ index: qa.index + 1, records: newRecords });
+      }
+    }, delayMs);
   };
 
-  const handleNextAfterWrong = () => {
-    const q = PLACEMENT_QUESTIONS[qa.index];
-    const newAnswers = [...qa.answers, { questionId: q.id, correct: false, skill: q.skill }];
-    if (qa.index + 1 >= PLACEMENT_QUESTIONS.length) {
-      finishQuiz(newAnswers);
-    } else {
-      setQa({ index: qa.index + 1, answers: newAnswers, feedback: "idle", selectedOption: null });
-    }
+  const goBack = () => {
+    if (qa.index <= 0) return;
+    setQa({ index: qa.index - 1, records: qa.records });
   };
 
-  const finishQuiz = (answers: QAState["answers"]) => {
-    const scores = computeSkillScores(answers);
+  const finishQuiz = (records: QAState["records"]) => {
+    const scores = computeSkillScores(records);
     setSkillBreakdown(scores);
     setStep(4);
     setTimeout(() => {
@@ -119,6 +121,19 @@ export function OnboardingFlow({ userName }: { userName: string }) {
   };
 
   const [submitting, setSubmitting] = useState(false);
+  const buildPlacementPayload = (): { questionId: string; correct: boolean; skill: string }[] => {
+    const out: { questionId: string; correct: boolean; skill: string }[] = [];
+    qa.records.forEach((r, i) => {
+      if (!r) return;
+      out.push({
+        questionId: PLACEMENT_QUESTIONS[i].id,
+        correct: r.correct,
+        skill: String(PLACEMENT_QUESTIONS[i].skill),
+      });
+    });
+    return out;
+  };
+
   const handleFinalSubmit = async () => {
     setSubmitting(true);
     try {
@@ -128,11 +143,32 @@ export function OnboardingFlow({ userName }: { userName: string }) {
         dailyMinutes,
         placement: skipQuiz
           ? null
-          : { answers: qa.answers, skillScores: skillBreakdown },
+          : { answers: buildPlacementPayload(), skillScores: skillBreakdown },
       });
       if (result.ok) {
         window.location.assign("/");
       } else {
+        setSubmitting(false);
+        alert("Error: " + (result as { error?: string }).error);
+      }
+    } catch (e) {
+      setSubmitting(false);
+      alert("Lỗi: " + (e instanceof Error ? e.message : String(e)));
+    }
+  };
+
+  /** "Bỏ qua toàn bộ" — straight to A1, default goals, skip everything */
+  const handleSkipAll = async () => {
+    setSubmitting(true);
+    try {
+      const result = await submitOnboarding({
+        goals: ["foreign-company"],
+        industries: [],
+        dailyMinutes: 15,
+        placement: null,
+      });
+      if (result.ok) window.location.assign("/");
+      else {
         setSubmitting(false);
         alert("Error: " + (result as { error?: string }).error);
       }
@@ -164,7 +200,14 @@ export function OnboardingFlow({ userName }: { userName: string }) {
 
       <main className="flex-1 flex items-start justify-center px-4 py-10">
         <div className="w-full max-w-3xl">
-          {step === 0 && <StepWelcome userName={userName} onNext={() => setStep(1)} />}
+          {step === 0 && (
+            <StepWelcome
+              userName={userName}
+              onNext={() => setStep(1)}
+              onSkipAll={handleSkipAll}
+              skipping={submitting}
+            />
+          )}
           {step === 1 && (
             <StepGoals
               selected={goals}
@@ -180,11 +223,7 @@ export function OnboardingFlow({ userName }: { userName: string }) {
             />
           )}
           {step === 3 && (
-            <StepQuiz
-              qa={qa}
-              onAnswer={handleAnswer}
-              onNextAfterWrong={handleNextAfterWrong}
-            />
+            <StepQuiz qa={qa} onAnswer={handleAnswer} onBack={goBack} />
           )}
           {step === 4 && <StepProcessing />}
           {step === 5 && (
@@ -220,10 +259,20 @@ export function OnboardingFlow({ userName }: { userName: string }) {
 
 // ----- Step components -----
 
-function StepWelcome({ userName, onNext }: { userName: string; onNext: () => void }) {
+function StepWelcome({
+  userName,
+  onNext,
+  onSkipAll,
+  skipping,
+}: {
+  userName: string;
+  onNext: () => void;
+  onSkipAll: () => void;
+  skipping: boolean;
+}) {
   return (
     <div className="text-center py-12 animate-[slide-up_0.4s_ease-out]">
-      <Logo size="lg" className="justify-center mb-8" />
+      <Logo size="lg" withSlogan className="justify-center mb-8" />
       <h1 className="text-3xl font-bold mb-3">
         Xin chào {userName.split(" ")[0] || "bạn"} 👋
       </h1>
@@ -244,9 +293,19 @@ function StepWelcome({ userName, onNext }: { userName: string; onNext: () => voi
         ))}
       </div>
 
-      <Button size="lg" onClick={onNext} className="px-10">
-        Bắt đầu nào <ArrowRight className="size-4" />
-      </Button>
+      <div className="flex flex-col items-center gap-3">
+        <Button size="lg" onClick={onNext} className="px-10" disabled={skipping}>
+          Bắt đầu nào <ArrowRight className="size-4" />
+        </Button>
+        <button
+          type="button"
+          onClick={onSkipAll}
+          disabled={skipping}
+          className="text-sm text-stone-500 hover:text-stone-700 underline underline-offset-4 disabled:opacity-50"
+        >
+          {skipping ? "Đang xử lý..." : "Bỏ qua hoàn toàn (mặc định A1)"}
+        </button>
+      </div>
     </div>
   );
 }
@@ -381,17 +440,20 @@ function StepProfession({
 function StepQuiz({
   qa,
   onAnswer,
-  onNextAfterWrong,
+  onBack,
 }: {
   qa: QAState;
   onAnswer: (idx: number) => void;
-  onNextAfterWrong: () => void;
+  onBack: () => void;
 }) {
   const q = PLACEMENT_QUESTIONS[qa.index];
+  const record = qa.records[qa.index];
+  const isAnswered = record !== undefined;
+
   const totalDots = 5;
   const dotsState = Array.from({ length: totalDots }).map((_, i) => {
     const slot = qa.index - (qa.index % totalDots) + i;
-    const ans = qa.answers[slot];
+    const ans = qa.records[slot];
     if (slot === qa.index) return "active";
     if (slot < qa.index) return ans?.correct ? "correct" : "wrong";
     return "future";
@@ -399,7 +461,7 @@ function StepQuiz({
 
   return (
     <div className="animate-[slide-up_0.3s_ease-out]">
-      <div className="flex flex-wrap gap-2 mb-5">
+      <div className="flex flex-wrap gap-2 mb-5 items-center">
         <span className="text-xs bg-stone-100 text-stone-600 px-2.5 py-1 rounded-full">
           ⏱ ~{Math.round(((PLACEMENT_QUESTIONS.length - qa.index) * 20) / 60)} phút còn lại
         </span>
@@ -409,6 +471,11 @@ function StepQuiz({
         <span className="text-xs bg-brand-100 text-brand-700 px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
           <Brain className="size-3" /> Adaptive AI
         </span>
+        {qa.index > 0 && (
+          <Button variant="ghost" size="sm" className="ml-auto" onClick={onBack}>
+            <ArrowLeft className="size-3.5" /> Quay lại câu trước
+          </Button>
+        )}
       </div>
 
       <div className="rounded-2xl border border-stone-200 bg-white p-6 md:p-8">
@@ -421,21 +488,22 @@ function StepQuiz({
         <p className="text-lg font-semibold leading-snug mb-6">{q.question}</p>
         <div className="space-y-2.5">
           {q.options.map((opt, idx) => {
-            const isSelected = qa.selectedOption === idx;
-            const isCorrect = idx === q.correctIndex;
-            const showCorrect = qa.feedback !== "idle" && isCorrect && qa.feedback === "correct";
-            const showWrong = qa.feedback === "wrong" && isSelected;
+            const isSelected = record?.selected === idx;
+            const isCorrectChoice = idx === q.correctIndex;
+            // Reveal correct + wrong selection once answered (or when navigated back to a past Q)
+            const showCorrect = isAnswered && isCorrectChoice;
+            const showWrong = isAnswered && isSelected && !record!.correct;
             return (
               <button
                 key={idx}
                 onClick={() => onAnswer(idx)}
-                disabled={qa.feedback !== "idle"}
+                disabled={isAnswered}
                 className={cn(
                   "w-full text-left rounded-xl border-2 px-4 py-3 transition flex items-center gap-3",
                   showCorrect && "border-emerald-500 bg-emerald-50",
                   showWrong && "border-red-400 bg-red-50",
                   !showCorrect && !showWrong && "border-stone-200 bg-white hover:border-brand-300 hover:bg-brand-50/50",
-                  qa.feedback !== "idle" && "cursor-not-allowed"
+                  isAnswered && "cursor-not-allowed"
                 )}
               >
                 <span
@@ -454,11 +522,23 @@ function StepQuiz({
           })}
         </div>
 
-        {qa.feedback === "wrong" && (
-          <div className="mt-5 flex justify-end gap-2">
-            <Button variant="ghost" size="sm" onClick={onNextAfterWrong}>
-              Câu tiếp →
-            </Button>
+        {isAnswered && (
+          <div
+            className={cn(
+              "mt-4 text-sm rounded-lg px-3 py-2 border",
+              record.correct
+                ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                : "bg-amber-50 border-amber-200 text-amber-800"
+            )}
+          >
+            {record.correct ? (
+              <>✓ Chính xác — đáp án {String.fromCharCode(65 + q.correctIndex)} đúng.</>
+            ) : (
+              <>
+                ✗ Sai — đáp án đúng là{" "}
+                <span className="font-semibold">{String.fromCharCode(65 + q.correctIndex)}</span>. Tự động chuyển câu...
+              </>
+            )}
           </div>
         )}
       </div>
