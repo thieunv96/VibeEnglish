@@ -22,81 +22,118 @@ import {
   reports,
 } from "./schema";
 import argon2 from "argon2";
-import { sql } from "drizzle-orm";
+import { sql, eq } from "drizzle-orm";
 
 const uid = () => crypto.randomUUID();
 
-async function clear() {
-  // Disable FK temporarily, truncate, re-enable
+/**
+ * Truncate only the "factory" content tables — never users/profiles/progress.
+ * Real registrations persist across `db:seed`.
+ * Test users (created by Playwright with unique-email helpers) accumulate;
+ * `pnpm --filter web db:reset-test-users` cleans them.
+ */
+async function clearContent() {
   await db.execute(sql`SET FOREIGN_KEY_CHECKS=0`);
   const tables = [
     "feedback", "reports", "user_badges", "badges", "exercise_responses",
     "lesson_attempts", "quiz_questions", "exercises", "lessons", "categories", "series",
-    "transcript_segments", "videos", "skill_scores", "user_progress",
-    "onboarding_profiles", "help_votes", "help_articles", "help_categories",
-    "content_intel_suggestions", "ai_jobs", "verification_tokens",
-    "sessions", "accounts", "users",
+    "transcript_segments", "videos", "help_votes", "help_articles", "help_categories",
+    "content_intel_suggestions", "ai_jobs",
   ];
   for (const t of tables) await db.execute(sql.raw(`TRUNCATE TABLE ${t}`));
   await db.execute(sql`SET FOREIGN_KEY_CHECKS=1`);
 }
 
+/**
+ * Idempotent upsert of a fixture account by email — preserves existing user id.
+ */
+async function upsertUser(email: string, role: "user" | "admin", name: string, password: string) {
+  const pwHash = await argon2.hash(password);
+  const existing = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  if (existing[0]) {
+    await db
+      .update(users)
+      .set({ name, role, passwordHash: pwHash })
+      .where(eq(users.email, email));
+    return existing[0].id;
+  }
+  const id = uid();
+  await db.insert(users).values({ id, email, name, passwordHash: pwHash, role });
+  return id;
+}
+
 async function main() {
-  console.log("Clearing existing data...");
-  await clear();
+  console.log("Clearing content (users preserved)...");
+  await clearContent();
 
-  // ----- Users -----
-  console.log("Creating users...");
-  const adminId = uid();
-  const userId = uid();
-  const pwHash = await argon2.hash("vibevibe");
-  await db.insert(users).values([
-    {
-      id: adminId,
-      email: "admin@vibeenglish.local",
-      name: "Admin Vibe",
-      passwordHash: pwHash,
-      role: "admin",
-    },
-    {
-      id: userId,
-      email: "demo@vibeenglish.local",
-      name: "Demo User",
-      passwordHash: pwHash,
-      role: "user",
-    },
-  ]);
+  // ----- Users (fixtures) -----
+  console.log("Upserting fixture accounts (passwords reset to seed defaults)...");
+  const adminId = await upsertUser("admin@vibeenglish.local", "admin", "Admin Vibe", "vibevibe");
+  const userId = await upsertUser("demo@vibeenglish.local", "user", "Demo User", "vibevibe");
+  // Personal account preserved — keeps thieunv@asilla.net usable across reseeds.
+  await upsertUser("thieunv@asilla.net", "user", "Thieu NV", "123123");
+  void adminId;
 
-  await db.insert(onboardingProfiles).values({
-    userId,
-    goals: ["email", "meeting", "foreign-company"],
-    industries: ["engineer", "manager"],
-    dailyMinutes: 15,
-    level: "B1",
-    targetLevel: "B2",
-    placementResult: {
-      answers: [],
-      skillScores: { vocabulary: 65, grammar: 60, reading: 70, listening: 55 },
-    },
-    completedAt: new Date(),
-  });
+  // Ensure demo user has onboarding profile + progress + skills (idempotent).
+  await db
+    .insert(onboardingProfiles)
+    .values({
+      userId,
+      goals: ["email", "meeting", "foreign-company"],
+      industries: ["engineer", "manager"],
+      dailyMinutes: 15,
+      level: "B1",
+      targetLevel: "B2",
+      placementResult: {
+        answers: [],
+        skillScores: { vocabulary: 65, grammar: 60, reading: 70, listening: 55 },
+      },
+      completedAt: new Date(),
+    })
+    .onDuplicateKeyUpdate({
+      set: {
+        goals: ["email", "meeting", "foreign-company"],
+        industries: ["engineer", "manager"],
+        dailyMinutes: 15,
+        level: "B1",
+        targetLevel: "B2",
+        completedAt: new Date(),
+      },
+    });
 
-  await db.insert(userProgress).values({
-    userId,
-    xp: 320,
-    streakDays: 4,
-    longestStreak: 7,
-    lastActiveDate: new Date().toISOString().slice(0, 10),
-    totalLessons: 6,
-    totalMinutes: 95,
-  });
+  await db
+    .insert(userProgress)
+    .values({
+      userId,
+      xp: 320,
+      streakDays: 4,
+      longestStreak: 7,
+      lastActiveDate: new Date().toISOString().slice(0, 10),
+      totalLessons: 6,
+      totalMinutes: 95,
+    })
+    .onDuplicateKeyUpdate({
+      set: {
+        xp: 320,
+        streakDays: 4,
+        longestStreak: 7,
+        lastActiveDate: new Date().toISOString().slice(0, 10),
+        totalLessons: 6,
+        totalMinutes: 95,
+      },
+    });
 
-  await db.insert(skillScores).values([
-    { userId, skill: "vocabulary", score: 68 },
-    { userId, skill: "grammar", score: 62 },
-    { userId, skill: "reading", score: 72 },
-    { userId, skill: "listening", score: 55 },
-  ]);
+  for (const s of [
+    { skill: "vocabulary" as const, score: 68 },
+    { skill: "grammar" as const, score: 62 },
+    { skill: "reading" as const, score: 72 },
+    { skill: "listening" as const, score: 55 },
+  ]) {
+    await db
+      .insert(skillScores)
+      .values({ userId, ...s })
+      .onDuplicateKeyUpdate({ set: { score: s.score } });
+  }
 
   // ----- Categories -----
   console.log("Creating categories...");
