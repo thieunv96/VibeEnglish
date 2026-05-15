@@ -50,6 +50,9 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   emailVerified: timestamp("email_verified", { fsp: 3 }),
   image: varchar("image", { length: 500 }),
+  // base64 data-URI of 64x64 PNG. Only latest is kept (overwritten).
+  avatarData: text("avatar_data"),
+  locale: mysqlEnum("locale", ["vi", "en"]).notNull().default("vi"),
   passwordHash: varchar("password_hash", { length: 255 }),
   role: mysqlEnum("role", ["user", "admin"]).notNull().default("user"),
   createdAt: timestamp("created_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),

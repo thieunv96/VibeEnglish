@@ -1,6 +1,5 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import Google from "next-auth/providers/google";
 import argon2 from "argon2";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
@@ -16,15 +15,6 @@ const credentialsSchema = z.object({
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
   providers: [
-    ...(process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET
-      ? [
-          Google({
-            clientId: process.env.AUTH_GOOGLE_ID,
-            clientSecret: process.env.AUTH_GOOGLE_SECRET,
-            allowDangerousEmailAccountLinking: true,
-          }),
-        ]
-      : []),
     Credentials({
       credentials: {
         email: { label: "Email", type: "email" },
@@ -48,28 +38,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
-  events: {
-    async signIn({ user, account }) {
-      // For OAuth sign-ins, ensure a user row exists with our schema (id-based).
-      if (account?.provider === "google" && user.email) {
-        const existing = await db.select().from(users).where(eq(users.email, user.email)).limit(1);
-        if (existing.length === 0) {
-          const id = crypto.randomUUID();
-          const isAdmin = user.email === process.env.ADMIN_EMAIL;
-          await db.insert(users).values({
-            id,
-            email: user.email,
-            name: user.name ?? null,
-            image: user.image ?? null,
-            role: isAdmin ? "admin" : "user",
-          });
-          user.id = id;
-        } else {
-          user.id = existing[0].id;
-        }
-      }
-    },
-  },
 });
 
 declare module "next-auth" {
@@ -86,4 +54,3 @@ declare module "next-auth" {
     };
   }
 }
-
