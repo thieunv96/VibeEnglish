@@ -75,9 +75,8 @@ test.describe("Màn 9 — Help / FAQ (CONTEXT.md §5)", () => {
 
   test("Click category → FAQ accordion expand on click", async ({ page }) => {
     await page.getByRole("button", { name: /Bắt đầu & Onboarding/ }).click();
-    // First article expands
-    const firstArticleTrigger = page.locator('button[data-state="closed"]').first();
-    await firstArticleTrigger.click();
+    // Click the first article trigger by its heading text
+    await page.getByRole("button", { name: /Làm sao bắt đầu nhanh/ }).click();
     // Helpful / unhelpful chips appear in expanded body
     await expect(page.getByText(/hữu ích/)).toBeVisible();
   });

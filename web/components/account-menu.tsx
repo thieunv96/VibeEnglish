@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -30,6 +31,7 @@ type Props = {
 };
 
 export function AccountMenu({ name, email, avatarSrc, locale, isAdmin, signOutAction }: Props) {
+  const t = useTranslations("account");
   const [cropOpen, setCropOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
@@ -45,7 +47,10 @@ export function AccountMenu({ name, email, avatarSrc, locale, isAdmin, signOutAc
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" title="Tài khoản">
+          <button
+            className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+            title={t("trigger")}
+          >
             <Avatar className="size-9">
               {avatarSrc && <AvatarImage src={avatarSrc} />}
               <AvatarFallback>{initials(name || email)}</AvatarFallback>
@@ -59,26 +64,28 @@ export function AccountMenu({ name, email, avatarSrc, locale, isAdmin, signOutAc
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => setCropOpen(true)}>
-            <Camera /> Đổi ảnh đại diện
+            <Camera /> {t("changeAvatar")}
           </DropdownMenuItem>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
-              <Globe /> Ngôn ngữ
-              <span className="ml-auto text-xs text-stone-400">{locale === "vi" ? "Tiếng Việt" : "English"}</span>
+              <Globe /> {t("language")}
+              <span className="ml-auto text-xs text-stone-400">
+                {locale === "vi" ? t("viLabel") : t("enLabel")}
+              </span>
             </DropdownMenuSubTrigger>
             <DropdownMenuSubContent>
               <DropdownMenuItem onSelect={() => onLocale("vi")} disabled={pending}>
-                {locale === "vi" && <Check />} Tiếng Việt
+                {locale === "vi" && <Check />} {t("viLabel")}
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => onLocale("en")} disabled={pending}>
-                {locale === "en" && <Check />} English
+                {locale === "en" && <Check />} {t("enLabel")}
               </DropdownMenuItem>
             </DropdownMenuSubContent>
           </DropdownMenuSub>
           {!isAdmin && (
             <DropdownMenuItem asChild>
               <Link href="/settings">
-                <Settings /> Cài đặt
+                <Settings /> {t("settings")}
               </Link>
             </DropdownMenuItem>
           )}
@@ -87,7 +94,7 @@ export function AccountMenu({ name, email, avatarSrc, locale, isAdmin, signOutAc
             onSelect={() => startTransition(async () => { await signOutAction(); })}
             className="text-red-600 focus:bg-red-50 focus:text-red-700"
           >
-            <LogOut /> Đăng xuất
+            <LogOut /> {t("logout")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +17,7 @@ export function AuthTabs({
   defaultMode: "login" | "register";
   nextPath?: string;
 }) {
+  const t = useTranslations("auth");
   const [mode, setMode] = useState<"login" | "register">(defaultMode);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -43,12 +45,10 @@ export function AuthTabs({
     <div className="space-y-6">
       <div className="text-center space-y-1.5">
         <h2 className="text-2xl font-bold">
-          {mode === "login" ? "Chào mừng trở lại 👋" : "Bắt đầu hành trình"}
+          {mode === "login" ? t("loginTitle") : t("registerTitle")}
         </h2>
         <p className="text-sm text-stone-500">
-          {mode === "login"
-            ? "Đăng nhập để tiếp tục lộ trình học của bạn."
-            : "Tạo tài khoản miễn phí trong 30 giây."}
+          {mode === "login" ? t("loginSubtitle") : t("registerSubtitle")}
         </p>
       </div>
 
@@ -67,7 +67,7 @@ export function AuthTabs({
               mode === m ? "bg-white shadow-sm text-brand-700" : "text-stone-500 hover:text-stone-900"
             )}
           >
-            {m === "login" ? "Đăng nhập" : "Đăng ký"}
+            {m === "login" ? t("login") : t("register")}
           </button>
         ))}
       </div>
@@ -76,27 +76,27 @@ export function AuthTabs({
         {mode === "register" && (
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="firstName">Họ</Label>
-              <Input id="firstName" name="firstName" required placeholder="Nguyễn" autoComplete="given-name" />
+              <Label htmlFor="firstName">{t("firstName")}</Label>
+              <Input id="firstName" name="firstName" required autoComplete="given-name" />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="lastName">Tên</Label>
-              <Input id="lastName" name="lastName" required placeholder="Minh" autoComplete="family-name" />
+              <Label htmlFor="lastName">{t("lastName")}</Label>
+              <Input id="lastName" name="lastName" required autoComplete="family-name" />
             </div>
           </div>
         )}
 
         <div className="space-y-1.5">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" name="email" type="email" required placeholder="ban@email.com" autoComplete="email" />
+          <Label htmlFor="email">{t("email")}</Label>
+          <Input id="email" name="email" type="email" required placeholder="you@example.com" autoComplete="email" />
         </div>
 
         <div className="space-y-1.5">
           <div className="flex justify-between items-center">
-            <Label htmlFor="password">Mật khẩu</Label>
+            <Label htmlFor="password">{t("password")}</Label>
             {mode === "login" && (
               <button type="button" className="text-xs text-brand-600 hover:underline">
-                Quên mật khẩu?
+                {t("forgotPassword")}
               </button>
             )}
           </div>
@@ -106,7 +106,7 @@ export function AuthTabs({
             type="password"
             required
             minLength={mode === "register" ? 6 : 1}
-            placeholder={mode === "register" ? "Tối thiểu 6 ký tự" : "Mật khẩu của bạn"}
+            placeholder={mode === "register" ? t("passwordHintRegister") : t("passwordHintLogin")}
             autoComplete={mode === "login" ? "current-password" : "new-password"}
           />
         </div>
@@ -118,18 +118,18 @@ export function AuthTabs({
         )}
         {success && (
           <p className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">
-            Thành công! Đang chuyển trang...
+            {t("successRedirecting")}
           </p>
         )}
 
         <Button type="submit" size="lg" className="w-full" disabled={pending}>
           {pending && <Loader2 className="animate-spin size-4" />}
-          {mode === "login" ? "Đăng nhập" : "Tạo tài khoản"}
+          {mode === "login" ? t("login") : t("createAccount")}
         </Button>
       </form>
 
       <p className="text-center text-xs text-stone-400">
-        Bằng việc {mode === "login" ? "đăng nhập" : "đăng ký"}, bạn đồng ý với Điều khoản & Chính sách của Vibe English.
+        {t("terms", { action: mode === "login" ? t("login").toLowerCase() : t("register").toLowerCase() })}
       </p>
     </div>
   );
