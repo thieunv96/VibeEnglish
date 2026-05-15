@@ -65,17 +65,22 @@ export async function scoreSpeakingAction(input: { targetText: string; exerciseI
   return scoreSpeaking({ targetText: input.targetText });
 }
 
-export async function completeLessonAction(input: { lessonId: string }) {
-  const session = await auth();
-  if (!session?.user?.id) return { ok: false as const };
-  const userId = session.user.id;
-  const attemptId = await ensureAttempt(userId, input.lessonId);
+export async function completeLessonAction(input: {
+  lessonId: string;
+  /** Optional final score (0-100). If omitted, defaults to 80. */
+  score?: number;
+}) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) return { ok: false as const, error: "Unauthorized" };
+    const userId = session.user.id;
+    const attemptId = await ensureAttempt(userId, input.lessonId);
 
-  const [lesson] = await db.select().from(lessons).where(eq(lessons.id, input.lessonId)).limit(1);
-  if (!lesson) return { ok: false as const };
+    const [lesson] = await db.select().from(lessons).where(eq(lessons.id, input.lessonId)).limit(1);
+    if (!lesson) return { ok: false as const, error: "Lesson not found" };
 
-  const xp = 50;
-  const score = 80;
+    const score = Math.max(0, Math.min(100, input.score ?? 80));
+    const xp = 30 + Math.round(score / 5); // 30..50 xp based on score
 
   await db
     .update(lessonAttempts)
@@ -125,24 +130,27 @@ export async function completeLessonAction(input: { lessonId: string }) {
     });
   }
 
-  // Bump skill scores slightly
-  const skills = ["vocabulary", "grammar", "reading", "listening"] as const;
-  for (const sk of skills) {
-    const [row] = await db
-      .select()
-      .from(skillScores)
-      .where(and(eq(skillScores.userId, userId), eq(skillScores.skill, sk)))
-      .limit(1);
-    const newScore = Math.min(100, (row?.score ?? 50) + 2);
-    if (row) {
-      await db
-        .update(skillScores)
-        .set({ score: newScore, updatedAt: new Date() })
-        .where(and(eq(skillScores.userId, userId), eq(skillScores.skill, sk)));
-    } else {
-      await db.insert(skillScores).values({ userId, skill: sk, score: newScore });
+    // Bump skill scores slightly
+    const skills = ["vocabulary", "grammar", "reading", "listening"] as const;
+    for (const sk of skills) {
+      const [row] = await db
+        .select()
+        .from(skillScores)
+        .where(and(eq(skillScores.userId, userId), eq(skillScores.skill, sk)))
+        .limit(1);
+      const newScore = Math.min(100, (row?.score ?? 50) + 2);
+      if (row) {
+        await db
+          .update(skillScores)
+          .set({ score: newScore, updatedAt: new Date() })
+          .where(and(eq(skillScores.userId, userId), eq(skillScores.skill, sk)));
+      } else {
+        await db.insert(skillScores).values({ userId, skill: sk, score: newScore });
+      }
     }
-  }
 
-  return { ok: true as const, attemptId };
+    return { ok: true as const, attemptId };
+  } catch (e) {
+    return { ok: false as const, error: e instanceof Error ? e.message : "Submit failed" };
+  }
 }

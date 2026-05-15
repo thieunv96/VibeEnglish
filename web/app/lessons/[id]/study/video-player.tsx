@@ -40,10 +40,12 @@ export function VideoPlayer({
   videoId,
   title,
   onTimeUpdate,
+  onDurationChange,
 }: {
   videoId: string;
   title: string;
   onTimeUpdate: (sec: number) => void;
+  onDurationChange?: (sec: number) => void;
 }) {
   const playerRef = useRef<YTPlayer | null>(null);
   const containerId = "yt-player";
@@ -69,7 +71,9 @@ export function VideoPlayer({
         },
         events: {
           onReady: () => {
-            setDuration(playerRef.current?.getDuration() ?? 0);
+            const d = playerRef.current?.getDuration() ?? 0;
+            setDuration(d);
+            onDurationChange?.(d);
             setApiReady(true);
           },
           onStateChange: (e) => {

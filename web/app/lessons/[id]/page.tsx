@@ -52,47 +52,50 @@ export default async function LessonPreviewPage({ params }: { params: Promise<{ 
   return (
     <div className="min-h-screen bg-stone-50">
       <TopNav />
-      <main className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-stone-500 hover:text-stone-900 mb-4">
+      <main className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-stone-500 hover:text-stone-900">
           <ArrowLeft className="size-4" /> Quay lại thư viện
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6">
-          {/* Left — main info */}
+        {/* Title + badges row — full-width, above the 2-col grid */}
+        <header>
+          <div className="flex flex-wrap gap-2 mb-3">
+            <Badge variant="brand">
+              <span className="mr-1">{typeMeta.icon}</span> {typeMeta.label}
+            </Badge>
+            <Badge variant="outline">{lesson.level}</Badge>
+            {category && (
+              <Badge variant="info">
+                <span>{category.icon}</span> {category.title}
+              </Badge>
+            )}
+            {series && <Badge variant="info">{series.title}</Badge>}
+            {lastCompleted && (
+              <Badge variant="success">
+                <CheckCircle2 className="size-3" /> Đã hoàn thành
+              </Badge>
+            )}
+            {inProgress && !lastCompleted && <Badge variant="warning">Đang học</Badge>}
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-stone-900">{lesson.title}</h1>
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6 items-start">
+          {/* Left — meta + media + description */}
           <div className="space-y-6">
-            <div>
-              <div className="flex flex-wrap gap-2 mb-3">
-                <Badge variant="brand">
-                  <span className="mr-1">{typeMeta.icon}</span> {typeMeta.label}
-                </Badge>
-                <Badge variant="outline">{lesson.level}</Badge>
-                {category && (
-                  <Badge variant="info">
-                    <span>{category.icon}</span> {category.title}
-                  </Badge>
-                )}
-                {series && <Badge variant="info">{series.title}</Badge>}
-                {lastCompleted && (
-                  <Badge variant="success">
-                    <CheckCircle2 className="size-3" /> Đã hoàn thành
-                  </Badge>
-                )}
-                {inProgress && !lastCompleted && <Badge variant="warning">Đang học</Badge>}
-              </div>
-              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-stone-900">{lesson.title}</h1>
-              <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-stone-500">
+            {/* Meta row — the CTA aside is aligned with the top of this row */}
+            <div className="flex flex-wrap items-center gap-4 text-sm text-stone-500">
+              <span className="flex items-center gap-1">
+                <Clock className="size-4" /> {durationMin} phút
+              </span>
+              <span className="flex items-center gap-1">
+                <Hash className="size-4" /> {exercises.length} bài tập
+              </span>
+              {lesson.rating != null && (
                 <span className="flex items-center gap-1">
-                  <Clock className="size-4" /> {durationMin} phút
+                  <Star className="size-4 fill-amber-400 text-amber-400" /> {lesson.rating.toFixed(1)}
                 </span>
-                <span className="flex items-center gap-1">
-                  <Hash className="size-4" /> {exercises.length} bài tập
-                </span>
-                {lesson.rating != null && (
-                  <span className="flex items-center gap-1">
-                    <Star className="size-4 fill-amber-400 text-amber-400" /> {lesson.rating.toFixed(1)}
-                  </span>
-                )}
-              </div>
+              )}
             </div>
 
             {/* Video thumbnail / type illustration */}
@@ -151,9 +154,9 @@ export default async function LessonPreviewPage({ params }: { params: Promise<{ 
             </section>
           </div>
 
-          {/* Right — CTA card */}
+          {/* Right — CTA card (aligned top with meta row) */}
           <aside className="lg:sticky lg:top-20 lg:self-start space-y-3">
-            <div className="rounded-xl border border-stone-200 bg-white p-5 space-y-4">
+            <div className="rounded-xl border border-stone-200 bg-white p-5 space-y-3">
               <div>
                 <div className="text-xs text-stone-500 uppercase tracking-wide mb-1">
                   {lastCompleted ? "Bạn đã hoàn thành" : inProgress ? "Bạn đang học" : "Sẵn sàng bắt đầu?"}

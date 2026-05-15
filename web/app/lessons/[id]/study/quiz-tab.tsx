@@ -12,7 +12,7 @@ export function QuizTab({
   onDone,
 }: {
   questions: QuizQuestion[];
-  onDone: () => void;
+  onDone: (score: number) => void;
 }) {
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState<"idle" | "correct" | "wrong">("idle");
@@ -57,7 +57,7 @@ export function QuizTab({
     const result = await scoreQuizAction({ answers });
     setAiFeedback(result);
     setSubmitting(false);
-    onDone();
+    onDone(result.score);
   };
 
   if (aiFeedback) {

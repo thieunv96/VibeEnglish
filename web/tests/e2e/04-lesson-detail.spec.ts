@@ -8,6 +8,12 @@ async function gotoStandupLesson(page: import("@playwright/test").Page) {
   await page.waitForURL(/\/lessons\/[^/]+$/);
   await page.getByRole("link", { name: /Bắt đầu học|Tiếp tục học|Học lại/ }).first().click();
   await page.waitForURL(/\/lessons\/[^/]+\/study/);
+  // Stand-up is a video_quiz lesson → exercises are locked until the video is
+  // ≥ 90% watched. Click "Đã xem xong" to bypass the gate for tests.
+  const unlock = page.getByRole("button", { name: "Đã xem xong" });
+  if (await unlock.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await unlock.click();
+  }
 }
 
 test.describe("Màn 4 — Lesson Detail (CONTEXT.md §5)", () => {
@@ -15,10 +21,13 @@ test.describe("Màn 4 — Lesson Detail (CONTEXT.md §5)", () => {
     await loginViaApi(page, DEMO_USER);
   });
 
-  test("Header nav: ← Thư viện, title, series progress", async ({ page }) => {
+  test("Study has TopNav + sub-header with back to preview", async ({ page }) => {
     await gotoStandupLesson(page);
-    await expect(page.getByRole("link", { name: /Thư viện/ })).toBeVisible();
-    // Title appears in both h1 (header) and h2 (lesson info) — both is fine
+    // TopNav (global) is sticky with logo
+    await expect(page.locator("header").first()).toBeVisible();
+    // Sub-header has "Quay lại preview" link
+    await expect(page.getByRole("link", { name: /Quay lại preview/ })).toBeVisible();
+    // Title appears in both h1 (sub-header) and h2 (lesson info)
     await expect(page.locator("h1").filter({ hasText: /Stand-up meeting/ })).toBeVisible();
     await expect(page.locator("h2").filter({ hasText: /Stand-up meeting/ })).toBeVisible();
   });
@@ -118,6 +127,23 @@ test.describe("Màn 4 — Lesson Detail (CONTEXT.md §5)", () => {
     // Big record button visible — find by aria/class
     const recordBtn = page.locator("button.size-20").first();
     await expect(recordBtn).toBeVisible();
+  });
+
+  test("video_quiz gate: exercises locked until video watched 90% (or 'Đã xem xong')", async ({ page }) => {
+    // Navigate to study WITHOUT clicking "Đã xem xong" — locked state visible
+    await page.goto("/");
+    await page.getByText("Stand-up meeting: introduction & blockers").first().click();
+    await page.waitForURL(/\/lessons\/[^/]+$/);
+    await page.getByRole("link", { name: /Bắt đầu học|Tiếp tục học|Học lại/ }).first().click();
+    await page.waitForURL(/\/lessons\/[^/]+\/study/);
+    // Lock screen
+    await expect(page.getByText(/Bài tập sẽ mở sau khi bạn xem xong/)).toBeVisible();
+    await expect(page.getByText(/Tiến độ:/)).toBeVisible();
+    // Tabs should NOT be visible while locked
+    await expect(page.getByRole("tab", { name: "Quiz" })).toHaveCount(0);
+    // Click "Đã xem xong" unlocks
+    await page.getByRole("button", { name: "Đã xem xong" }).click();
+    await expect(page.getByRole("tab", { name: "Quiz" })).toBeVisible();
   });
 
   test('Next bar: "Cần làm xong bài tập" gated disabled until all exercises done', async ({ page }) => {

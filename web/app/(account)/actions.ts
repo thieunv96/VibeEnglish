@@ -9,9 +9,12 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
 const avatarSchema = z.object({
+  // 128x128 PNG typically ≤ 50 KB base64; cap at 200 KB to leave headroom for
+  // detail-heavy photos. Column is MEDIUMTEXT (16 MB) so the bottleneck is the
+  // server-action body limit, not the schema.
   dataUri: z
     .string()
-    .max(80_000) // 128x128 PNG fits well under 80KB
+    .max(200_000)
     .regex(/^data:image\/(png|jpeg|webp);base64,/, "Invalid image data URI"),
 });
 
@@ -20,7 +23,11 @@ export async function updateAvatarAction(input: z.infer<typeof avatarSchema>) {
   if (!session?.user?.id) return { ok: false as const, error: "Unauthorized" };
   const parsed = avatarSchema.safeParse(input);
   if (!parsed.success) return { ok: false as const, error: parsed.error.issues[0].message };
-  await db.update(users).set({ avatarData: parsed.data.dataUri }).where(eq(users.id, session.user.id));
+  try {
+    await db.update(users).set({ avatarData: parsed.data.dataUri }).where(eq(users.id, session.user.id));
+  } catch (e) {
+    return { ok: false as const, error: e instanceof Error ? e.message : "DB error" };
+  }
   revalidatePath("/", "layout");
   return { ok: true as const };
 }
@@ -28,7 +35,11 @@ export async function updateAvatarAction(input: z.infer<typeof avatarSchema>) {
 export async function deleteAvatarAction() {
   const session = await auth();
   if (!session?.user?.id) return { ok: false as const, error: "Unauthorized" };
-  await db.update(users).set({ avatarData: null }).where(eq(users.id, session.user.id));
+  try {
+    await db.update(users).set({ avatarData: null }).where(eq(users.id, session.user.id));
+  } catch (e) {
+    return { ok: false as const, error: e instanceof Error ? e.message : "DB error" };
+  }
   revalidatePath("/", "layout");
   return { ok: true as const };
 }

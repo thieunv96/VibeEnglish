@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { redirect, notFound } from "next/navigation";
 import { getLessonFull, getNextLessonInSeries } from "@/lib/data";
+import { TopNav } from "@/components/top-nav";
 import { LessonView } from "./lesson-view";
 import { startAttemptAction } from "./actions";
 
@@ -13,5 +14,10 @@ export default async function LessonStudyPage({ params }: { params: Promise<{ id
   const next = await getNextLessonInSeries(id);
   // Ensure an in_progress attempt exists; this marks the lesson as "đang học"
   await startAttemptAction({ lessonId: id });
-  return <LessonView data={data} next={next} />;
+  return (
+    <>
+      <TopNav />
+      <LessonView data={data} next={next} />
+    </>
+  );
 }

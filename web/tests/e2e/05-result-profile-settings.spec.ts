@@ -41,6 +41,26 @@ test.describe("Màn 5 — Lesson Result (CONTEXT.md §5)", () => {
     // Next lesson CTAs
     await expect(page.getByRole("link", { name: /Học bài tiếp|Về thư viện/ }).first()).toBeVisible();
   });
+
+  test("Result page has 1-5 star rating UI", async ({ page }) => {
+    await page.goto("/profile");
+    const historySection = page.locator("section").filter({ hasText: /Lịch sử gần đây/ });
+    const completedRow = historySection
+      .locator('a[href^="/lessons/"]')
+      .filter({ has: page.locator("span", { hasText: /^\d+$/ }) })
+      .first();
+    const href = await completedRow.getAttribute("href");
+    const lessonId = href!.split("/lessons/")[1];
+    await page.goto(`/lessons/${lessonId}/result`);
+
+    await expect(page.getByRole("heading", { name: /Đánh giá bài học/ })).toBeVisible();
+    // 5 star buttons
+    const stars = page.locator('button[aria-label*="sao"]');
+    await expect(stars).toHaveCount(5);
+    // Click 4 stars
+    await page.getByRole("button", { name: "4 sao" }).click();
+    await expect(page.getByText(/Cảm ơn bạn đã đánh giá/)).toBeVisible({ timeout: 5000 });
+  });
 });
 
 test.describe("Màn 6 — Profile & Progress (CONTEXT.md §5)", () => {

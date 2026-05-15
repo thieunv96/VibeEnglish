@@ -51,43 +51,33 @@ export default async function HomePage({
       <TopNav />
 
       <main className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Plain hero — greeting + level summary + big stat cards */}
-        <section className="space-y-4">
-          <div>
-            <p className="text-sm text-stone-500">{greeting()},</p>
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-stone-900">
-              {firstName} <span aria-hidden>👋</span>
+        {/* Plain hero — greeting + 3 inline stat chips on one row */}
+        <section className="flex flex-wrap items-center gap-x-6 gap-y-3">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-stone-900 truncate">
+              {greeting()}, {firstName} <span aria-hidden>👋</span>
             </h1>
-            <p className="mt-1.5 text-sm text-stone-500">
-              Mục tiêu hôm nay: học khoảng{" "}
-              <span className="font-semibold text-stone-700">
-                {Math.max(1, Math.round(profile.dailyMinutes / 8))} bài
-              </span>{" "}
-              · Level{" "}
-              <span className="font-semibold text-brand-700">{profile.level}</span>{" "}
-              ({info.name}) → mục tiêu{" "}
-              <span className="font-semibold text-brand-700">{profile.targetLevel}</span>
+            <p className="mt-0.5 text-xs text-stone-500 truncate">
+              <span className="font-semibold text-brand-700">{profile.level}</span> ({info.name}) → mục tiêu{" "}
+              <span className="font-semibold text-brand-700">{profile.targetLevel}</span> · Hôm nay học{" "}
+              {Math.max(1, Math.round(profile.dailyMinutes / 8))} bài
             </p>
           </div>
-
-          <div className="grid grid-cols-3 gap-3 sm:gap-4 max-w-2xl">
-            <BigStat
-              icon={<Trophy className="size-5 text-brand-600" />}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <StatChip
+              icon={<Trophy className="size-3.5 text-brand-600" />}
               label="Đã học"
               value={String(ctx.progress?.totalLessons ?? 0)}
-              hint="bài"
             />
-            <BigStat
-              icon={<Flame className="size-5 text-orange-500" />}
+            <StatChip
+              icon={<Flame className="size-3.5 text-orange-500" />}
               label="Streak"
-              value={String(ctx.progress?.streakDays ?? 0)}
-              hint="ngày liên tiếp"
+              value={`${ctx.progress?.streakDays ?? 0} ngày`}
             />
-            <BigStat
-              icon={<Target className="size-5 text-emerald-600" />}
-              label="Tuần này"
+            <StatChip
+              icon={<Target className="size-3.5 text-emerald-600" />}
+              label="Tuần"
               value={`${weeklyDone}/${weeklyTarget}`}
-              hint={`mục tiêu ${weeklyTarget} bài`}
             />
           </div>
         </section>
@@ -104,25 +94,20 @@ export default async function HomePage({
   );
 }
 
-function BigStat({
+function StatChip({
   icon,
   label,
   value,
-  hint,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
-  hint: string;
 }) {
   return (
-    <div className="rounded-xl border border-stone-200 bg-white px-4 py-3 sm:px-5 sm:py-4">
-      <div className="flex items-center gap-2 text-xs text-stone-500 mb-1.5 font-medium">
-        {icon}
-        {label}
-      </div>
-      <div className="text-2xl sm:text-3xl font-bold leading-none text-stone-900 tabular-nums">{value}</div>
-      <div className="text-[11px] text-stone-400 mt-1">{hint}</div>
+    <div className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-1.5">
+      {icon}
+      <span className="text-xs text-stone-500">{label}</span>
+      <span className="text-sm font-semibold text-stone-900 tabular-nums">{value}</span>
     </div>
   );
 }

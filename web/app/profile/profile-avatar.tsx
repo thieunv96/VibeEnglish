@@ -28,9 +28,11 @@ export function ProfileAvatar({
   const router = useRouter();
 
   const onDelete = () => {
+    if (!confirm("Bạn chắc chắn muốn xoá ảnh đại diện?")) return;
     startTransition(async () => {
-      await deleteAvatarAction();
-      router.refresh();
+      const r = await deleteAvatarAction();
+      if (r.ok) router.refresh();
+      else alert("Xoá ảnh thất bại: " + (r.error ?? "unknown"));
     });
   };
 

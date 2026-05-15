@@ -4,6 +4,7 @@ import {
   varchar,
   int,
   text,
+  mediumtext,
   timestamp,
   boolean,
   mysqlEnum,
@@ -50,8 +51,9 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   emailVerified: timestamp("email_verified", { fsp: 3 }),
   image: varchar("image", { length: 500 }),
-  // base64 data-URI of 64x64 PNG. Only latest is kept (overwritten).
-  avatarData: text("avatar_data"),
+  // base64 data-URI of 128x128 PNG. Only latest is kept (overwritten).
+  // MEDIUMTEXT fits any 128x128 PNG including complex photos.
+  avatarData: mediumtext("avatar_data"),
   locale: mysqlEnum("locale", ["vi", "en"]).notNull().default("vi"),
   yearOfBirth: int("year_of_birth"),
   gender: mysqlEnum("gender", ["male", "female", "other"]),
@@ -268,6 +270,7 @@ export const lessonAttempts = mysqlTable(
     lessonId: varchar("lesson_id", { length: 36 }).notNull(),
     status: mysqlEnum("status", ["in_progress", "completed", "abandoned"]).notNull().default("in_progress"),
     score: int("score"),
+    rating: int("rating"), // user 1-5 star rating after completion
     xpAwarded: int("xp_awarded").notNull().default(0),
     startedAt: timestamp("started_at", { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP(3)`),
     completedAt: timestamp("completed_at", { fsp: 3 }),

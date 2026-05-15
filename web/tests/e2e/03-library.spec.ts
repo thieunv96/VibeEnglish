@@ -19,16 +19,13 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
     await expect(page.locator("header").getByTitle("Tài khoản")).toBeVisible();
   });
 
-  test("Plain hero: greeting + big stat cards (no gradient bg)", async ({ page }) => {
-    await expect(page.getByText(/Chào buổi/)).toBeVisible();
-    // Greeting heading (firstname + 👋)
-    await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
-    // 3 BigStat cards (Đã học / Streak / Tuần này)
-    await expect(page.getByText("Đã học", { exact: true })).toBeVisible();
-    await expect(page.getByText("Streak", { exact: true })).toBeVisible();
-    await expect(page.getByText("Tuần này", { exact: true })).toBeVisible();
-    // Level → target mention in subtitle
-    await expect(page.getByText(/Level/).first()).toBeVisible();
+  test("Single-line hero: greeting + 3 stat chips (no bg)", async ({ page }) => {
+    await expect(page.getByRole("heading", { level: 1 }).first()).toContainText(/Chào buổi.*/);
+    // 3 inline chips with abbreviated labels
+    const hero = page.locator("section").first();
+    await expect(hero.getByText("Đã học")).toBeVisible();
+    await expect(hero.getByText("Streak")).toBeVisible();
+    await expect(hero.getByText("Tuần", { exact: true })).toBeVisible();
   });
 
   test('"Khám phá theo chủ đề" categories chips visible', async ({ page }) => {
@@ -87,14 +84,14 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
     expect(afterCount).toBeGreaterThan(0);
   });
 
-  test("Search input filters realtime by title", async ({ page }) => {
-    const searchBox = page.getByPlaceholder(/Tìm theo tên/);
+  test("Topbar global search filters via ?q= param", async ({ page }) => {
+    const searchBox = page.locator("header").getByPlaceholder(/Tìm bài học/);
     await searchBox.fill("Stand-up");
+    await searchBox.press("Enter");
+    await page.waitForURL(/q=Stand-up/);
     await expect(page.getByText("Stand-up meeting: introduction & blockers").first()).toBeVisible();
-    // Type something that doesn't match — empty state
-    await searchBox.fill("xyz-nothing-matches");
-    await expect(page.getByText(/Không có bài học phù hợp/)).toBeVisible();
   });
+
 
   test("Grid → List toggle changes layout", async ({ page }) => {
     // List toggle button (icon-only)

@@ -8,6 +8,7 @@ import { Trophy, ArrowRight, Flame, ThumbsUp, AlertCircle, Lightbulb, Sparkles }
 import { Button } from "@/components/ui/button";
 import { LESSON_TYPES, LEVEL_INFO, SKILL_LABELS } from "@/lib/constants";
 import { getNextLessonInSeries } from "@/lib/data";
+import { RatingCard } from "./rating-card";
 
 export default async function ResultPage({
   params,
@@ -101,6 +102,9 @@ export default async function ResultPage({
             ))}
           </div>
         </div>
+
+        {/* Rating */}
+        <RatingCard attemptId={attempt.id} initialRating={attempt.rating ?? null} />
 
         {/* Vocabulary chips */}
         {vocab.length > 0 && (

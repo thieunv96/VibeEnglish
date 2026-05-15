@@ -89,8 +89,6 @@ export function LibrarySections({
         <LibraryToolbar
           filter={filter}
           onFilterChange={setFilter}
-          search={search}
-          onSearchChange={setSearch}
           view={view}
           onViewChange={setView}
         />
