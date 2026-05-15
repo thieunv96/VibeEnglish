@@ -43,21 +43,11 @@ test.describe("Màn 1 — Auth (CONTEXT.md §5)", () => {
     await expect(page.getByLabel("Họ")).not.toBeVisible();
   });
 
-  test("Social buttons: Google enabled, GitHub disabled (phase 1)", async ({ page }) => {
+  test("Social login (Google/GitHub) removed at phase 1", async ({ page }) => {
     await page.goto("/auth");
-    const googleBtn = page.getByRole("button", { name: "Google" });
-    const githubBtn = page.getByRole("button", { name: "GitHub" });
-    await expect(googleBtn).toBeVisible();
-    await expect(googleBtn).toBeEnabled();
-    await expect(githubBtn).toBeVisible();
-    await expect(githubBtn).toBeDisabled();
-  });
-
-  test('"hoặc đăng nhập bằng email" separator visible', async ({ page }) => {
-    await page.goto("/auth");
-    await expect(page.getByText(/hoặc đăng nhập bằng email/)).toBeVisible();
-    await page.getByRole("button", { name: "Đăng ký", exact: true }).click();
-    await expect(page.getByText(/hoặc đăng ký bằng email/)).toBeVisible();
+    await expect(page.getByRole("button", { name: "Google" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "GitHub" })).toHaveCount(0);
+    await expect(page.getByText(/hoặc đăng nhập bằng email/)).toHaveCount(0);
   });
 
   test('"Quên mật khẩu?" link visible on login, hidden on register', async ({ page }) => {

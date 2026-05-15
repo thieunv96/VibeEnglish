@@ -63,7 +63,8 @@ export function LibrarySections({
           onViewChange={setView}
         />
 
-        <div className="mt-5">
+        {/* Reserve min-height matching original list so search/filter doesn't shrink page → no scroll jump */}
+        <div className="mt-5 min-h-[480px]" style={{ contain: "layout" }}>
           {pending.length === 0 ? (
             <EmptyState />
           ) : view === "grid" ? (

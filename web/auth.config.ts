@@ -8,17 +8,27 @@ export const authConfig: NextAuthConfig = {
   trustHost: true,
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user;
       const path = nextUrl.pathname;
-
       const publicPaths = ["/auth", "/_next", "/favicon", "/api/auth"];
       if (publicPaths.some((p) => path.startsWith(p))) return true;
 
-      // Everything else requires auth
+      const isLoggedIn = !!auth?.user;
       if (!isLoggedIn) {
         const url = new URL("/auth", nextUrl.origin);
         url.searchParams.set("next", path + nextUrl.search);
         return Response.redirect(url);
+      }
+
+      const role = auth?.user?.role;
+      // Admin role is management-only — block all learner routes and redirect to /admin
+      const learnerPrefixes = ["/onboarding", "/lessons", "/profile", "/settings", "/feedback", "/help"];
+      const isLearnerPath = path === "/" || learnerPrefixes.some((p) => path.startsWith(p));
+      if (role === "admin" && isLearnerPath) {
+        return Response.redirect(new URL("/admin", nextUrl.origin));
+      }
+      // Non-admin trying to access /admin/* — bounce to home
+      if (role !== "admin" && path.startsWith("/admin")) {
+        return Response.redirect(new URL("/", nextUrl.origin));
       }
       return true;
     },

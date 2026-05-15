@@ -61,13 +61,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="min-h-screen flex bg-stone-50">
       <aside className="w-64 bg-stone-900 text-stone-100 sticky top-0 h-screen flex flex-col">
-        <div className="p-4 border-b border-stone-700 flex items-center gap-2">
+        <Link href="/admin" className="p-4 border-b border-stone-700 flex items-center gap-2 hover:bg-stone-800 transition">
           <Logo size="sm" withText={false} className="[&_div]:bg-white/15" />
           <div>
             <div className="font-bold text-sm">Vibe Admin</div>
             <div className="text-[10px] text-stone-400">{session.user.email}</div>
           </div>
-        </div>
+        </Link>
         <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5 text-sm">
           {nav.map(({ href, label, icon: Icon, badge }) => (
             <Link

@@ -2,12 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GoogleIcon } from "@/components/icons/google";
-import { GithubIcon } from "@/components/icons/github";
 import { loginAction, registerAction } from "./actions";
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
@@ -73,31 +70,6 @@ export function AuthTabs({
             {m === "login" ? "Đăng nhập" : "Đăng ký"}
           </button>
         ))}
-      </div>
-
-      {/* Social buttons */}
-      <div className="grid grid-cols-2 gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => signIn("google", { callbackUrl: nextPath || "/" })}
-        >
-          <GoogleIcon className="size-4" /> Google
-        </Button>
-        <Button type="button" variant="outline" disabled title="GitHub OAuth sẽ bật ở pha sau">
-          <GithubIcon className="size-4" /> GitHub
-        </Button>
-      </div>
-
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-stone-200" />
-        </div>
-        <div className="relative flex justify-center text-xs">
-          <span className="bg-white px-3 text-stone-400">
-            hoặc {mode === "login" ? "đăng nhập" : "đăng ký"} bằng email
-          </span>
-        </div>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4">

@@ -20,6 +20,7 @@ import { Flame, Trophy, Target } from "lucide-react";
 export default async function HomePage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/auth");
+  if (session.user.role === "admin") redirect("/admin");
 
   const [profile] = await db
     .select()
