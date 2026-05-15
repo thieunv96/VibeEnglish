@@ -7,36 +7,55 @@ test.describe("Màn 10 — Admin Panel (CONTEXT.md §5)", () => {
     await page.goto("/admin");
   });
 
-  test("Sidebar: 11 nav items + logo + account menu inside; no topbar header", async ({ page }) => {
+  test("Sidebar: grouped nav (5 groups), version footer, account menu inside", async ({ page }) => {
     const sidebar = page.locator("aside");
     // Logo + brand text
     await expect(sidebar.getByText("Vibe Admin")).toBeVisible();
-    // All 11 nav items inside the sidebar
-    for (const label of [
-      "Dashboard",
-      "Lesson Queue",
-      "Tạo bài học",
-      "Video Manager",
-      "Content Intelligence",
-      "Reports",
-      "User Feedback",
-      "Analytics",
-      "Help Content",
-      "Users",
-      "AI Settings",
-    ]) {
-      await expect(sidebar.getByRole("link", { name: new RegExp(label) })).toBeVisible();
+    // 5 collapsible group headers
+    for (const group of ["Tổng quan", "Nội dung", "Cộng đồng", "Phân tích & Người dùng", "Hệ thống"]) {
+      await expect(sidebar.getByRole("button", { name: new RegExp(group) })).toBeVisible();
     }
-    // Account menu trigger lives inside the sidebar (no separate header)
+    // Account menu inside sidebar
     await expect(sidebar.getByTitle("Tài khoản")).toBeVisible();
-    // No top header
-    await expect(page.locator("body > div > header")).toHaveCount(0);
+    // Version footer
+    await expect(sidebar.getByText(/^v\d+\.\d+\.\d+/)).toBeVisible();
+  });
+
+  test("Sidebar groups expand/collapse on click; nav items reachable", async ({ page }) => {
+    const sidebar = page.locator("aside");
+    // "Nội dung" group: clicking should toggle list of 4 items (Queue, Tạo bài học, Videos, Intel)
+    const contentGroup = sidebar.getByRole("button", { name: /Nội dung/ });
+    // Initially "Tổng quan" is the active group (since we're on /admin Dashboard) — content closed
+    const queueLink = sidebar.getByRole("link", { name: /Lesson Queue/ });
+    await expect(queueLink).toBeHidden();
+    await contentGroup.click();
+    await expect(queueLink).toBeVisible();
+    await expect(sidebar.getByRole("link", { name: /Tạo bài học/ })).toBeVisible();
+    await expect(sidebar.getByRole("link", { name: /Video Manager/ })).toBeVisible();
+    await expect(sidebar.getByRole("link", { name: /Content Intelligence/ })).toBeVisible();
+    // Collapsing
+    await contentGroup.click();
+    await expect(queueLink).toBeHidden();
+  });
+
+  test("Active group auto-opens on page load", async ({ page }) => {
+    await page.goto("/admin/queue");
+    const sidebar = page.locator("aside");
+    // Content group should be open since /admin/queue lives under it
+    await expect(sidebar.getByRole("link", { name: /Lesson Queue/ })).toBeVisible();
   });
 
   test("Admin sidebar is fixed (does not scroll with main content)", async ({ page }) => {
-    const sidebar = page.locator("aside");
-    // Fixed positioning verified via class — Tailwind 'fixed' class
-    await expect(sidebar).toHaveClass(/fixed/);
+    await expect(page.locator("aside")).toHaveClass(/fixed/);
+  });
+
+  test("Admin topbar: search + locale switcher + help + bell", async ({ page }) => {
+    const header = page.locator("header").first();
+    await expect(header.getByPlaceholder(/Tìm bài học/)).toBeVisible();
+    await expect(header.getByRole("button", { name: /^vi$/i })).toBeVisible();
+    await expect(header.getByRole("button", { name: /^en$/i })).toBeVisible();
+    await expect(header.getByTitle("Trợ giúp")).toBeVisible();
+    await expect(header.getByTitle("Thông báo")).toBeVisible();
   });
 
   test("Admin logo click → /admin", async ({ page }) => {
@@ -158,10 +177,12 @@ test.describe("Màn 10 — Admin Panel (CONTEXT.md §5)", () => {
     await expect(table.getByText("demo@vibeenglish.local")).toBeVisible();
   });
 
-  test("AI Settings: 3 sections + test connection button + save", async ({ page }) => {
-    await page.goto("/admin/ai-settings");
-    await expect(page.getByRole("heading", { name: /AI Settings/ })).toBeVisible();
-    // 3 sections
+  test("Settings page → AI tab: 3 sections + test connection button + save", async ({ page }) => {
+    await page.goto("/admin/settings");
+    await expect(page.getByRole("heading", { name: /^Settings$/ })).toBeVisible();
+    // Tab bar with AI Models active
+    await expect(page.getByRole("tab", { name: /AI Models/ })).toBeVisible();
+    // 3 sections inside AI tab
     await expect(page.getByRole("heading", { name: /Chat \/ Generation/ })).toBeVisible();
     await expect(page.getByRole("heading", { name: /Speech-to-text/ })).toBeVisible();
     await expect(page.getByRole("heading", { name: /Text-to-speech/ })).toBeVisible();

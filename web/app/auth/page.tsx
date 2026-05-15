@@ -25,7 +25,7 @@ export default async function AuthPage({
         <div className="absolute inset-0 dotted-bg opacity-30" />
 
         <div className="relative z-10 flex flex-col justify-between p-12 text-white w-full">
-          <Logo size="lg" className="text-white [&_div]:bg-white/15 [&_div]:backdrop-blur" />
+          <Logo size="lg" className="text-white" />
 
           <div className="space-y-8 max-w-md">
             <div>

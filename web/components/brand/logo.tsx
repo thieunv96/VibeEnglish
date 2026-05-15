@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 export function Logo({
@@ -12,15 +13,21 @@ export function Logo({
   size?: "sm" | "md" | "lg";
 }) {
   const dims = {
-    sm: { box: "size-7", text: "text-base", slogan: "text-[10px]" },
-    md: { box: "size-9", text: "text-lg", slogan: "text-[11px]" },
-    lg: { box: "size-12", text: "text-2xl", slogan: "text-xs" },
+    sm: { box: 28, text: "text-base", slogan: "text-[10px]" },
+    md: { box: 36, text: "text-lg", slogan: "text-[11px]" },
+    lg: { box: 48, text: "text-2xl", slogan: "text-xs" },
   }[size];
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <div className={cn("brand-gradient rounded-lg flex items-center justify-center text-white font-bold", dims.box)}>
-        <span className="text-[0.65em]">VE</span>
-      </div>
+      <Image
+        src="/logo.png"
+        alt="Vibe English"
+        width={dims.box}
+        height={dims.box}
+        priority
+        className="shrink-0 rounded-lg"
+        style={{ width: dims.box, height: dims.box }}
+      />
       {withText && (
         <div className="flex flex-col leading-tight">
           <span className={cn("font-bold tracking-tight", dims.text)}>
