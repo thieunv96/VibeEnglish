@@ -95,9 +95,9 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
 
   test("Grid → List toggle changes layout", async ({ page }) => {
     // List toggle button (icon-only)
-    const toggles = page.locator("button[title='Lưới'], button[title='Danh sách']");
+    const toggles = page.locator("button[title='Grid'], button[title='List']");
     await expect(toggles).toHaveCount(2);
-    await page.locator("button[title='Danh sách']").click();
+    await page.locator("button[title='List']").click();
     // After switching to list, items should be in flex-col layout
     // Verify by checking the first list-style row has the icon + title + badge structure (no aspect-video)
     const firstRow = page.locator("section").filter({ hasText: /Tất cả bài học/ }).locator('a[href^="/lessons/"]').first();

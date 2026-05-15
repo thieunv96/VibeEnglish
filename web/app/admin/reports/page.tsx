@@ -2,18 +2,21 @@ import { db } from "@/db";
 import { reports, lessons, users } from "@/db/schema";
 import { desc, eq, inArray } from "drizzle-orm";
 import Link from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-const CATEGORY: Record<string, string> = {
-  wrong_answer: "Sai đáp án",
-  unclear_question: "Câu hỏi mơ hồ",
-  translation_error: "Lỗi dịch",
-  audio_issue: "Lỗi âm thanh",
-  other: "Khác",
+const CATEGORY_KEY: Record<string, string> = {
+  wrong_answer: "categoryWrong",
+  unclear_question: "categoryUnclear",
+  translation_error: "categoryTranslation",
+  audio_issue: "categoryAudio",
+  other: "categoryOther",
 };
 
 export default async function ReportsPage() {
+  const t = await getTranslations("admin.reports");
+  const locale = await getLocale();
   const open = await db
     .select()
     .from(reports)
@@ -34,13 +37,13 @@ export default async function ReportsPage() {
   return (
     <div className="p-6 md:p-8 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Reports</h1>
-        <p className="text-sm text-stone-500 mt-1">Báo lỗi nội dung từ users.</p>
+        <h1 className="text-2xl font-bold">{t("title")}</h1>
+        <p className="text-sm text-stone-500 mt-1">{t("subtitle")}</p>
       </div>
 
       {open.length === 0 ? (
         <div className="text-center py-12 rounded-xl border border-dashed border-stone-300 text-stone-500">
-          Không có report nào đang mở.
+          {t("empty")}
         </div>
       ) : (
         <div className="space-y-3">
@@ -50,22 +53,22 @@ export default async function ReportsPage() {
             return (
               <div key={r.id} className="rounded-xl border border-stone-200 bg-white p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="danger">{CATEGORY[r.category]}</Badge>
-                  <span className="text-xs text-stone-500">{user?.email ?? "?"} · {new Date(r.createdAt).toLocaleString("vi-VN")}</span>
+                  <Badge variant="danger">{t(CATEGORY_KEY[r.category])}</Badge>
+                  <span className="text-xs text-stone-500">{user?.email ?? "?"} · {new Date(r.createdAt).toLocaleString(locale === "en" ? "en-US" : "vi-VN")}</span>
                 </div>
                 <p className="text-sm mb-2">{r.content}</p>
                 {lesson && (
                   <p className="text-xs text-stone-500">
-                    Bài: <span className="font-medium text-stone-700">{lesson.title}</span>
+                    {t("lesson")}: <span className="font-medium text-stone-700">{lesson.title}</span>
                   </p>
                 )}
                 <div className="mt-3 flex gap-2">
                   {lesson && (
                     <Button asChild size="sm" variant="outline">
-                      <Link href={`/lessons/${lesson.id}`} target="_blank">Xem bài</Link>
+                      <Link href={`/lessons/${lesson.id}`} target="_blank">{t("viewLesson")}</Link>
                     </Button>
                   )}
-                  <Button size="sm" variant="success">Đã fix</Button>
+                  <Button size="sm" variant="success">{t("fixed")}</Button>
                 </div>
               </div>
             );

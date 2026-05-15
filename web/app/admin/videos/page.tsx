@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { videos } from "@/db/schema";
 import { desc } from "drizzle-orm";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Film, RefreshCw } from "lucide-react";
@@ -12,31 +13,30 @@ const STATUS_VARIANT: Record<string, "default" | "warning" | "info" | "success" 
   indexed: "success",
   error: "danger",
 };
-const STATUS_LABEL: Record<string, string> = {
-  pending: "Chờ index",
-  processing: "Đang xử lý",
-  indexed: "Đã index",
-  error: "Lỗi",
-};
 
 export default async function VideosPage() {
   const list = await db.select().from(videos).orderBy(desc(videos.createdAt));
+  const t = await getTranslations("admin.videos");
+  const tItems = await getTranslations("admin.items");
+  const locale = await getLocale();
+  const statusKey = (s: string) =>
+    s === "pending" ? "statusPending" : s === "processing" ? "statusProcessing" : s === "indexed" ? "statusIndexed" : "statusError";
   return (
     <div className="p-6 md:p-8">
-      <h1 className="text-2xl font-bold mb-6">Video Manager</h1>
+      <h1 className="text-2xl font-bold mb-6">{tItems("videos")}</h1>
       {list.length === 0 ? (
         <div className="text-center py-12 rounded-xl border border-dashed border-stone-300 text-stone-500">
-          Chưa có video nào. Upload video lên kênh YouTube, hệ thống sẽ tự pick up.
+          {t("empty")}
         </div>
       ) : (
         <div className="rounded-xl border border-stone-200 bg-white overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-stone-50 text-xs uppercase text-stone-500">
               <tr>
-                <th className="text-left px-4 py-3">Video</th>
-                <th className="text-left px-4 py-3">Trạng thái</th>
-                <th className="text-left px-4 py-3">Thời lượng</th>
-                <th className="text-left px-4 py-3">Cập nhật</th>
+                <th className="text-left px-4 py-3">{t("headerVideo")}</th>
+                <th className="text-left px-4 py-3">{t("headerStatus")}</th>
+                <th className="text-left px-4 py-3">{t("headerDuration")}</th>
+                <th className="text-left px-4 py-3">{t("headerUpdated")}</th>
                 <th className="text-right px-4 py-3"></th>
               </tr>
             </thead>
@@ -52,13 +52,13 @@ export default async function VideosPage() {
                       <div className="text-xs text-stone-500">{v.youtubeId ?? "—"}</div>
                     </div>
                   </td>
-                  <td className="px-4 py-3"><Badge variant={STATUS_VARIANT[v.status]}>{STATUS_LABEL[v.status]}</Badge></td>
+                  <td className="px-4 py-3"><Badge variant={STATUS_VARIANT[v.status]}>{t(statusKey(v.status))}</Badge></td>
                   <td className="px-4 py-3">{formatDuration(v.durationSec)}</td>
-                  <td className="px-4 py-3 text-stone-500 text-xs">{new Date(v.createdAt).toLocaleDateString("vi-VN")}</td>
+                  <td className="px-4 py-3 text-stone-500 text-xs">{new Date(v.createdAt).toLocaleDateString(locale === "en" ? "en-US" : "vi-VN")}</td>
                   <td className="px-4 py-3 text-right">
                     {v.status === "error" && (
                       <Button size="sm" variant="outline">
-                        <RefreshCw className="size-3.5" /> Index lại
+                        <RefreshCw className="size-3.5" /> {t("reindex")}
                       </Button>
                     )}
                   </td>

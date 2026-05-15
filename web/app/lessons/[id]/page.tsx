@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
 import {
   getLessonPreview,
   getInProgressAttempt,
@@ -33,35 +34,43 @@ export default async function LessonPreviewPage({ params }: { params: Promise<{ 
   if (!data) notFound();
   const { lesson, video, exercises, series, category } = data;
 
+  const t = await getTranslations("lesson.preview");
+  const tTypes = await getTranslations("lessonTypes");
+  const locale = await getLocale();
+
   const [inProgress, lastCompleted] = await Promise.all([
     getInProgressAttempt(session.user.id, id),
     getLastCompletedAttempt(session.user.id, id),
   ]);
 
-  const typeMeta = LESSON_TYPES.find((t) => t.id === lesson.type) ?? LESSON_TYPES[0];
+  const typeMeta = LESSON_TYPES.find((tt) => tt.id === lesson.type) ?? LESSON_TYPES[0];
+  const typeLabel = tTypes(typeMeta.id);
   const durationMin = Math.max(1, Math.round(lesson.durationSec / 60));
 
+  const quizCount = exercises.filter((e) => e.kind === "quiz").length;
+  const writingCount = exercises.filter((e) => e.kind === "writing").length;
+  const speakingCount = exercises.filter((e) => e.kind === "speaking").length;
   const exerciseSummary = [
-    { kind: "quiz" as const, icon: ListChecks, label: "Quiz", count: exercises.filter((e) => e.kind === "quiz").length },
-    { kind: "writing" as const, icon: Pencil, label: "Writing", count: exercises.filter((e) => e.kind === "writing").length },
-    { kind: "speaking" as const, icon: Mic, label: "Speaking", count: exercises.filter((e) => e.kind === "speaking").length },
-  ].filter((e) => e.count > 0);
+    quizCount > 0 && { kind: "quiz" as const, icon: ListChecks, label: "Quiz", desc: t("quizExercises", { n: quizCount }) },
+    writingCount > 0 && { kind: "writing" as const, icon: Pencil, label: "Writing", desc: t("writingExercises", { n: writingCount }) },
+    speakingCount > 0 && { kind: "speaking" as const, icon: Mic, label: "Speaking", desc: t("speakingExercises", { n: speakingCount }) },
+  ].filter(Boolean) as Array<{ kind: "quiz" | "writing" | "speaking"; icon: typeof ListChecks; label: string; desc: string }>;
 
-  const ctaText = lastCompleted ? "Học lại" : inProgress ? "Tiếp tục học" : "Bắt đầu học";
+  const ctaText = lastCompleted ? t("ctaRetry") : inProgress ? t("ctaContinue") : t("ctaStart");
 
   return (
     <div className="min-h-screen bg-stone-50">
       <TopNav />
       <main className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
         <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-stone-500 hover:text-stone-900">
-          <ArrowLeft className="size-4" /> Quay lại thư viện
+          <ArrowLeft className="size-4" /> {t("back")}
         </Link>
 
         {/* Title + badges row — full-width, above the 2-col grid */}
         <header>
           <div className="flex flex-wrap gap-2 mb-3">
             <Badge variant="brand">
-              <span className="mr-1">{typeMeta.icon}</span> {typeMeta.label}
+              <span className="mr-1">{typeMeta.icon}</span> {typeLabel}
             </Badge>
             <Badge variant="outline">{lesson.level}</Badge>
             {category && (
@@ -72,10 +81,10 @@ export default async function LessonPreviewPage({ params }: { params: Promise<{ 
             {series && <Badge variant="info">{series.title}</Badge>}
             {lastCompleted && (
               <Badge variant="success">
-                <CheckCircle2 className="size-3" /> Đã hoàn thành
+                <CheckCircle2 className="size-3" /> {t("completedBadge")}
               </Badge>
             )}
-            {inProgress && !lastCompleted && <Badge variant="warning">Đang học</Badge>}
+            {inProgress && !lastCompleted && <Badge variant="warning">{t("inProgressBadge")}</Badge>}
           </div>
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-stone-900">{lesson.title}</h1>
         </header>
@@ -86,10 +95,10 @@ export default async function LessonPreviewPage({ params }: { params: Promise<{ 
             {/* Meta row — the CTA aside is aligned with the top of this row */}
             <div className="flex flex-wrap items-center gap-4 text-sm text-stone-500">
               <span className="flex items-center gap-1">
-                <Clock className="size-4" /> {durationMin} phút
+                <Clock className="size-4" /> {durationMin} {t("minutes")}
               </span>
               <span className="flex items-center gap-1">
-                <Hash className="size-4" /> {exercises.length} bài tập
+                <Hash className="size-4" /> {exercises.length} {t("exercises")}
               </span>
               {lesson.rating != null && (
                 <span className="flex items-center gap-1">
@@ -108,7 +117,7 @@ export default async function LessonPreviewPage({ params }: { params: Promise<{ 
                   <Link
                     href={`/lessons/${id}/study`}
                     className="size-16 rounded-full bg-white/90 backdrop-blur flex items-center justify-center hover:scale-105 transition shadow-xl"
-                    title="Bắt đầu học"
+                    title={t("ctaStart")}
                   >
                     <Play className="size-7 fill-stone-900 text-stone-900 ml-1" />
                   </Link>
@@ -119,17 +128,16 @@ export default async function LessonPreviewPage({ params }: { params: Promise<{ 
             {/* Description */}
             <section>
               <h2 className="text-lg font-bold mb-2 flex items-center gap-2">
-                <BookOpen className="size-4 text-brand-600" /> Về bài học này
+                <BookOpen className="size-4 text-brand-600" /> {t("aboutTitle")}
               </h2>
               <p className="text-stone-700 leading-relaxed">
-                {lesson.description ||
-                  "Bài học này giúp bạn luyện tập với nội dung thực tế. AI sẽ chấm điểm, đưa ra feedback chi tiết, và điều chỉnh lộ trình theo tiến độ học của bạn."}
+                {lesson.description || t("aboutDefault")}
               </p>
             </section>
 
             {/* What you'll do */}
             <section>
-              <h2 className="text-lg font-bold mb-3">Bạn sẽ luyện</h2>
+              <h2 className="text-lg font-bold mb-3">{t("willPractice")}</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {exerciseSummary.map((e) => {
                   const Icon = e.icon;
@@ -137,17 +145,15 @@ export default async function LessonPreviewPage({ params }: { params: Promise<{ 
                     <div key={e.kind} className="rounded-xl border border-stone-200 bg-white p-4">
                       <Icon className="size-5 text-brand-600 mb-2" />
                       <div className="font-semibold text-sm">{e.label}</div>
-                      <div className="text-xs text-stone-500 mt-0.5">
-                        {e.count} bài tập {e.kind === "quiz" ? "trắc nghiệm" : e.kind === "writing" ? "viết" : "nói"}
-                      </div>
+                      <div className="text-xs text-stone-500 mt-0.5">{e.desc}</div>
                     </div>
                   );
                 })}
                 {video && (
                   <div className="rounded-xl border border-stone-200 bg-white p-4">
                     <Play className="size-5 text-brand-600 mb-2" />
-                    <div className="font-semibold text-sm">Video</div>
-                    <div className="text-xs text-stone-500 mt-0.5">{formatDuration(video.durationSec)} với transcript song ngữ</div>
+                    <div className="font-semibold text-sm">{t("video")}</div>
+                    <div className="text-xs text-stone-500 mt-0.5">{t("videoMeta", { duration: formatDuration(video.durationSec) })}</div>
                   </div>
                 )}
               </div>
@@ -159,17 +165,16 @@ export default async function LessonPreviewPage({ params }: { params: Promise<{ 
             <div className="rounded-xl border border-stone-200 bg-white p-5 space-y-3">
               <div>
                 <div className="text-xs text-stone-500 uppercase tracking-wide mb-1">
-                  {lastCompleted ? "Bạn đã hoàn thành" : inProgress ? "Bạn đang học" : "Sẵn sàng bắt đầu?"}
+                  {lastCompleted ? t("completedTitle") : inProgress ? t("inProgressTitle") : t("readyTitle")}
                 </div>
                 {lastCompleted && (
                   <div className="text-sm text-stone-700">
-                    Điểm gần nhất:{" "}
-                    <span className="font-bold text-emerald-600">{lastCompleted.score ?? "—"}</span>
+                    {t("lastScore", { score: lastCompleted.score ?? "—" })}
                   </div>
                 )}
                 {inProgress && !lastCompleted && (
                   <div className="text-sm text-stone-700">
-                    Bắt đầu lúc {new Date(inProgress.startedAt).toLocaleString("vi-VN")}
+                    {t("startedAt", { time: new Date(inProgress.startedAt).toLocaleString(locale === "en" ? "en-US" : "vi-VN") })}
                   </div>
                 )}
               </div>
@@ -180,24 +185,24 @@ export default async function LessonPreviewPage({ params }: { params: Promise<{ 
               </Button>
               <div className="space-y-1.5 text-xs text-stone-500 pt-2 border-t border-stone-100">
                 <div className="flex justify-between">
-                  <span>Loại</span>
-                  <span className="font-medium text-stone-700">{typeMeta.label}</span>
+                  <span>{t("factType")}</span>
+                  <span className="font-medium text-stone-700">{typeLabel}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Trình độ</span>
+                  <span>{t("factLevel")}</span>
                   <span className="font-medium text-stone-700">{lesson.level}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Thời lượng</span>
-                  <span className="font-medium text-stone-700">{durationMin} phút</span>
+                  <span>{t("factDuration")}</span>
+                  <span className="font-medium text-stone-700">{durationMin} {t("minutes")}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Bài tập</span>
+                  <span>{t("factExercises")}</span>
                   <span className="font-medium text-stone-700">{exercises.length}</span>
                 </div>
                 {category && (
                   <div className="flex justify-between">
-                    <span>Chủ đề</span>
+                    <span>{t("factCategory")}</span>
                     <span className="font-medium text-stone-700">
                       {category.icon} {category.title}
                     </span>

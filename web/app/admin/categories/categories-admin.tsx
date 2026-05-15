@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +15,8 @@ import type { Category } from "@/db/schema";
 type Row = Category & { lessonCount: number };
 
 export function CategoriesAdmin({ items }: { items: Row[] }) {
+  const t = useTranslations("admin.categories");
+  const tCommon = useTranslations("common");
   const [adding, setAdding] = useState(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +42,7 @@ export function CategoriesAdmin({ items }: { items: Row[] }) {
   };
 
   const onDelete = (id: string) => {
-    if (!confirm("Xoá category này? (Lesson đang gán vào sẽ thành 'không phân loại')")) return;
+    if (!confirm(t("confirmDelete"))) return;
     startTransition(async () => {
       await deleteCategoryAction(id);
       router.refresh();
@@ -50,7 +53,7 @@ export function CategoriesAdmin({ items }: { items: Row[] }) {
     <div className="space-y-4">
       <div className="flex justify-end">
         <Button onClick={() => setAdding(true)} disabled={adding}>
-          <Plus className="size-4" /> Thêm category
+          <Plus className="size-4" /> {t("addBtn")}
         </Button>
       </div>
 
@@ -59,36 +62,36 @@ export function CategoriesAdmin({ items }: { items: Row[] }) {
           action={onCreate}
           className="rounded-xl border border-stone-200 bg-white p-5 space-y-3"
         >
-          <h3 className="font-bold text-sm">Category mới</h3>
+          <h3 className="font-bold text-sm">{t("newTitle")}</h3>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="slug">Slug</Label>
-              <Input id="slug" name="slug" required placeholder="vd: food" pattern="[a-z0-9-]+" />
+              <Label htmlFor="slug">{t("slug")}</Label>
+              <Input id="slug" name="slug" required placeholder={t("slugPlaceholder")} pattern="[a-z0-9-]+" />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="title">Tên hiển thị</Label>
-              <Input id="title" name="title" required placeholder="Ẩm thực" />
+              <Label htmlFor="title">{t("displayName")}</Label>
+              <Input id="title" name="title" required placeholder={t("displayPlaceholder")} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="icon">Emoji icon</Label>
+              <Label htmlFor="icon">{t("iconLabel")}</Label>
               <Input id="icon" name="icon" placeholder="🍜" maxLength={4} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="order">Thứ tự (số)</Label>
+              <Label htmlFor="order">{t("orderLabel")}</Label>
               <Input id="order" name="order" type="number" defaultValue={items.length} />
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="description">Mô tả (tuỳ chọn)</Label>
-            <Textarea id="description" name="description" rows={2} placeholder="Đồ ăn, nhà hàng, công thức nấu ăn" />
+            <Label htmlFor="description">{t("descLabel")}</Label>
+            <Textarea id="description" name="description" rows={2} placeholder={t("descPlaceholder")} />
           </div>
           {error && (
             <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{error}</p>
           )}
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => setAdding(false)}>Huỷ</Button>
+            <Button type="button" variant="outline" onClick={() => setAdding(false)}>{tCommon("cancel")}</Button>
             <Button type="submit" disabled={pending}>
-              {pending && <Loader2 className="size-4 animate-spin" />} Lưu
+              {pending && <Loader2 className="size-4 animate-spin" />} {tCommon("save")}
             </Button>
           </div>
         </form>
@@ -96,18 +99,18 @@ export function CategoriesAdmin({ items }: { items: Row[] }) {
 
       {items.length === 0 ? (
         <div className="rounded-xl border border-dashed border-stone-300 p-12 text-center text-stone-500">
-          Chưa có category nào. Thêm mới ở trên.
+          {t("empty")}
         </div>
       ) : (
         <div className="rounded-xl border border-stone-200 bg-white overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-stone-50 text-xs uppercase text-stone-500">
               <tr>
-                <th className="text-left px-4 py-3">Icon</th>
-                <th className="text-left px-4 py-3">Slug</th>
-                <th className="text-left px-4 py-3">Tên</th>
-                <th className="text-left px-4 py-3">Mô tả</th>
-                <th className="text-right px-4 py-3">Bài học</th>
+                <th className="text-left px-4 py-3">{t("headerIcon")}</th>
+                <th className="text-left px-4 py-3">{t("slug")}</th>
+                <th className="text-left px-4 py-3">{t("headerName")}</th>
+                <th className="text-left px-4 py-3">{t("headerDesc")}</th>
+                <th className="text-right px-4 py-3">{t("headerLessons")}</th>
                 <th className="text-right px-4 py-3"></th>
               </tr>
             </thead>
@@ -129,7 +132,7 @@ export function CategoriesAdmin({ items }: { items: Row[] }) {
                       variant="ghost"
                       onClick={() => onDelete(c.id)}
                       disabled={pending}
-                      title="Xoá"
+                      title={tCommon("delete")}
                     >
                       <Trash2 className="size-3.5 text-red-500" />
                     </Button>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Loader2, Mic, Square, RotateCcw } from "lucide-react";
 import type { Exercise } from "@/db/schema";
@@ -14,6 +15,7 @@ export function SpeakingTab({
   exercise: Exercise;
   onDone: () => void;
 }) {
+  const t = useTranslations("lesson.speaking");
   const payload = exercise.payload as Extract<Exercise["payload"], { kind: "speaking" }>;
   const [recording, setRecording] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -41,8 +43,8 @@ export function SpeakingTab({
       };
       mr.start();
       setRecording(true);
-    } catch (e) {
-      alert("Không truy cập được mic. Hãy cấp quyền cho trình duyệt.");
+    } catch {
+      alert(t("micDenied"));
     }
   };
 
@@ -70,7 +72,7 @@ export function SpeakingTab({
   return (
     <div className="space-y-5 py-2">
       <div className="rounded-lg border-l-4 border-brand-500 bg-brand-50/50 p-4">
-        <div className="text-xs font-semibold text-brand-700 mb-1">Đọc to câu sau:</div>
+        <div className="text-xs font-semibold text-brand-700 mb-1">{t("instruction")}</div>
         <p className="text-lg leading-snug">{payload.targetText}</p>
       </div>
 
@@ -98,7 +100,7 @@ export function SpeakingTab({
             )}
           </button>
           <p className="text-xs text-stone-500">
-            {recording ? "Đang thu âm... nhấn để dừng" : submitting ? "AI đang phân tích..." : "Nhấn để bắt đầu thu âm"}
+            {recording ? t("recording") : submitting ? t("analyzing") : t("tapToStart")}
           </p>
         </div>
       )}
@@ -106,7 +108,7 @@ export function SpeakingTab({
       {result && (
         <div className="space-y-4 animate-[slide-up_0.3s_ease-out]">
           <div className="text-center">
-            <div className="text-xs text-stone-500 mb-1">Điểm phát âm</div>
+            <div className="text-xs text-stone-500 mb-1">{t("scoreLabel")}</div>
             <div className="text-5xl font-bold text-brand-600">{result.score}</div>
             <div className="text-xs text-stone-400">/ 100</div>
           </div>
@@ -129,7 +131,7 @@ export function SpeakingTab({
           <p className="text-sm text-center text-stone-600">{result.overall}</p>
           <div className="flex justify-center">
             <Button onClick={handleRetry} variant="outline" size="sm">
-              <RotateCcw className="size-3.5" /> Thu âm lại
+              <RotateCcw className="size-3.5" /> {t("redo")}
             </Button>
           </div>
         </div>

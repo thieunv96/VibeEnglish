@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, RotateCcw } from "lucide-react";
@@ -17,6 +18,7 @@ export function WritingTab({
   level: string;
   onDone: () => void;
 }) {
+  const t = useTranslations("lesson.writing");
   const payload = exercise.payload as Extract<Exercise["payload"], { kind: "writing" }>;
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -72,7 +74,7 @@ export function WritingTab({
 
         {result.suggestions.length > 0 && (
           <div className="rounded-lg border border-stone-200 bg-white p-3 space-y-2">
-            <div className="text-xs font-semibold text-stone-600">Gợi ý sửa lỗi</div>
+            <div className="text-xs font-semibold text-stone-600">{t("suggestions")}</div>
             {result.suggestions.map((s, i) => (
               <div key={i} className="text-xs">
                 <span className="text-red-600 line-through">{s.quote}</span>
@@ -84,7 +86,7 @@ export function WritingTab({
         )}
 
         <Button onClick={handleReset} variant="outline" size="sm">
-          <RotateCcw className="size-3.5" /> Viết lại
+          <RotateCcw className="size-3.5" /> {t("rewrite")}
         </Button>
       </div>
     );
@@ -93,17 +95,17 @@ export function WritingTab({
   return (
     <div className="space-y-4 py-2">
       <div className="rounded-lg bg-stone-50 border border-stone-200 p-3 text-sm">
-        <div className="text-xs font-semibold text-stone-500 mb-1">Prompt</div>
+        <div className="text-xs font-semibold text-stone-500 mb-1">{t("promptLabel")}</div>
         <p>{payload.prompt}</p>
         {payload.minWords && (
-          <p className="text-xs text-stone-400 mt-1">Tối thiểu {payload.minWords} từ.</p>
+          <p className="text-xs text-stone-400 mt-1">{t("minWordsHint", { n: payload.minWords })}</p>
         )}
       </div>
       <Textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
         rows={8}
-        placeholder="Viết câu trả lời của bạn..."
+        placeholder={t("placeholder")}
       />
       <div className="flex items-center justify-between">
         <div
@@ -112,11 +114,11 @@ export function WritingTab({
             payload.minWords && wordCount >= payload.minWords ? "text-emerald-600" : "text-stone-500"
           )}
         >
-          {wordCount} từ
-          {payload.minWords && ` / cần ≥${payload.minWords}`}
+          {t("wordCount", { n: wordCount })}
+          {payload.minWords && ` ${t("wordTarget", { n: payload.minWords })}`}
         </div>
         <Button onClick={handleSubmit} disabled={submitting || (payload.minWords ? wordCount < payload.minWords : wordCount < 10)}>
-          {submitting && <Loader2 className="size-4 animate-spin" />} Nộp & nhận feedback
+          {submitting && <Loader2 className="size-4 animate-spin" />} {t("submit")}
         </Button>
       </div>
     </div>

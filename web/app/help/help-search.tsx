@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Search, ThumbsUp, ThumbsDown } from "lucide-react";
@@ -10,6 +11,7 @@ import type { HelpCategory, HelpArticle } from "@/db/schema";
 type CategoryWithArticles = HelpCategory & { articles: HelpArticle[] };
 
 export function HelpSearch({ categories }: { categories: CategoryWithArticles[] }) {
+  const t = useTranslations("help");
   const [q, setQ] = useState("");
   const [activeCat, setActiveCat] = useState<string | null>(categories[0]?.id ?? null);
 
@@ -29,7 +31,7 @@ export function HelpSearch({ categories }: { categories: CategoryWithArticles[] 
         <Input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Tìm câu hỏi, từ khoá, tính năng..."
+          placeholder={t("search")}
           className="pl-10 h-12 text-base"
         />
       </div>
@@ -37,11 +39,11 @@ export function HelpSearch({ categories }: { categories: CategoryWithArticles[] 
       {filtered ? (
         <div>
           <h3 className="text-sm text-stone-500 mb-3">
-            {filtered.length} kết quả cho "<span className="font-medium text-stone-700">{q}</span>"
+            {t("resultsFor", { n: filtered.length, q })}
           </h3>
           {filtered.length === 0 ? (
             <p className="text-sm text-stone-500 text-center py-8">
-              Không tìm thấy. Thử từ khoá khác hoặc gửi câu hỏi cho team.
+              {t("noResults")}
             </p>
           ) : (
             <Accordion type="single" collapsible className="bg-white rounded-xl border border-stone-200 px-4">
@@ -86,7 +88,7 @@ export function HelpSearch({ categories }: { categories: CategoryWithArticles[] 
               return (
                 <Accordion type="single" collapsible className="bg-white rounded-xl border border-stone-200 px-4">
                   {cat.articles.length === 0 && (
-                    <p className="text-sm text-stone-500 py-6 text-center">Chưa có câu hỏi trong category này.</p>
+                    <p className="text-sm text-stone-500 py-6 text-center">{t("noArticles")}</p>
                   )}
                   {cat.articles.map((a) => (
                     <AccordionItem key={a.id} value={a.id}>
@@ -106,11 +108,12 @@ export function HelpSearch({ categories }: { categories: CategoryWithArticles[] 
 }
 
 function ArticleBody({ article }: { article: HelpArticle }) {
+  const t = useTranslations("help");
   return (
     <div className="space-y-3">
       <div className="prose prose-sm max-w-none whitespace-pre-wrap text-stone-700">{article.body}</div>
       <div className="flex items-center gap-2 pt-2 border-t border-stone-100">
-        <span className="text-xs text-stone-500">Câu trả lời có hữu ích?</span>
+        <span className="text-xs text-stone-500">{t("usefulQuestion")}</span>
         <button className="rounded-full bg-stone-100 hover:bg-emerald-100 hover:text-emerald-700 transition px-3 py-1 text-xs flex items-center gap-1">
           <ThumbsUp className="size-3" /> {article.helpfulCount}
         </button>

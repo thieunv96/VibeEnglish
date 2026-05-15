@@ -1,11 +1,13 @@
 import { db } from "@/db";
 import { users, onboardingProfiles, userProgress } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { initials } from "@/lib/utils";
 
 export default async function UsersAdminPage() {
+  const t = await getTranslations("admin.users");
   const list = await db
     .select({
       id: users.id,
@@ -26,16 +28,16 @@ export default async function UsersAdminPage() {
 
   return (
     <div className="p-6 md:p-8 space-y-6">
-      <h1 className="text-2xl font-bold">Users</h1>
+      <h1 className="text-2xl font-bold">{t("title")}</h1>
       <div className="rounded-xl border border-stone-200 bg-white overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-stone-50 text-xs uppercase text-stone-500">
             <tr>
-              <th className="text-left px-4 py-3">User</th>
-              <th className="text-left px-4 py-3">Level</th>
-              <th className="text-left px-4 py-3">Streak</th>
-              <th className="text-left px-4 py-3">Bài đã học</th>
-              <th className="text-left px-4 py-3">Hoạt động gần nhất</th>
+              <th className="text-left px-4 py-3">{t("headerUser")}</th>
+              <th className="text-left px-4 py-3">{t("headerLevel")}</th>
+              <th className="text-left px-4 py-3">{t("headerStreak")}</th>
+              <th className="text-left px-4 py-3">{t("headerLessons")}</th>
+              <th className="text-left px-4 py-3">{t("headerActivity")}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-100">

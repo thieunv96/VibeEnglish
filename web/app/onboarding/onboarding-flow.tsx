@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -10,12 +11,10 @@ import {
   INDUSTRIES,
   TIME_OPTIONS,
   CEFR_LEVELS,
-  LEVEL_INFO,
-  SKILL_LABELS,
 } from "@/lib/constants";
 import { PLACEMENT_QUESTIONS } from "./placement-bank";
 import { submitOnboarding } from "./actions";
-import { ArrowLeft, ArrowRight, Check, Loader2, Sparkles, Clock, Brain, Zap, BarChart3 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Loader2, Sparkles, Clock, Brain, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Step = 0 | 1 | 2 | 3 | 4 | 5;
@@ -30,6 +29,13 @@ type QAState = {
 
 export function OnboardingFlow({ userName }: { userName: string }) {
   const router = useRouter();
+  const t = useTranslations("onboarding");
+  const tCommon = useTranslations("common");
+  const tGoals = useTranslations("goals");
+  const tIndustries = useTranslations("industries");
+  const tTime = useTranslations("time");
+  const tSkills = useTranslations("skills");
+  const tCefr = useTranslations("cefr");
   const [step, setStep] = useState<Step>(0);
   const [goals, setGoals] = useState<string[]>([]);
   const [industries, setIndustries] = useState<string[]>([]);
@@ -188,11 +194,11 @@ export function OnboardingFlow({ userName }: { userName: string }) {
             <Progress value={progress} />
           </div>
           <div className="text-xs text-stone-500 whitespace-nowrap">
-            Bước {step + 1}/{totalSteps + 1}
+            {t("step", { current: step + 1, total: totalSteps + 1 })}
           </div>
           {step === 3 && (
             <Button variant="ghost" size="sm" onClick={handleSkipQuiz}>
-              Bỏ qua quiz
+              {t("skipQuiz")}
             </Button>
           )}
         </div>
@@ -206,12 +212,15 @@ export function OnboardingFlow({ userName }: { userName: string }) {
               onNext={() => setStep(1)}
               onSkipAll={handleSkipAll}
               skipping={submitting}
+              t={t}
             />
           )}
           {step === 1 && (
             <StepGoals
               selected={goals}
               onToggle={(v) => toggleArray(goals, v, setGoals)}
+              t={t}
+              tGoals={tGoals}
             />
           )}
           {step === 2 && (
@@ -220,18 +229,24 @@ export function OnboardingFlow({ userName }: { userName: string }) {
               dailyMinutes={dailyMinutes}
               onToggleIndustry={(v) => toggleArray(industries, v, setIndustries)}
               onSetMinutes={setDailyMinutes}
+              t={t}
+              tIndustries={tIndustries}
+              tTime={tTime}
             />
           )}
           {step === 3 && (
-            <StepQuiz qa={qa} onAnswer={handleAnswer} onBack={goBack} />
+            <StepQuiz qa={qa} onAnswer={handleAnswer} onBack={goBack} t={t} />
           )}
-          {step === 4 && <StepProcessing />}
+          {step === 4 && <StepProcessing t={t} />}
           {step === 5 && (
             <StepResult
               level={predictedLevel}
               skills={skillBreakdown}
               pending={submitting}
               onSubmit={handleFinalSubmit}
+              t={t}
+              tSkills={tSkills}
+              tCefr={tCefr}
             />
           )}
         </div>
@@ -242,13 +257,13 @@ export function OnboardingFlow({ userName }: { userName: string }) {
         <footer className="sticky bottom-0 bg-white border-t border-stone-200">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <Button variant="ghost" onClick={() => setStep((step - 1) as Step)} disabled={step === 0}>
-              <ArrowLeft className="size-4" /> Quay lại
+              <ArrowLeft className="size-4" /> {t("back")}
             </Button>
             <Button
               onClick={() => setStep((step + 1) as Step)}
               disabled={!canAdvance}
             >
-              Tiếp tục <ArrowRight className="size-4" />
+              {t("continue")} <ArrowRight className="size-4" />
             </Button>
           </div>
         </footer>
@@ -259,43 +274,46 @@ export function OnboardingFlow({ userName }: { userName: string }) {
 
 // ----- Step components -----
 
+type TFn = (key: string, values?: Record<string, string | number>) => string;
+
 function StepWelcome({
   userName,
   onNext,
   onSkipAll,
   skipping,
+  t,
 }: {
   userName: string;
   onNext: () => void;
   onSkipAll: () => void;
   skipping: boolean;
+  t: TFn;
 }) {
+  const name = userName.split(" ")[0] || "bạn";
   return (
     <div className="text-center py-12 animate-[slide-up_0.4s_ease-out]">
       <Logo size="lg" withSlogan className="justify-center mb-8" />
-      <h1 className="text-3xl font-bold mb-3">
-        Xin chào {userName.split(" ")[0] || "bạn"} 👋
-      </h1>
-      <p className="text-lg text-stone-500 mb-2">Sẵn sàng bắt đầu hành trình tự tin nói tiếng Anh?</p>
-      <p className="text-sm text-stone-400 mb-10">Chỉ cần 2 phút để AI hiểu bạn và thiết kế lộ trình riêng.</p>
+      <h1 className="text-3xl font-bold mb-3">{t("welcome.hello", { name })}</h1>
+      <p className="text-lg text-stone-500 mb-2">{t("welcome.subtitle")}</p>
+      <p className="text-sm text-stone-400 mb-10">{t("welcome.subtitle2")}</p>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl mx-auto mb-10">
         {[
-          { icon: Sparkles, label: "Cá nhân hoá" },
-          { icon: Brain, label: "AI feedback" },
-          { icon: Clock, label: "5-30 phút" },
-          { icon: BarChart3, label: "Theo dõi rõ ràng" },
-        ].map(({ icon: Icon, label }) => (
-          <div key={label} className="rounded-xl border border-stone-200 bg-white p-4 flex flex-col items-center gap-2">
+          { icon: Sparkles, key: "f1" },
+          { icon: Brain, key: "f2" },
+          { icon: Clock, key: "f3" },
+          { icon: BarChart3, key: "f4" },
+        ].map(({ icon: Icon, key }) => (
+          <div key={key} className="rounded-xl border border-stone-200 bg-white p-4 flex flex-col items-center gap-2">
             <Icon className="size-5 text-brand-600" />
-            <span className="text-xs font-medium">{label}</span>
+            <span className="text-xs font-medium">{t(`welcome.${key}`)}</span>
           </div>
         ))}
       </div>
 
       <div className="flex flex-col items-center gap-3">
         <Button size="lg" onClick={onNext} className="px-10" disabled={skipping}>
-          Bắt đầu nào <ArrowRight className="size-4" />
+          {t("welcome.start")} <ArrowRight className="size-4" />
         </Button>
         <button
           type="button"
@@ -303,7 +321,7 @@ function StepWelcome({
           disabled={skipping}
           className="text-sm text-stone-500 hover:text-stone-700 underline underline-offset-4 disabled:opacity-50"
         >
-          {skipping ? "Đang xử lý..." : "Bỏ qua hoàn toàn (mặc định A1)"}
+          {skipping ? t("welcome.skipping") : t("welcome.skipAll")}
         </button>
       </div>
     </div>
@@ -313,14 +331,18 @@ function StepWelcome({
 function StepGoals({
   selected,
   onToggle,
+  t,
+  tGoals,
 }: {
   selected: string[];
   onToggle: (id: string) => void;
+  t: TFn;
+  tGoals: TFn;
 }) {
   return (
     <div className="animate-[slide-up_0.3s_ease-out]">
-      <h2 className="text-2xl font-bold mb-1">Mục tiêu học của bạn là gì?</h2>
-      <p className="text-stone-500 mb-6 text-sm">Có thể chọn nhiều — AI sẽ tùy chỉnh nội dung phù hợp.</p>
+      <h2 className="text-2xl font-bold mb-1">{t("goals.title")}</h2>
+      <p className="text-stone-500 mb-6 text-sm">{t("goals.subtitle")}</p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {GOALS.map((g) => {
           const active = selected.includes(g.id);
@@ -347,16 +369,16 @@ function StepGoals({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="text-xl">{g.icon}</span>
-                  <span className="font-semibold">{g.title}</span>
+                  <span className="font-semibold">{tGoals(`${g.id}.title`)}</span>
                 </div>
-                <p className="mt-1 text-xs text-stone-500">{g.desc}</p>
+                <p className="mt-1 text-xs text-stone-500">{tGoals(`${g.id}.desc`)}</p>
               </div>
             </button>
           );
         })}
       </div>
       <p className="mt-4 text-xs text-stone-400">
-        Đã chọn: <span className="font-medium text-brand-700">{selected.length} mục tiêu</span>
+        <span className="font-medium text-brand-700">{t("goals.selected", { n: selected.length })}</span>
       </p>
     </div>
   );
@@ -367,17 +389,23 @@ function StepProfession({
   dailyMinutes,
   onToggleIndustry,
   onSetMinutes,
+  t,
+  tIndustries,
+  tTime,
 }: {
   industries: string[];
   dailyMinutes: number;
   onToggleIndustry: (id: string) => void;
   onSetMinutes: (m: number) => void;
+  t: TFn;
+  tIndustries: TFn;
+  tTime: TFn;
 }) {
   return (
     <div className="animate-[slide-up_0.3s_ease-out] space-y-10">
       <div>
-        <h2 className="text-2xl font-bold mb-1">Ngành nghề của bạn?</h2>
-        <p className="text-stone-500 mb-6 text-sm">AI sẽ ưu tiên nội dung có ngữ cảnh phù hợp với công việc.</p>
+        <h2 className="text-2xl font-bold mb-1">{t("profession.title")}</h2>
+        <p className="text-stone-500 mb-6 text-sm">{t("profession.subtitle")}</p>
         <div className="grid grid-cols-2 md:grid-cols-2 gap-3">
           {INDUSTRIES.map((g) => {
             const active = industries.includes(g.id);
@@ -401,7 +429,7 @@ function StepProfession({
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-xl">{g.icon}</span>
-                  <span className="font-semibold">{g.title}</span>
+                  <span className="font-semibold">{tIndustries(g.id)}</span>
                 </div>
               </button>
             );
@@ -410,24 +438,26 @@ function StepProfession({
       </div>
 
       <div>
-        <h2 className="text-xl font-bold mb-1">Thời gian học mỗi ngày</h2>
-        <p className="text-stone-500 mb-4 text-sm">Càng đều càng tốt — không cần dài.</p>
+        <h2 className="text-xl font-bold mb-1">{t("profession.timeTitle")}</h2>
+        <p className="text-stone-500 mb-4 text-sm">{t("profession.timeSubtitle")}</p>
         <div className="grid grid-cols-3 gap-3">
-          {TIME_OPTIONS.map((t) => {
-            const active = dailyMinutes === t.id;
+          {TIME_OPTIONS.map((opt) => {
+            const active = dailyMinutes === opt.id;
+            const labelKey = `min${opt.id}`;
+            const descKey = opt.id === 5 ? "veryShort" : opt.id === 15 ? "balanced" : "deeper";
             return (
               <button
-                key={t.id}
+                key={opt.id}
                 type="button"
-                onClick={() => onSetMinutes(t.id)}
+                onClick={() => onSetMinutes(opt.id)}
                 className={cn(
                   "rounded-xl border-2 p-5 text-center transition",
                   active ? "border-brand-500 bg-brand-50" : "border-stone-200 bg-white hover:border-stone-300"
                 )}
               >
                 <Clock className={cn("size-5 mx-auto mb-2", active ? "text-brand-600" : "text-stone-400")} />
-                <div className="font-bold text-lg">{t.label}</div>
-                <div className="text-xs text-stone-500 mt-0.5">{t.desc}</div>
+                <div className="font-bold text-lg">{tTime(labelKey)}</div>
+                <div className="text-xs text-stone-500 mt-0.5">{tTime(descKey)}</div>
               </button>
             );
           })}
@@ -441,10 +471,12 @@ function StepQuiz({
   qa,
   onAnswer,
   onBack,
+  t,
 }: {
   qa: QAState;
   onAnswer: (idx: number) => void;
   onBack: () => void;
+  t: TFn;
 }) {
   const q = PLACEMENT_QUESTIONS[qa.index];
   const record = qa.records[qa.index];
@@ -463,17 +495,17 @@ function StepQuiz({
     <div className="animate-[slide-up_0.3s_ease-out]">
       <div className="flex flex-wrap gap-2 mb-5 items-center">
         <span className="text-xs bg-stone-100 text-stone-600 px-2.5 py-1 rounded-full">
-          ⏱ ~{Math.round(((PLACEMENT_QUESTIONS.length - qa.index) * 20) / 60)} phút còn lại
+          ⏱ {t("quiz.minutesLeft", { n: Math.round(((PLACEMENT_QUESTIONS.length - qa.index) * 20) / 60) })}
         </span>
         <span className="text-xs bg-stone-100 text-stone-600 px-2.5 py-1 rounded-full">
-          {qa.index + 1}/{PLACEMENT_QUESTIONS.length} câu
+          {t("quiz.questionsCount", { current: qa.index + 1, total: PLACEMENT_QUESTIONS.length })}
         </span>
         <span className="text-xs bg-brand-100 text-brand-700 px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
-          <Brain className="size-3" /> Adaptive AI
+          <Brain className="size-3" /> {t("quiz.adaptive")}
         </span>
         {qa.index > 0 && (
           <Button variant="ghost" size="sm" className="ml-auto" onClick={onBack}>
-            <ArrowLeft className="size-3.5" /> Quay lại câu trước
+            <ArrowLeft className="size-3.5" /> {t("quiz.back")}
           </Button>
         )}
       </div>
@@ -481,7 +513,7 @@ function StepQuiz({
       <div className="rounded-2xl border border-stone-200 bg-white p-6 md:p-8">
         <div className="flex items-center justify-between mb-4">
           <span className="text-xs font-medium text-stone-400 uppercase tracking-wide">
-            Câu {qa.index + 1} · {q.skill}
+            {t("quiz.questionLabel", { n: qa.index + 1 })} · {q.skill}
           </span>
           <span className="text-xs text-stone-400">{q.level}</span>
         </div>
@@ -531,14 +563,9 @@ function StepQuiz({
                 : "bg-amber-50 border-amber-200 text-amber-800"
             )}
           >
-            {record.correct ? (
-              <>✓ Chính xác — đáp án {String.fromCharCode(65 + q.correctIndex)} đúng.</>
-            ) : (
-              <>
-                ✗ Sai — đáp án đúng là{" "}
-                <span className="font-semibold">{String.fromCharCode(65 + q.correctIndex)}</span>. Tự động chuyển câu...
-              </>
-            )}
+            {record.correct
+              ? t("quiz.correct", { letter: String.fromCharCode(65 + q.correctIndex) })
+              : t("quiz.wrong", { letter: String.fromCharCode(65 + q.correctIndex) })}
           </div>
         )}
       </div>
@@ -562,42 +589,55 @@ function StepQuiz({
   );
 }
 
-function StepProcessing() {
+function StepProcessing({ t }: { t: TFn }) {
   return (
     <div className="text-center py-20">
       <div className="size-16 mx-auto mb-6 rounded-full border-4 border-stone-200 border-t-brand-600 animate-spin" />
-      <h2 className="text-xl font-bold mb-2">AI đang phân tích kết quả...</h2>
-      <p className="text-sm text-stone-500">Đang xác định CEFR level và thiết kế lộ trình riêng cho bạn.</p>
+      <h2 className="text-xl font-bold mb-2">{t("processing.title")}</h2>
+      <p className="text-sm text-stone-500">{t("processing.subtitle")}</p>
     </div>
   );
 }
+
+const LEVEL_COLORS: Record<string, string> = {
+  A1: "bg-gradient-to-br from-stone-400 to-stone-500",
+  A2: "bg-gradient-to-br from-blue-400 to-blue-500",
+  B1: "bg-gradient-to-br from-brand-400 to-brand-500",
+  B2: "bg-gradient-to-br from-brand-500 to-brand-600",
+  C1: "bg-gradient-to-br from-amber-400 to-amber-500",
+};
 
 function StepResult({
   level,
   skills,
   pending,
   onSubmit,
+  t,
+  tSkills,
+  tCefr,
 }: {
-  level: keyof typeof LEVEL_INFO;
+  level: (typeof CEFR_LEVELS)[number];
   skills: Record<string, number>;
   pending: boolean;
   onSubmit: () => void;
+  t: TFn;
+  tSkills: TFn;
+  tCefr: TFn;
 }) {
-  const info = LEVEL_INFO[level];
   const weakest = Object.entries(skills).sort((a, b) => a[1] - b[1])[0];
   return (
     <div className="text-center animate-[slide-up_0.5s_ease-out]">
       <div className="inline-flex flex-col items-center gap-3 mb-6">
-        <div className={cn("size-36 rounded-full flex flex-col items-center justify-center text-white shadow-lg animate-[pop_0.6s_cubic-bezier(0.34,1.56,0.64,1)]", info.color)}>
+        <div className={cn("size-36 rounded-full flex flex-col items-center justify-center text-white shadow-lg animate-[pop_0.6s_cubic-bezier(0.34,1.56,0.64,1)]", LEVEL_COLORS[level])}>
           <span className="text-5xl font-bold leading-none">{level}</span>
-          <span className="text-xs mt-1 opacity-90">{info.name}</span>
+          <span className="text-xs mt-1 opacity-90">{tCefr(`${level}.name`)}</span>
         </div>
       </div>
-      <h2 className="text-2xl font-bold mb-1">Trình độ của bạn: {level}</h2>
-      <p className="text-stone-500 max-w-md mx-auto mb-2">{info.description}</p>
+      <h2 className="text-2xl font-bold mb-1">{t("result.yourLevel", { level })}</h2>
+      <p className="text-stone-500 max-w-md mx-auto mb-2">{tCefr(`${level}.description`)}</p>
       {weakest && (
         <p className="text-sm text-amber-700 bg-amber-50 inline-flex px-3 py-1.5 rounded-full mb-8">
-          🎯 Cần luyện thêm: <span className="font-medium ml-1">{SKILL_LABELS[weakest[0]]}</span>
+          {t("result.needPractice", { skill: tSkills(weakest[0]) })}
         </p>
       )}
 
@@ -606,7 +646,7 @@ function StepResult({
           const isWeakest = weakest && weakest[0] === skill;
           return (
             <div key={skill} className="rounded-xl border border-stone-200 bg-white p-4 text-left">
-              <div className="text-xs text-stone-500 mb-1">{SKILL_LABELS[skill]}</div>
+              <div className="text-xs text-stone-500 mb-1">{tSkills(skill)}</div>
               <div className="text-2xl font-bold mb-2">{score}</div>
               <div className="h-1.5 bg-stone-200 rounded-full overflow-hidden">
                 <div
@@ -620,7 +660,7 @@ function StepResult({
       </div>
 
       <Button size="lg" onClick={onSubmit} disabled={pending} className="px-10">
-        {pending && <Loader2 className="size-4 animate-spin" />} Bắt đầu học <ArrowRight className="size-4" />
+        {pending && <Loader2 className="size-4 animate-spin" />} {t("result.start")} <ArrowRight className="size-4" />
       </Button>
     </div>
   );

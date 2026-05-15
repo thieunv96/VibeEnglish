@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +11,7 @@ import type { AiSettings } from "@/db/schema";
 import { cn } from "@/lib/utils";
 
 export function AiSettingsForm({ initial }: { initial: AiSettings | null }) {
+  const tCommon = useTranslations("common");
   const [form, setForm] = useState({
     baseUrl: initial?.baseUrl ?? "",
     apiKey: initial?.apiKey ?? "",
@@ -94,7 +96,7 @@ export function AiSettingsForm({ initial }: { initial: AiSettings | null }) {
         <div className="flex items-center gap-3 pt-2">
           <Button type="button" variant="outline" onClick={handleTest} disabled={testing}>
             {testing ? <Loader2 className="size-4 animate-spin" /> : <Plug className="size-4" />}
-            Test kết nối
+            Test
           </Button>
           {testResult && (
             <span className={cn("text-sm", testResult.ok ? "text-emerald-600" : "text-red-600")}>
@@ -139,11 +141,11 @@ export function AiSettingsForm({ initial }: { initial: AiSettings | null }) {
       <div className="sticky bottom-0 bg-stone-50 py-3 -mx-6 px-6 border-t border-stone-200 flex items-center justify-end gap-3">
         {saved && (
           <span className="text-sm text-emerald-600 font-medium flex items-center gap-1">
-            <Check className="size-4" /> Đã lưu
+            <Check className="size-4" /> {tCommon("saved")}
           </span>
         )}
         <Button onClick={handleSave} disabled={pending}>
-          {pending && <Loader2 className="size-4 animate-spin" />} <Save className="size-4" /> Lưu cấu hình
+          {pending && <Loader2 className="size-4 animate-spin" />} <Save className="size-4" /> {tCommon("save")}
         </Button>
       </div>
     </div>

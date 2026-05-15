@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { LESSON_TYPES } from "@/lib/constants";
 import { Check, Clock } from "lucide-react";
@@ -16,7 +19,10 @@ export function LessonCard({
   recommendation?: number; // 0..1, higher = better fit
   view?: "grid" | "list";
 }) {
+  const tTypes = useTranslations("lessonTypes");
+  const tCommon = useTranslations("common");
   const typeMeta = LESSON_TYPES.find((t) => t.id === lesson.type) ?? LESSON_TYPES[0];
+  const typeLabel = tTypes(typeMeta.id);
   const durationMin = Math.max(1, Math.round(lesson.durationSec / 60));
 
   if (view === "list") {
@@ -33,10 +39,10 @@ export function LessonCard({
           <div className="mt-0.5 text-[11px] text-stone-500 flex gap-1.5">
             <span>{lesson.level}</span>
             <span>·</span>
-            <span>{durationMin} phút</span>
+            <span>{durationMin} {tCommon("minutes")}</span>
           </div>
         </div>
-        <Badge variant="outline" className="hidden md:inline-flex text-[10px]">{typeMeta.label}</Badge>
+        <Badge variant="outline" className="hidden md:inline-flex text-[10px]">{typeLabel}</Badge>
         {completed && <Check className="size-4 text-emerald-500 shrink-0" />}
       </Link>
     );

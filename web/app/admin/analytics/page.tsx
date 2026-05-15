@@ -1,8 +1,10 @@
 import { db } from "@/db";
 import { users, lessonAttempts, userProgress } from "@/db/schema";
 import { eq, sql, and, gte } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 
 export default async function AnalyticsPage() {
+  const t = await getTranslations("admin.analytics");
   const now = new Date();
   const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000);
 
@@ -48,19 +50,19 @@ export default async function AnalyticsPage() {
 
   return (
     <div className="p-6 md:p-8 space-y-6">
-      <h1 className="text-2xl font-bold">Analytics</h1>
+      <h1 className="text-2xl font-bold">{t("title")}</h1>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <KPI label="Sessions (7 ngày)" value={String(sessions.c)} />
-        <KPI label="Completion rate" value={`${completionRate}%`} />
-        <KPI label="Điểm TB" value={avgScore.a ? Math.round(Number(avgScore.a)).toString() : "—"} />
-        <KPI label="Streak TB" value={avgStreak.a ? Number(avgStreak.a).toFixed(1) : "—"} />
+        <KPI label={t("sessions")} value={String(sessions.c)} />
+        <KPI label={t("completion")} value={`${completionRate}%`} />
+        <KPI label={t("avgScore")} value={avgScore.a ? Math.round(Number(avgScore.a)).toString() : "—"} />
+        <KPI label={t("avgStreak")} value={avgStreak.a ? Number(avgStreak.a).toFixed(1) : "—"} />
       </div>
 
       <div className="rounded-xl border border-stone-200 bg-white p-5">
-        <h3 className="font-bold mb-4">Phân bố level users</h3>
+        <h3 className="font-bold mb-4">{t("levelDist")}</h3>
         {dist.length === 0 ? (
-          <p className="text-sm text-stone-500">Chưa có dữ liệu.</p>
+          <p className="text-sm text-stone-500">{t("noData")}</p>
         ) : (
           <div className="space-y-2.5">
             {dist.map((d) => (

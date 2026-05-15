@@ -53,7 +53,8 @@ test.describe("Màn 5 — Lesson Result (CONTEXT.md §5)", () => {
     const lessonId = href!.split("/lessons/")[1];
     await page.goto(`/lessons/${lessonId}/result`);
 
-    await expect(page.getByRole("heading", { name: /Đánh giá bài học/ })).toBeVisible();
+    // Rating card heading: either "Đánh giá bài học này" or "Cảm ơn bạn đã đánh giá!" (already rated)
+    await expect(page.getByRole("heading", { name: /Đánh giá bài học|Cảm ơn bạn đã đánh giá/ })).toBeVisible();
     // 5 star buttons
     const stars = page.locator('button[aria-label*="sao"]');
     await expect(stars).toHaveCount(5);
@@ -87,8 +88,8 @@ test.describe("Màn 6 — Profile & Progress (CONTEXT.md §5)", () => {
 
   test("Skills card: 4 skills with weakest tagged 'Cần luyện'", async ({ page }) => {
     const skillsCard = page.locator("section").filter({ hasText: /^Kỹ năng/ }).first();
-    await expect(skillsCard.getByText("Vocabulary").first()).toBeVisible();
-    await expect(skillsCard.getByText("Listening").first()).toBeVisible();
+    await expect(skillsCard.getByText("Từ vựng").first()).toBeVisible();
+    await expect(skillsCard.getByText("Nghe").first()).toBeVisible();
     await expect(skillsCard.getByText("Cần luyện").first()).toBeVisible();
   });
 

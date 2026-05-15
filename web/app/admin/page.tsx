@@ -2,11 +2,14 @@ import { db } from "@/db";
 import { users, lessons, reports, contentIntelSuggestions } from "@/db/schema";
 import { eq, sql, desc } from "drizzle-orm";
 import { Users as UsersIcon, Clock, Send, AlertTriangle } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { LESSON_TYPES } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 
 export default async function AdminDashboard() {
+  const t = await getTranslations("admin.dashboard");
+  const tTypes = await getTranslations("lessonTypes");
   const [userCount] = await db.select({ c: sql<number>`count(*)` }).from(users);
   const [queueCount] = await db.select({ c: sql<number>`count(*)` }).from(lessons).where(eq(lessons.status, "queued"));
   const [publishedCount] = await db.select({ c: sql<number>`count(*)` }).from(lessons).where(eq(lessons.status, "published"));
@@ -28,31 +31,31 @@ export default async function AdminDashboard() {
 
   return (
     <div className="p-6 md:p-8">
-      <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+      <h1 className="text-2xl font-bold mb-6">{t("title")}</h1>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <MetricCard icon={<UsersIcon className="size-5" />} label="Tổng users" value={String(userCount.c)} color="brand" />
-        <MetricCard icon={<Clock className="size-5" />} label="Bài chờ duyệt" value={String(queueCount.c)} color="amber" />
-        <MetricCard icon={<Send className="size-5" />} label="Đã publish" value={String(publishedCount.c)} color="emerald" />
-        <MetricCard icon={<AlertTriangle className="size-5" />} label="Reports mở" value={String(openReports.c)} color="red" />
+        <MetricCard icon={<UsersIcon className="size-5" />} label={t("totalUsers")} value={String(userCount.c)} color="brand" />
+        <MetricCard icon={<Clock className="size-5" />} label={t("queueWaiting")} value={String(queueCount.c)} color="amber" />
+        <MetricCard icon={<Send className="size-5" />} label={t("published")} value={String(publishedCount.c)} color="emerald" />
+        <MetricCard icon={<AlertTriangle className="size-5" />} label={t("reportsOpen")} value={String(openReports.c)} color="red" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Panel title="Bài chờ duyệt gần nhất" href="/admin/queue">
+        <Panel title={t("recentQueue")} href="/admin/queue" viewAllLabel={t("viewAll")}>
           {recentQueue.length === 0 ? (
-            <p className="text-sm text-stone-500">Không có bài nào đang chờ.</p>
+            <p className="text-sm text-stone-500">{t("noQueue")}</p>
           ) : (
             <ul className="divide-y divide-stone-100">
               {recentQueue.map((l) => {
-                const t = LESSON_TYPES.find((x) => x.id === l.type)!;
+                const lt = LESSON_TYPES.find((x) => x.id === l.type)!;
                 return (
                   <li key={l.id} className="py-2.5 flex items-center gap-3">
-                    <span className="text-lg">{t.icon}</span>
+                    <span className="text-lg">{lt.icon}</span>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium truncate">{l.title}</div>
-                      <div className="text-xs text-stone-500">{l.level} · {t.label}</div>
+                      <div className="text-xs text-stone-500">{l.level} · {tTypes(lt.id)}</div>
                     </div>
-                    <Badge variant="warning">Pending</Badge>
+                    <Badge variant="warning">{t("pending")}</Badge>
                   </li>
                 );
               })}
@@ -60,9 +63,9 @@ export default async function AdminDashboard() {
           )}
         </Panel>
 
-        <Panel title="AI suggestions mới nhất" href="/admin/intel">
+        <Panel title={t("recentIntel")} href="/admin/intel" viewAllLabel={t("viewAll")}>
           {recentIntel.length === 0 ? (
-            <p className="text-sm text-stone-500">AI chưa có gợi ý mới.</p>
+            <p className="text-sm text-stone-500">{t("noIntel")}</p>
           ) : (
             <ul className="space-y-3">
               {recentIntel.map((s) => (
@@ -101,12 +104,12 @@ function MetricCard({ icon, label, value, color }: { icon: React.ReactNode; labe
   );
 }
 
-function Panel({ title, href, children }: { title: string; href: string; children: React.ReactNode }) {
+function Panel({ title, href, viewAllLabel, children }: { title: string; href: string; viewAllLabel: string; children: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-stone-200 bg-white p-5">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-bold">{title}</h3>
-        <Link href={href} className="text-xs text-brand-600 hover:underline">Xem tất cả →</Link>
+        <Link href={href} className="text-xs text-brand-600 hover:underline">{viewAllLabel}</Link>
       </div>
       {children}
     </div>

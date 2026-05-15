@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Loader2, ThumbsUp, AlertCircle, Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -14,6 +15,7 @@ export function QuizTab({
   questions: QuizQuestion[];
   onDone: (score: number) => void;
 }) {
+  const t = useTranslations("lesson.quiz");
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState<"idle" | "correct" | "wrong">("idle");
   const [selected, setSelected] = useState<number | null>(null);
@@ -28,7 +30,7 @@ export function QuizTab({
   }>(null);
 
   if (questions.length === 0) {
-    return <p className="text-sm text-stone-500 py-4">Không có câu hỏi quiz.</p>;
+    return <p className="text-sm text-stone-500 py-4">{t("empty")}</p>;
   }
   const q = questions[idx];
   const finished = answers.length === questions.length;
@@ -68,7 +70,7 @@ export function QuizTab({
     <div className="space-y-4 py-2">
       <div className="flex items-center justify-between text-xs text-stone-400">
         <span>
-          Câu {idx + 1}/{questions.length} · {q.skill}
+          {t("questionLabel", { current: idx + 1, total: questions.length, skill: q.skill })}
         </span>
         <span>{Math.round(((answers.length) / questions.length) * 100)}%</span>
       </div>
@@ -111,14 +113,14 @@ export function QuizTab({
       {feedback === "wrong" && (
         <div className="flex justify-end">
           <Button size="sm" variant="ghost" onClick={() => next(false)}>
-            Câu tiếp →
+            {t("nextWrong")}
           </Button>
         </div>
       )}
 
       {finished && (
         <Button onClick={handleSubmit} size="lg" className="w-full" disabled={submitting}>
-          {submitting && <Loader2 className="size-4 animate-spin" />} Nộp bài
+          {submitting && <Loader2 className="size-4 animate-spin" />} {t("submit")}
         </Button>
       )}
     </div>
@@ -130,21 +132,22 @@ function AIFeedbackBox({
 }: {
   feedback: { score: number; bySkill: Record<string, number>; strengths: string[]; improvements: string[]; tips: string[] };
 }) {
+  const t = useTranslations("lesson.quiz");
   return (
     <div className="space-y-4 py-2 animate-[slide-up_0.3s_ease-out]">
       <div className="text-center">
-        <div className="text-xs text-stone-500 mb-1">Điểm Quiz</div>
+        <div className="text-xs text-stone-500 mb-1">{t("scoreLabel")}</div>
         <div className="text-5xl font-bold text-brand-600">{feedback.score}</div>
         <div className="text-xs text-stone-400">/ 100</div>
       </div>
       <div className="rounded-xl bg-stone-50 p-4 space-y-3 border border-stone-200">
         <div className="text-sm font-semibold flex items-center gap-2">
-          <Lightbulb className="size-4 text-amber-500" /> Nhận xét từ AI
+          <Lightbulb className="size-4 text-amber-500" /> {t("aiFeedback")}
         </div>
         {feedback.strengths.length > 0 && (
           <div>
             <div className="text-xs font-medium text-emerald-700 mb-1 flex items-center gap-1">
-              <ThumbsUp className="size-3" /> Điểm mạnh
+              <ThumbsUp className="size-3" /> {t("strengths")}
             </div>
             <ul className="text-sm space-y-1 text-stone-700">
               {feedback.strengths.map((s, i) => (
@@ -156,7 +159,7 @@ function AIFeedbackBox({
         {feedback.improvements.length > 0 && (
           <div>
             <div className="text-xs font-medium text-amber-700 mb-1 flex items-center gap-1">
-              <AlertCircle className="size-3" /> Cần cải thiện
+              <AlertCircle className="size-3" /> {t("improvements")}
             </div>
             <ul className="text-sm space-y-1 text-stone-700">
               {feedback.improvements.map((s, i) => (
@@ -168,7 +171,7 @@ function AIFeedbackBox({
         {feedback.tips.length > 0 && (
           <div>
             <div className="text-xs font-medium text-brand-700 mb-1 flex items-center gap-1">
-              <Lightbulb className="size-3" /> Gợi ý
+              <Lightbulb className="size-3" /> {t("tips")}
             </div>
             <ul className="text-sm space-y-1 text-stone-700">
               {feedback.tips.map((s, i) => (

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +24,8 @@ const TYPES = LESSON_TYPES.filter((t) => t.id !== "video_quiz");
 
 export function CreateLessonForm() {
   const router = useRouter();
+  const t = useTranslations("admin.create");
+  const tTypes = useTranslations("lessonTypes");
   const [title, setTitle] = useState("");
   const [type, setType] = useState<"quiz" | "writing" | "speaking" | "audio_quiz">("quiz");
   const [level, setLevel] = useState<(typeof CEFR_LEVELS)[number]>("B1");
@@ -63,34 +66,34 @@ export function CreateLessonForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <Section title="Thông tin cơ bản">
+      <Section title={t("basicInfo")}>
         <div className="space-y-3">
           <div>
-            <Label htmlFor="title">Tiêu đề bài học</Label>
+            <Label htmlFor="title">{t("titleField")}</Label>
             <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
           </div>
           <div>
-            <Label>Loại bài</Label>
+            <Label>{t("typeField")}</Label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-1">
-              {TYPES.map((t) => (
+              {TYPES.map((opt) => (
                 <button
-                  key={t.id}
+                  key={opt.id}
                   type="button"
-                  onClick={() => setType(t.id)}
+                  onClick={() => setType(opt.id)}
                   className={cn(
                     "rounded-lg border-2 p-2.5 text-center text-sm transition",
-                    type === t.id ? "border-brand-500 bg-brand-50 text-brand-700" : "border-stone-200 bg-white"
+                    type === opt.id ? "border-brand-500 bg-brand-50 text-brand-700" : "border-stone-200 bg-white"
                   )}
                 >
-                  <span className="block text-xl mb-1">{t.icon}</span>
-                  {t.label}
+                  <span className="block text-xl mb-1">{opt.icon}</span>
+                  {tTypes(opt.id)}
                 </button>
               ))}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Level</Label>
+              <Label>{t("levelField")}</Label>
               <div className="flex gap-1 mt-1">
                 {CEFR_LEVELS.map((l) => (
                   <button
@@ -108,7 +111,7 @@ export function CreateLessonForm() {
               </div>
             </div>
             <div>
-              <Label htmlFor="tags">Tags (phân cách bằng dấu phẩy)</Label>
+              <Label htmlFor="tags">{t("tagsField")}</Label>
               <Input id="tags" value={tagsInput} onChange={(e) => setTagsInput(e.target.value)} placeholder="business, conditional, b1" />
             </div>
           </div>
@@ -116,12 +119,12 @@ export function CreateLessonForm() {
       </Section>
 
       {type === "quiz" && (
-        <Section title="Câu hỏi quiz">
+        <Section title={t("quizSection")}>
           <div className="space-y-4">
             {quiz.map((q, i) => (
               <div key={i} className="rounded-lg border border-stone-200 p-3 space-y-2 bg-stone-50">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-stone-500">Câu {i + 1}</span>
+                  <span className="text-xs font-semibold text-stone-500">{t("questionN", { n: i + 1 })}</span>
                   {quiz.length > 1 && (
                     <button
                       type="button"
@@ -135,7 +138,7 @@ export function CreateLessonForm() {
                 <Input
                   value={q.question}
                   onChange={(e) => updateQ(i, { question: e.target.value })}
-                  placeholder="Nội dung câu hỏi..."
+                  placeholder={t("questionPlaceholder")}
                   required
                 />
                 <div className="grid grid-cols-2 gap-2">
@@ -148,7 +151,7 @@ export function CreateLessonForm() {
                           "size-6 rounded-full border-2 flex items-center justify-center text-xs font-bold",
                           q.correctIndex === oi ? "bg-emerald-500 border-emerald-500 text-white" : "border-stone-300 text-stone-500"
                         )}
-                        title="Đáp án đúng"
+                        title={t("correctTooltip")}
                       >
                         {q.correctIndex === oi ? <Check className="size-3" /> : String.fromCharCode(65 + oi)}
                       </button>
@@ -185,17 +188,17 @@ export function CreateLessonForm() {
                 setQuiz([...quiz, { question: "", options: ["", "", "", ""], correctIndex: 0, skill: "vocabulary" }])
               }
             >
-              <Plus className="size-3.5" /> Thêm câu hỏi
+              <Plus className="size-3.5" /> {t("addQuestion")}
             </Button>
           </div>
         </Section>
       )}
 
       {type === "writing" && (
-        <Section title="Writing prompt">
+        <Section title={t("writingPrompt")}>
           <div className="space-y-3">
             <div>
-              <Label>Prompt</Label>
+              <Label>{t("promptLabel")}</Label>
               <Textarea
                 rows={3}
                 value={writing.prompt}
@@ -204,7 +207,7 @@ export function CreateLessonForm() {
               />
             </div>
             <div>
-              <Label>Sample answer (AI dùng làm reference)</Label>
+              <Label>{t("sampleAnswer")}</Label>
               <Textarea
                 rows={3}
                 value={writing.sampleAnswer}
@@ -212,7 +215,7 @@ export function CreateLessonForm() {
               />
             </div>
             <div>
-              <Label>Số từ tối thiểu</Label>
+              <Label>{t("minWords")}</Label>
               <Input
                 type="number"
                 value={writing.minWords}
@@ -224,8 +227,8 @@ export function CreateLessonForm() {
       )}
 
       {type === "speaking" && (
-        <Section title="Speaking target">
-          <Label>Câu cần đọc</Label>
+        <Section title={t("speakingTarget")}>
+          <Label>{t("targetText")}</Label>
           <Textarea
             rows={3}
             value={speaking.targetText}
@@ -238,12 +241,12 @@ export function CreateLessonForm() {
       <div className="rounded-xl border border-stone-200 bg-white p-5 flex items-center justify-between">
         <label className="flex items-center gap-2 text-sm cursor-pointer">
           <Checkbox checked={publishImmediately} onCheckedChange={(v) => setPublishImmediately(v === true)} />
-          Publish ngay (không cần qua queue)
+          {t("publishNow")}
         </label>
         {error && <span className="text-sm text-red-600">{error}</span>}
         <Button type="submit" disabled={pending}>
           {pending && <Loader2 className="size-4 animate-spin" />}
-          {publishImmediately ? "Publish ngay" : "Lưu vào queue"}
+          {publishImmediately ? t("savePublish") : t("saveQueue")}
         </Button>
       </div>
     </form>

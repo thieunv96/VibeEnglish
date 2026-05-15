@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Star, Clock, Hash, Lock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +27,9 @@ export type LessonData = {
 
 export function LessonView({ data, next }: { data: LessonData; next: Lesson | null }) {
   const { lesson, video, segments, exercises, questions, series } = data;
+  const t = useTranslations("lesson.study");
+  const tTypes = useTranslations("lessonTypes");
+  const tCommon = useTranslations("common");
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [mediaCompleted, setMediaCompleted] = useState(false);
@@ -40,7 +44,9 @@ export function LessonView({ data, next }: { data: LessonData; next: Lesson | nu
   const quizEx = exercises.find((e) => e.kind === "quiz");
   const quizQuestions = quizEx ? questions.filter((q) => q.exerciseId === quizEx.id) : [];
 
-  const typeMeta = LESSON_TYPES.find((t) => t.id === lesson.type)!;
+  const typeMeta = LESSON_TYPES.find((tt) => tt.id === lesson.type)!;
+  const typeLabel = tTypes(typeMeta.id);
+  const kindLabel = t(lesson.type === "audio_quiz" ? "kindAudio" : "kindVideo");
 
   // Lessons that require media-watch before unlocking exercises.
   const requiresMedia = lesson.type === "video_quiz" || lesson.type === "audio_quiz";
@@ -80,7 +86,7 @@ export function LessonView({ data, next }: { data: LessonData; next: Lesson | nu
       router.push(`/lessons/${lesson.id}/result?attempt=${r.attemptId}`);
     } else {
       setSubmitting(false);
-      setSubmitError(r.error ?? "Không thể nộp bài. Thử lại sau.");
+      setSubmitError(r.error ?? t("submitError"));
     }
   };
 
@@ -93,14 +99,14 @@ export function LessonView({ data, next }: { data: LessonData; next: Lesson | nu
             href={`/lessons/${lesson.id}`}
             className="flex items-center gap-1.5 text-sm font-medium text-stone-600 hover:text-stone-900"
           >
-            <ArrowLeft className="size-4" /> <span className="hidden sm:inline">Quay lại preview</span>
+            <ArrowLeft className="size-4" /> <span className="hidden sm:inline">{t("backToPreview")}</span>
           </Link>
           <h1 className="flex-1 text-center truncate font-semibold text-sm sm:text-base">
             {lesson.title}
           </h1>
           {series && lesson.orderInSeries != null && (
             <div className="hidden md:flex items-center gap-2 text-xs text-stone-500">
-              <span>Bài {lesson.orderInSeries}</span>
+              <span>{t("lessonNumber", { n: lesson.orderInSeries })}</span>
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <span
@@ -132,23 +138,23 @@ export function LessonView({ data, next }: { data: LessonData; next: Lesson | nu
             />
           ) : (
             <div className="rounded-xl bg-black aspect-video flex items-center justify-center text-white/60">
-              {typeMeta.icon} <span className="ml-2 text-sm">Bài học không có video</span>
+              {typeMeta.icon} <span className="ml-2 text-sm">{t("noVideo")}</span>
             </div>
           )}
 
           <div>
             <div className="flex flex-wrap gap-2 mb-2">
-              <Badge variant="brand">{typeMeta.label}</Badge>
+              <Badge variant="brand">{typeLabel}</Badge>
               <Badge variant="outline">{lesson.level}</Badge>
               {series && <Badge variant="info">{series.title}</Badge>}
             </div>
             <h2 className="text-xl font-bold leading-tight">{lesson.title}</h2>
             <div className="mt-2 flex items-center gap-4 text-sm text-stone-500">
               <span className="flex items-center gap-1">
-                <Clock className="size-3.5" /> {Math.round(lesson.durationSec / 60)} phút
+                <Clock className="size-3.5" /> {Math.round(lesson.durationSec / 60)} {tCommon("minutes")}
               </span>
               <span className="flex items-center gap-1">
-                <Hash className="size-3.5" /> {exercises.length} bài tập
+                <Hash className="size-3.5" /> {exercises.length}
               </span>
               {lesson.rating != null && (
                 <span className="flex items-center gap-1">
@@ -162,21 +168,17 @@ export function LessonView({ data, next }: { data: LessonData; next: Lesson | nu
             <TranscriptPanel segments={segments} currentTime={currentTime} />
           )}
 
-          {/* Manual "Đã xem xong" override for media lessons */}
+          {/* Manual unlock override for media lessons */}
           {requiresMedia && !mediaCompleted && (
             <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 flex items-center justify-between gap-3">
               <span className="text-xs text-amber-800">
-                ▶ Xem hết{" "}
-                <span className="font-medium">
-                  {lesson.type === "audio_quiz" ? "audio" : "video"}
-                </span>{" "}
-                để mở khoá bài tập (hoặc bấm "Đã xem xong").
+                ▶ {t("unlockBanner", { kind: kindLabel })}
               </span>
               <button
                 onClick={() => setMediaCompleted(true)}
                 className="text-xs font-medium rounded-md bg-amber-600 text-white px-2.5 py-1 hover:bg-amber-700"
               >
-                Đã xem xong
+                {t("markWatched")}
               </button>
             </div>
           )}
@@ -191,18 +193,18 @@ export function LessonView({ data, next }: { data: LessonData; next: Lesson | nu
                   <Lock className="size-5" />
                 </div>
                 <p className="text-sm font-medium text-stone-700">
-                  Bài tập sẽ mở sau khi bạn xem xong {lesson.type === "audio_quiz" ? "audio" : "video"}
+                  {t("lockedTitle", { kind: kindLabel })}
                 </p>
                 <p className="text-xs text-stone-500 mt-1">
-                  Tiến độ: {duration > 0 ? Math.round((currentTime / duration) * 100) : 0}% / 90%
+                  {t("lockedProgress", { current: duration > 0 ? Math.round((currentTime / duration) * 100) : 0 })}
                 </p>
               </div>
             ) : (
               <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
                 <TabsList className="w-full justify-start">
-                  {hasQuiz && <TabsTrigger value="quiz">Quiz</TabsTrigger>}
-                  {hasWriting && <TabsTrigger value="writing">Writing</TabsTrigger>}
-                  {hasSpeaking && <TabsTrigger value="speaking">Speaking</TabsTrigger>}
+                  {hasQuiz && <TabsTrigger value="quiz">{t("tabQuiz")}</TabsTrigger>}
+                  {hasWriting && <TabsTrigger value="writing">{t("tabWriting")}</TabsTrigger>}
+                  {hasSpeaking && <TabsTrigger value="speaking">{t("tabSpeaking")}</TabsTrigger>}
                 </TabsList>
                 {hasQuiz && (
                   <TabsContent value="quiz">
@@ -239,7 +241,7 @@ export function LessonView({ data, next }: { data: LessonData; next: Lesson | nu
           <div className="rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 flex items-center justify-between gap-3">
             <div className="min-w-0 mr-3">
               <div className="text-[11px] uppercase text-stone-400 tracking-wide">
-                {next ? "Bài tiếp theo" : "Bài cuối series"}
+                {next ? t("nextLesson") : t("lastInSeries")}
               </div>
               <div className="text-sm font-medium truncate">{next?.title ?? "—"}</div>
             </div>
@@ -248,7 +250,7 @@ export function LessonView({ data, next }: { data: LessonData; next: Lesson | nu
               disabled={!allDone || submitting}
               className="rounded-lg bg-brand-600 disabled:bg-stone-300 text-white px-4 py-2 text-sm font-medium hover:bg-brand-700 transition flex items-center gap-1.5 shrink-0"
             >
-              {submitting ? "Đang nộp..." : allDone ? "Hoàn thành" : "Cần làm xong bài tập"} <ArrowRight className="size-4" />
+              {submitting ? t("submitting") : allDone ? t("completeBtn") : t("needAllBtn")} <ArrowRight className="size-4" />
             </button>
           </div>
           {submitError && (

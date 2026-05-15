@@ -3,10 +3,10 @@ import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { onboardingProfiles } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import { TopNav } from "@/components/top-nav";
 import { LibrarySections } from "./_library/sections";
-import { LEVEL_INFO } from "@/lib/constants";
-import { greeting } from "@/lib/utils";
+import { greetingKey } from "@/lib/utils";
 import {
   getCompletedLessons,
   getPublishedLessons,
@@ -41,42 +41,46 @@ export default async function HomePage({
     getAllCategories(),
   ]);
 
-  const firstName = session.user.name?.split(" ").slice(-1)[0] || "bạn";
+  const tHome = await getTranslations("home");
+  const tGreeting = await getTranslations("greeting");
+  const tCefr = await getTranslations("cefr");
+
+  const firstName = session.user.name?.split(" ").slice(-1)[0] || tGreeting("you");
   const weeklyTarget = Math.max(3, Math.ceil((profile.dailyMinutes / 15) * 5));
   const weeklyDone = Math.min(weeklyTarget, completed.length);
-  const info = LEVEL_INFO[profile.level];
+  const levelName = tCefr(`${profile.level}.name`);
+  const todayN = Math.max(1, Math.round(profile.dailyMinutes / 8));
 
   return (
     <div className="min-h-screen bg-stone-50">
       <TopNav />
 
       <main className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Plain hero — greeting + 3 inline stat chips on one row */}
         <section className="flex flex-wrap items-center gap-x-6 gap-y-3">
           <div className="min-w-0 flex-1">
             <h1 className="text-xl md:text-2xl font-bold tracking-tight text-stone-900 truncate">
-              {greeting()}, {firstName} <span aria-hidden>👋</span>
+              {tGreeting(greetingKey())}, {firstName} <span aria-hidden>👋</span>
             </h1>
             <p className="mt-0.5 text-xs text-stone-500 truncate">
-              <span className="font-semibold text-brand-700">{profile.level}</span> ({info.name}) → mục tiêu{" "}
-              <span className="font-semibold text-brand-700">{profile.targetLevel}</span> · Hôm nay học{" "}
-              {Math.max(1, Math.round(profile.dailyMinutes / 8))} bài
+              {tHome("levelToTarget", { level: profile.level, name: levelName, target: profile.targetLevel })}
+              {" · "}
+              {tHome("todayGoal", { n: todayN })}
             </p>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <StatChip
               icon={<Trophy className="size-3.5 text-brand-600" />}
-              label="Đã học"
+              label={tHome("statLearned")}
               value={String(ctx.progress?.totalLessons ?? 0)}
             />
             <StatChip
               icon={<Flame className="size-3.5 text-orange-500" />}
-              label="Streak"
-              value={`${ctx.progress?.streakDays ?? 0} ngày`}
+              label={tHome("statStreak")}
+              value={tHome("streakDays", { n: ctx.progress?.streakDays ?? 0 })}
             />
             <StatChip
               icon={<Target className="size-3.5 text-emerald-600" />}
-              label="Tuần"
+              label={tHome("statWeek")}
               value={`${weeklyDone}/${weeklyTarget}`}
             />
           </div>

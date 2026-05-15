@@ -17,12 +17,13 @@ export function formatTimestamp(seconds: number): string {
   return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
 }
 
-export function greeting(date = new Date()): string {
+/** Returns the i18n key for the current part of day. */
+export function greetingKey(date = new Date()): "morning" | "noon" | "afternoon" | "evening" {
   const h = date.getHours();
-  if (h < 11) return "Chào buổi sáng";
-  if (h < 14) return "Chào buổi trưa";
-  if (h < 18) return "Chào buổi chiều";
-  return "Chào buổi tối";
+  if (h < 11) return "morning";
+  if (h < 14) return "noon";
+  if (h < 18) return "afternoon";
+  return "evening";
 }
 
 export function initials(name?: string | null): string {

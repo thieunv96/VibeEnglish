@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { LessonCard } from "@/components/lesson-card";
 import { LibraryToolbar, type LibraryFilter } from "./toolbar";
 import type { Lesson, Category } from "@/db/schema";
@@ -23,6 +24,8 @@ export function LibrarySections({
   categories: Category[];
   initialSearch?: string;
 }) {
+  const t = useTranslations("home");
+  const tCommon = useTranslations("common");
   const [filter, setFilter] = useState<LibraryFilter>("all");
   const [search, setSearch] = useState(initialSearch);
   const [category, setCategory] = useState<string | "all">("all");
@@ -49,10 +52,10 @@ export function LibrarySections({
       {/* Categories chip row */}
       {categories.length > 0 && (
         <section>
-          <h2 className="text-base font-bold mb-3 text-stone-900">Khám phá theo chủ đề</h2>
+          <h2 className="text-base font-bold mb-3 text-stone-900">{t("discover")}</h2>
           <div className="flex flex-wrap gap-2">
             <CategoryChip active={category === "all"} onClick={() => setCategory("all")}>
-              Tất cả
+              {tCommon("all")}
             </CategoryChip>
             {categories.map((c) => (
               <CategoryChip
@@ -72,9 +75,9 @@ export function LibrarySections({
         <section>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-bold flex items-center gap-2">
-              <Sparkles className="size-4 text-brand-500" /> Gợi ý cho bạn
+              <Sparkles className="size-4 text-brand-500" /> {t("recommended")}
             </h2>
-            <button className="text-sm text-brand-600 hover:underline">Xem tất cả</button>
+            <button className="text-sm text-brand-600 hover:underline">{t("viewAll")}</button>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
             {recommended.map((l) => (
@@ -85,7 +88,7 @@ export function LibrarySections({
       )}
 
       <section>
-        <h2 className="text-base font-bold mb-3">Tất cả bài học</h2>
+        <h2 className="text-base font-bold mb-3">{t("allLessons")}</h2>
         <LibraryToolbar
           filter={filter}
           onFilterChange={setFilter}
@@ -115,8 +118,8 @@ export function LibrarySections({
       {completed.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-bold">Đã hoàn thành</h2>
-            <span className="text-sm text-stone-500">{completed.length} bài</span>
+            <h2 className="text-base font-bold">{t("completed")}</h2>
+            <span className="text-sm text-stone-500">{t("completedCount", { n: completed.length })}</span>
           </div>
           {view === "grid" ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3">
@@ -162,9 +165,10 @@ function CategoryChip({
 }
 
 function EmptyState() {
+  const t = useTranslations("home");
   return (
     <div className="rounded-xl border border-dashed border-stone-300 p-12 text-center text-stone-500">
-      Không có bài học phù hợp với bộ lọc hiện tại.
+      {t("empty")}
     </div>
   );
 }

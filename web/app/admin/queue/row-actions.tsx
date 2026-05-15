@@ -2,12 +2,14 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Check, X, Pencil } from "lucide-react";
 import { approveLessonAction, rejectLessonAction } from "./actions";
 
 export function QueueRowActions({ id }: { id: string }) {
+  const t = useTranslations("admin.queue");
   const [pending, startTransition] = useTransition();
   const [confirming, setConfirming] = useState<"approve" | "reject" | null>(null);
   const [reason, setReason] = useState("");
@@ -33,13 +35,13 @@ export function QueueRowActions({ id }: { id: string }) {
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           rows={2}
-          placeholder="Lý do từ chối..."
+          placeholder={t("rejectPlaceholder")}
           className="text-sm"
         />
         <div className="flex gap-2 justify-end">
-          <Button size="sm" variant="ghost" onClick={() => setConfirming(null)}>Huỷ</Button>
+          <Button size="sm" variant="ghost" onClick={() => setConfirming(null)}>{t("cancel")}</Button>
           <Button size="sm" variant="danger" onClick={onReject} disabled={pending}>
-            Xác nhận từ chối
+            {t("confirmReject")}
           </Button>
         </div>
       </div>
@@ -49,13 +51,13 @@ export function QueueRowActions({ id }: { id: string }) {
   return (
     <div className="flex items-center gap-2 shrink-0">
       <Button asChild variant="outline" size="sm">
-        <Link href={`/lessons/${id}`} target="_blank"><Pencil className="size-3.5" /> Xem</Link>
+        <Link href={`/lessons/${id}`} target="_blank"><Pencil className="size-3.5" /> {t("view")}</Link>
       </Button>
       <Button size="sm" variant="outline" onClick={() => setConfirming("reject")} disabled={pending}>
-        <X className="size-3.5" /> Từ chối
+        <X className="size-3.5" /> {t("reject")}
       </Button>
       <Button size="sm" variant="success" onClick={onApprove} disabled={pending}>
-        <Check className="size-3.5" /> Duyệt
+        <Check className="size-3.5" /> {t("approve")}
       </Button>
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Switch } from "@/components/ui/switch";
 import type { TranscriptSegment } from "@/db/schema";
 import { cn, formatTimestamp } from "@/lib/utils";
@@ -14,6 +15,7 @@ export function TranscriptPanel({
   segments: TranscriptSegment[];
   currentTime: number;
 }) {
+  const t = useTranslations("lesson.study");
   const [mode, setMode] = useState<Mode>("bilingual");
   const [autoScroll, setAutoScroll] = useState(true);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -37,12 +39,12 @@ export function TranscriptPanel({
     <div className="rounded-xl border border-stone-200 bg-white">
       <div className="flex items-center justify-between px-4 py-3 border-b border-stone-200">
         <div className="flex items-center gap-2">
-          <h3 className="font-semibold">Transcript</h3>
-          {activeIdx >= 0 && <span className="size-2 rounded-full bg-red-500 animate-pulse" title="Đang sync" />}
+          <h3 className="font-semibold">{t("transcriptHeader")}</h3>
+          {activeIdx >= 0 && <span className="size-2 rounded-full bg-red-500 animate-pulse" />}
         </div>
         <div className="flex items-center gap-3">
           <label className="flex items-center gap-1.5 text-xs text-stone-500 cursor-pointer">
-            <span>Auto-scroll</span>
+            <span>{t("autoScroll")}</span>
             <Switch checked={autoScroll} onCheckedChange={setAutoScroll} />
           </label>
           <div className="flex rounded-md border border-stone-200 overflow-hidden text-xs">
@@ -55,7 +57,7 @@ export function TranscriptPanel({
                   mode === m ? "bg-brand-600 text-white" : "bg-white text-stone-600 hover:bg-stone-50"
                 )}
               >
-                {m === "en" ? "EN" : m === "vi" ? "VI" : "Song ngữ"}
+                {m === "en" ? t("transcriptEN") : m === "vi" ? t("transcriptVI") : t("transcriptBilingual")}
               </button>
             ))}
           </div>
@@ -64,8 +66,8 @@ export function TranscriptPanel({
 
       {mode === "bilingual" && (
         <div className="px-4 py-2 grid grid-cols-2 text-xs font-medium text-stone-500 border-b border-stone-100">
-          <span>🇬🇧 English</span>
-          <span>🇻🇳 Tiếng Việt</span>
+          <span>{t("transcriptHeaderEN")}</span>
+          <span>{t("transcriptHeaderVI")}</span>
         </div>
       )}
 

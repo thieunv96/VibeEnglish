@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -10,14 +11,15 @@ import { Star, Check, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TYPES = [
-  { id: "feature_request", icon: "💡", label: "Đề xuất tính năng" },
-  { id: "ui_bug", icon: "🐛", label: "Báo lỗi giao diện" },
-  { id: "content_feedback", icon: "📚", label: "Góp ý nội dung học" },
-  { id: "experience_rating", icon: "⭐", label: "Đánh giá trải nghiệm" },
-  { id: "other", icon: "💬", label: "Khác" },
+  { id: "feature_request", icon: "💡", labelKey: "typeFeature" },
+  { id: "ui_bug", icon: "🐛", labelKey: "typeUiBug" },
+  { id: "content_feedback", icon: "📚", labelKey: "typeContent" },
+  { id: "experience_rating", icon: "⭐", labelKey: "typeRating" },
+  { id: "other", icon: "💬", labelKey: "typeOther" },
 ] as const;
 
 export function FeedbackForm({ defaultEmail }: { defaultEmail: string }) {
+  const t = useTranslations("feedback");
   const [type, setType] = useState<(typeof TYPES)[number]["id"]>("feature_request");
   const [content, setContent] = useState("");
   const [rating, setRating] = useState<number | null>(null);
@@ -32,7 +34,7 @@ export function FeedbackForm({ defaultEmail }: { defaultEmail: string }) {
     e.preventDefault();
     setError(null);
     if (content.length < 5) {
-      setError("Vui lòng nhập ít nhất vài câu mô tả.");
+      setError(t("errorShort"));
       return;
     }
     startTransition(async () => {
@@ -57,10 +59,8 @@ export function FeedbackForm({ defaultEmail }: { defaultEmail: string }) {
         <div className="size-14 mx-auto rounded-full bg-emerald-500 text-white flex items-center justify-center mb-3">
           <Check className="size-7" />
         </div>
-        <h2 className="text-lg font-bold text-emerald-900 mb-1">Cảm ơn bạn!</h2>
-        <p className="text-sm text-emerald-700">
-          Góp ý của bạn giúp Vibe English tốt hơn mỗi ngày. Chúng tôi đã ghi nhận.
-        </p>
+        <h2 className="text-lg font-bold text-emerald-900 mb-1">{t("thankTitle")}</h2>
+        <p className="text-sm text-emerald-700">{t("thankBody")}</p>
       </div>
     );
   }
@@ -68,22 +68,21 @@ export function FeedbackForm({ defaultEmail }: { defaultEmail: string }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <label className="text-sm font-medium mb-2 block">Loại góp ý</label>
+        <label className="text-sm font-medium mb-2 block">{t("typeLabel")}</label>
         <div className="flex flex-wrap gap-2">
-          {TYPES.map((t) => (
+          {TYPES.map((opt) => (
             <button
-              key={t.id}
+              key={opt.id}
               type="button"
-              onClick={() => setType(t.id)}
+              onClick={() => setType(opt.id)}
               className={cn(
                 "px-3.5 py-2 rounded-full border-2 text-sm transition flex items-center gap-1.5",
-                type === t.id
+                type === opt.id
                   ? "border-brand-500 bg-brand-50 text-brand-700 font-medium"
                   : "border-stone-200 bg-white text-stone-600 hover:border-stone-300"
               )}
             >
-              <span>{t.icon}</span>
-              {t.label}
+              {t(opt.labelKey)}
             </button>
           ))}
         </div>
@@ -91,7 +90,7 @@ export function FeedbackForm({ defaultEmail }: { defaultEmail: string }) {
 
       {type === "experience_rating" && (
         <div>
-          <label className="text-sm font-medium mb-2 block">Đánh giá tổng thể</label>
+          <label className="text-sm font-medium mb-2 block">{t("overallRating")}</label>
           <div className="flex gap-1">
             {[1, 2, 3, 4, 5].map((n) => (
               <button
@@ -117,12 +116,12 @@ export function FeedbackForm({ defaultEmail }: { defaultEmail: string }) {
       )}
 
       <div>
-        <label className="text-sm font-medium mb-2 block">Nội dung</label>
+        <label className="text-sm font-medium mb-2 block">{t("contentLabel")}</label>
         <Textarea
           rows={6}
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="Chia sẻ chi tiết để team hiểu rõ hơn..."
+          placeholder={t("contentPlaceholder")}
         />
       </div>
 
@@ -134,8 +133,8 @@ export function FeedbackForm({ defaultEmail }: { defaultEmail: string }) {
             className="mt-0.5"
           />
           <div>
-            <div className="text-sm font-medium">Muốn nhận phản hồi từ team</div>
-            <div className="text-xs text-stone-500">Chúng tôi sẽ liên hệ qua email khi cần thêm thông tin.</div>
+            <div className="text-sm font-medium">{t("wantReply")}</div>
+            <div className="text-xs text-stone-500">{t("wantReplyHint")}</div>
           </div>
         </label>
         {wantsReply && (
@@ -154,7 +153,7 @@ export function FeedbackForm({ defaultEmail }: { defaultEmail: string }) {
       )}
 
       <Button type="submit" size="lg" className="w-full" disabled={pending}>
-        {pending && <Loader2 className="size-4 animate-spin" />} Gửi góp ý
+        {pending && <Loader2 className="size-4 animate-spin" />} {t("submit")}
       </Button>
     </form>
   );

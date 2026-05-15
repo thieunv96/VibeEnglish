@@ -2,11 +2,13 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { rateAttemptAction } from "./actions";
 
 export function RatingCard({ attemptId, initialRating }: { attemptId: string; initialRating: number | null }) {
+  const t = useTranslations("lesson.result");
   const [rating, setRating] = useState<number | null>(initialRating);
   const [hover, setHover] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(initialRating != null);
@@ -27,10 +29,10 @@ export function RatingCard({ attemptId, initialRating }: { attemptId: string; in
   return (
     <div className="rounded-xl border border-stone-200 bg-white p-5 text-center">
       <h3 className="font-bold mb-1">
-        {submitted ? "Cảm ơn bạn đã đánh giá!" : "Đánh giá bài học này"}
+        {submitted ? t("rateThank") : t("rateTitle")}
       </h3>
       <p className="text-xs text-stone-500 mb-3">
-        {submitted ? "Bạn có thể chọn lại số sao bất kỳ lúc nào." : "Giúp Vibe English cải thiện chất lượng nội dung."}
+        {submitted ? t("rateThankHint") : t("rateHint")}
       </p>
       <div className="flex justify-center gap-1.5">
         {[1, 2, 3, 4, 5].map((n) => {
@@ -44,7 +46,7 @@ export function RatingCard({ attemptId, initialRating }: { attemptId: string; in
               onMouseLeave={() => setHover(null)}
               onClick={() => choose(n)}
               className="p-1 transition disabled:opacity-50"
-              aria-label={`${n} sao`}
+              aria-label={t("starsLabel", { n })}
             >
               <Star
                 className={cn(
@@ -57,7 +59,7 @@ export function RatingCard({ attemptId, initialRating }: { attemptId: string; in
         })}
       </div>
       {submitted && rating && (
-        <p className="text-xs text-stone-500 mt-2">Bạn đánh giá {rating} sao</p>
+        <p className="text-xs text-stone-500 mt-2">{t("rateStars", { n: rating })}</p>
       )}
     </div>
   );

@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { lessons, reports, contentIntelSuggestions, feedback, users } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { signOut } from "@/auth";
 import { Logo } from "@/components/brand/logo";
 import { AccountMenu } from "@/components/account-menu";
@@ -36,30 +37,35 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     .from(feedback)
     .where(eq(feedback.status, "new"));
 
+  const tAdmin = await getTranslations("admin");
+  const tGroups = await getTranslations("admin.groups");
+  const tItems = await getTranslations("admin.items");
+  const tTopbar = await getTranslations("admin.topbar");
+
   const groups: SidebarGroup[] = [
     {
       id: "overview",
-      label: "Tổng quan",
+      label: tGroups("overview"),
       icon: "LayoutDashboard",
-      items: [{ href: "/admin", label: "Dashboard", icon: "LayoutDashboard" }],
+      items: [{ href: "/admin", label: tItems("dashboard"), icon: "LayoutDashboard" }],
     },
     {
       id: "content",
-      label: "Nội dung",
+      label: tGroups("content"),
       icon: "FolderOpen",
       items: [
         {
           href: "/admin/queue",
-          label: "Lesson Queue",
+          label: tItems("queue"),
           icon: "ListChecks",
           badge: queueCount?.c ? { count: Number(queueCount.c), color: "red" } : undefined,
         },
-        { href: "/admin/create", label: "Tạo bài học", icon: "PlusCircle" },
-        { href: "/admin/videos", label: "Video Manager", icon: "Film" },
-        { href: "/admin/categories", label: "Categories", icon: "Tag" },
+        { href: "/admin/create", label: tItems("create"), icon: "PlusCircle" },
+        { href: "/admin/videos", label: tItems("videos"), icon: "Film" },
+        { href: "/admin/categories", label: tItems("categories"), icon: "Tag" },
         {
           href: "/admin/intel",
-          label: "Content Intelligence",
+          label: tItems("intel"),
           icon: "Brain",
           badge: intelCount?.c ? { count: Number(intelCount.c), color: "amber" } : undefined,
         },
@@ -67,18 +73,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     },
     {
       id: "community",
-      label: "Cộng đồng",
+      label: tGroups("community"),
       icon: "Megaphone",
       items: [
         {
           href: "/admin/reports",
-          label: "Reports",
+          label: tItems("reports"),
           icon: "Flag",
           badge: reportCount?.c ? { count: Number(reportCount.c), color: "red" } : undefined,
         },
         {
           href: "/admin/feedback",
-          label: "User Feedback",
+          label: tItems("feedback"),
           icon: "MessageSquare",
           badge: feedbackCount?.c ? { count: Number(feedbackCount.c), color: "amber" } : undefined,
         },
@@ -86,20 +92,20 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     },
     {
       id: "analytics",
-      label: "Phân tích & Người dùng",
+      label: tGroups("analytics"),
       icon: "BarChart3",
       items: [
-        { href: "/admin/analytics", label: "Analytics", icon: "BarChart3" },
-        { href: "/admin/users", label: "Users", icon: "Users" },
+        { href: "/admin/analytics", label: tItems("analytics"), icon: "BarChart3" },
+        { href: "/admin/users", label: tItems("users"), icon: "Users" },
       ],
     },
     {
       id: "system",
-      label: "Hệ thống",
+      label: tGroups("system"),
       icon: "Cog",
       items: [
-        { href: "/admin/help", label: "Help Content", icon: "HelpCircle" },
-        { href: "/admin/settings", label: "Settings", icon: "Settings" },
+        { href: "/admin/help", label: tItems("help"), icon: "HelpCircle" },
+        { href: "/admin/settings", label: tItems("settings"), icon: "Settings" },
       ],
     },
   ];
@@ -119,8 +125,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         >
           <Logo size="sm" withText={false} />
           <div className="leading-tight">
-            <div className="font-bold text-sm">Vibe Admin</div>
-            <div className="text-[10px] text-stone-400">Learn freely, speak confidently</div>
+            <div className="font-bold text-sm">{tAdmin("brand")}</div>
+            <div className="text-[10px] text-stone-400">{tAdmin("brandHint")}</div>
           </div>
         </Link>
 
@@ -157,7 +163,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-stone-400" />
               <input
                 type="search"
-                placeholder="Tìm bài học, user, video..."
+                placeholder={tTopbar("search")}
                 className="h-9 w-full rounded-lg border border-stone-200 bg-stone-50 pl-9 pr-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:bg-white"
               />
             </div>
@@ -166,14 +172,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               <Link
                 href="/help"
                 className="size-9 rounded-full flex items-center justify-center text-stone-500 hover:bg-stone-100 hover:text-stone-900 transition"
-                title="Trợ giúp"
+                title={tTopbar("help")}
               >
                 <HelpCircle className="size-5" />
               </Link>
               <button
                 type="button"
                 className="size-9 rounded-full flex items-center justify-center text-stone-500 hover:bg-stone-100 hover:text-stone-900 transition relative"
-                title="Thông báo"
+                title={tTopbar("notifications")}
               >
                 <Bell className="size-5" />
                 <span className="absolute top-2 right-2 size-2 bg-red-500 rounded-full" />

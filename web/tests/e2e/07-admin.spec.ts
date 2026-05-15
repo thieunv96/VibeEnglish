@@ -118,7 +118,7 @@ test.describe("Màn 10 — Admin Panel (CONTEXT.md §5)", () => {
     // Submit (will go to /admin/queue)
     await page.getByRole("button", { name: /Lưu vào queue/ }).click();
     await page.waitForURL(/\/admin\/queue/, { timeout: 10000 });
-    await expect(page.getByText("E2E test quiz lesson")).toBeVisible();
+    await expect(page.getByText("E2E test quiz lesson").first()).toBeVisible();
   });
 
   test("Video Manager: table + status badges", async ({ page }) => {
@@ -193,12 +193,12 @@ test.describe("Màn 10 — Admin Panel (CONTEXT.md §5)", () => {
     await page.locator('input[placeholder="Qwen/Qwen2.5-32B-Instruct"]').fill("test-model");
 
     // Test connection — should fail gracefully (invalid host) and show error
-    await page.getByRole("button", { name: /Test kết nối/ }).click();
+    await page.getByRole("button", { name: /^\s*Test\s*$/ }).click();
     // Should show error message (red text)
     await expect(page.locator(".text-red-600")).toBeVisible({ timeout: 15000 });
 
     // Save
-    await page.getByRole("button", { name: /Lưu cấu hình/ }).click();
+    await page.getByRole("button", { name: /Lưu/ }).click();
     await expect(page.getByText(/Đã lưu/)).toBeVisible({ timeout: 5000 });
   });
 });
