@@ -46,9 +46,9 @@ export function LessonCard({
     return (
       <Link
         href={`/lessons/${lesson.id}`}
-        className="flex items-center gap-3 px-3 py-2 rounded-md border border-ink-200 bg-white hover:border-brand-700 hover:bg-brand-50/30 transition-colors"
+        className="flex items-center gap-3 px-3 py-2 rounded-xl border border-ink-200 bg-white hover:border-brand-700 hover:bg-brand-50/30 transition-colors"
       >
-        <div className={cn("size-8 rounded-md flex items-center justify-center text-base border shrink-0", typeMeta.color)}>
+        <div className="size-8 rounded-lg flex items-center justify-center text-base bg-ink-100 text-ink-500 shrink-0">
           {typeMeta.icon}
         </div>
         <div className="flex-1 min-w-0">
@@ -75,11 +75,11 @@ export function LessonCard({
     <Link
       href={`/lessons/${lesson.id}`}
       className={cn(
-        "card-lift group flex flex-col rounded-md border border-ink-200 bg-white overflow-hidden h-full",
+        "card-lift group flex flex-col rounded-xl border border-ink-200 bg-white overflow-hidden h-full",
         completed && "opacity-90"
       )}
     >
-      <div className={cn("relative aspect-video flex items-center justify-center text-5xl bg-ink-50", typeMeta.color)}>
+      <div className="relative aspect-video flex items-center justify-center text-5xl bg-ink-100 text-ink-400">
         <span aria-hidden>{typeMeta.icon}</span>
         {completed && (
           <div className="absolute inset-0 bg-success-500/25 flex items-center justify-center">
