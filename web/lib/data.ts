@@ -14,8 +14,9 @@ import {
   exercises,
   quizQuestions,
   transcriptSegments,
+  users,
 } from "@/db/schema";
-import { and, eq, desc, sql, inArray } from "drizzle-orm";
+import { and, eq, desc, sql, inArray, isNotNull } from "drizzle-orm";
 import type { CefrLevel } from "@/lib/constants";
 
 export async function getAllCategories() {
@@ -137,6 +138,44 @@ export async function getLessonPreview(lessonId: string) {
     ? (await db.select().from(categories).where(eq(categories.id, lesson.categoryId)).limit(1))[0]
     : null;
   return { lesson, video, exercises: exs, series: seriesRow, category };
+}
+
+export async function getLessonReviews(lessonId: string, limit = 6) {
+  const rows = await db
+    .select({
+      attemptId: lessonAttempts.id,
+      rating: lessonAttempts.rating,
+      completedAt: lessonAttempts.completedAt,
+      userName: users.name,
+      avatarData: users.avatarData,
+    })
+    .from(lessonAttempts)
+    .innerJoin(users, eq(users.id, lessonAttempts.userId))
+    .where(and(eq(lessonAttempts.lessonId, lessonId), isNotNull(lessonAttempts.rating)))
+    .orderBy(desc(lessonAttempts.completedAt))
+    .limit(limit);
+
+  const [agg] = await db
+    .select({
+      count: sql<number>`count(*)`,
+      avg: sql<number>`avg(${lessonAttempts.rating})`,
+    })
+    .from(lessonAttempts)
+    .where(and(eq(lessonAttempts.lessonId, lessonId), isNotNull(lessonAttempts.rating)));
+
+  return {
+    reviews: rows,
+    count: Number(agg?.count ?? 0),
+    avg: agg?.avg ? Number(agg.avg) : null,
+  };
+}
+
+export async function getLessonAttemptCount(lessonId: string) {
+  const [row] = await db
+    .select({ c: sql<number>`count(distinct ${lessonAttempts.userId})` })
+    .from(lessonAttempts)
+    .where(eq(lessonAttempts.lessonId, lessonId));
+  return Number(row?.c ?? 0);
 }
 
 export async function getLessonFull(lessonId: string) {

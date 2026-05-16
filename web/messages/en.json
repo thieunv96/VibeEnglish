@@ -283,7 +283,42 @@
       "factExercises": "Exercises",
       "factCategory": "Topic",
       "minutes": "min",
-      "exercises": "exercises"
+      "exercises": "exercises",
+      "ratingCount": "{n} ratings",
+      "learnersCount": "{n} learners",
+      "tabs": {
+        "overview": "Overview",
+        "modules": "Modules",
+        "reviews": "Reviews"
+      },
+      "skillsTitle": "What you'll learn",
+      "skillsDefault": [
+        "Expand vocabulary through real-world context",
+        "Train natural listening and speaking reflexes",
+        "Understand grammar structures through examples",
+        "Get detailed AI feedback after every answer"
+      ],
+      "modulesTitle": "Course content",
+      "modulesEmpty": "This lesson has no modules yet.",
+      "moduleVideo": "Video lesson",
+      "moduleVideoDesc": "Watch {duration} with English / Vietnamese bilingual transcript.",
+      "moduleQuiz": "Interactive quiz",
+      "moduleQuizDesc": "{n} multiple-choice questions with 4 options each — AI explains wrong answers.",
+      "moduleWriting": "Writing prompt",
+      "moduleWritingDesc": "{n} writing prompts graded by AI on grammar / vocab / cohesion.",
+      "moduleSpeaking": "Speaking drill",
+      "moduleSpeakingDesc": "{n} target sentences for pronunciation drills, AI compares against native.",
+      "reviewsTitle": "Learner reviews",
+      "reviewsEmpty": "No reviews yet. Be the first!",
+      "reviewsAvg": "{avg} / 5 from {n} learners",
+      "anonymousLearner": "Learner",
+      "faqTitle": "Frequently asked questions",
+      "faqQ1": "How long should I take to finish this lesson?",
+      "faqA1": "The lesson is designed to be completed in {duration} minutes. You can pause and come back anytime — progress is always saved.",
+      "faqQ2": "What if I answer incorrectly?",
+      "faqA2": "No problem. The AI will explain the correct answer and suggest how to remember it. You can retake the lesson to improve your score.",
+      "faqQ3": "What level is this lesson for?",
+      "faqA3": "This lesson is at level {level}. If you're at a lower level, try the basics first. If higher, you can still use it as review."
     },
     "study": {
       "backToPreview": "Back to preview",

@@ -283,7 +283,42 @@
       "factExercises": "Bài tập",
       "factCategory": "Chủ đề",
       "minutes": "phút",
-      "exercises": "bài tập"
+      "exercises": "bài tập",
+      "ratingCount": "{n} đánh giá",
+      "learnersCount": "{n} người đã học",
+      "tabs": {
+        "overview": "Tổng quan",
+        "modules": "Nội dung bài",
+        "reviews": "Đánh giá"
+      },
+      "skillsTitle": "Bạn sẽ học được",
+      "skillsDefault": [
+        "Mở rộng vốn từ qua ngữ cảnh thực tế",
+        "Luyện phản xạ nghe/nói tự nhiên",
+        "Hiểu cấu trúc ngữ pháp qua ví dụ",
+        "Nhận feedback chi tiết từ AI sau mỗi câu trả lời"
+      ],
+      "modulesTitle": "Cấu trúc bài học",
+      "modulesEmpty": "Bài học này chưa có module nào.",
+      "moduleVideo": "Video bài giảng",
+      "moduleVideoDesc": "Xem video {duration} với transcript song ngữ Anh — Việt.",
+      "moduleQuiz": "Quiz tương tác",
+      "moduleQuizDesc": "{n} câu hỏi trắc nghiệm với 4 lựa chọn mỗi câu, AI giải thích đáp án sai.",
+      "moduleWriting": "Bài viết",
+      "moduleWritingDesc": "{n} bài viết theo prompt, AI chấm theo grammar / vocab / cohesion.",
+      "moduleSpeaking": "Luyện nói",
+      "moduleSpeakingDesc": "{n} câu mục tiêu để luyện phát âm, AI so sánh với chuẩn native.",
+      "reviewsTitle": "Học viên đánh giá",
+      "reviewsEmpty": "Chưa có đánh giá. Bạn là người đầu tiên!",
+      "reviewsAvg": "{avg} / 5 từ {n} học viên",
+      "anonymousLearner": "Học viên",
+      "faqTitle": "Câu hỏi thường gặp",
+      "faqQ1": "Tôi học bài này trong bao lâu là phù hợp?",
+      "faqA1": "Bài học được thiết kế hoàn thành trong {duration} phút. Bạn có thể tạm dừng và quay lại bất kỳ lúc nào — tiến độ luôn được lưu.",
+      "faqQ2": "Nếu trả lời sai thì sao?",
+      "faqA2": "Không sao cả. AI sẽ giải thích đáp án đúng và gợi ý cách nhớ. Bạn có thể làm lại bài để cải thiện điểm.",
+      "faqQ3": "Bài học này phù hợp với level nào?",
+      "faqA3": "Bài học ở level {level}. Nếu bạn ở level thấp hơn, gợi ý học các bài cơ bản trước. Cao hơn thì vẫn có thể luyện như ôn tập."
     },
     "study": {
       "backToPreview": "Quay lại preview",

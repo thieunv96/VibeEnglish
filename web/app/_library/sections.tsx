@@ -121,10 +121,10 @@ export function LibrarySections({
       {visibleCategories.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-bold text-stone-900">{t("discover")}</h2>
+            <h2 className="text-xl md:text-2xl font-bold tracking-tight text-ink-900">{t("discover")}</h2>
             <Dialog open={modalOpen} onOpenChange={(o) => { setModalOpen(o); if (!o) setModalSearch(""); }}>
               <DialogTrigger asChild>
-                <button className="text-sm text-brand-600 hover:underline font-medium">
+                <button className="text-sm text-brand-700 hover:underline font-medium">
                   {t("viewAllCategories", { n: CATEGORIES.length })}
                 </button>
               </DialogTrigger>
@@ -136,19 +136,19 @@ export function LibrarySections({
                   </DialogDescription>
                 </DialogHeader>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-stone-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-ink-400" />
                   <input
                     autoFocus
                     type="text"
                     value={modalSearch}
                     onChange={(e) => setModalSearch(e.target.value)}
                     placeholder={t("categorySearchPlaceholder")}
-                    className="w-full h-10 pl-10 pr-3 rounded-lg border border-stone-200 bg-white text-sm placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-brand-400"
+                    className="w-full h-10 pl-10 pr-3 rounded-lg border border-ink-200 bg-white text-sm placeholder:text-ink-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-brand-400"
                   />
                 </div>
                 <div className="flex-1 overflow-y-auto -mx-6 px-6">
                   {modalEntries.length === 0 ? (
-                    <p className="text-center text-sm text-stone-500 py-8">
+                    <p className="text-center text-sm text-ink-500 py-8">
                       {t("categoryNoMatch")}
                     </p>
                   ) : (
@@ -168,8 +168,8 @@ export function LibrarySections({
                             className={cn(
                               "flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition",
                               hasLessons
-                                ? "border-stone-200 bg-white hover:border-brand-300 hover:bg-brand-50/40 text-stone-800"
-                                : "border-stone-100 bg-stone-50 text-stone-400 cursor-not-allowed"
+                                ? "border-ink-200 bg-white hover:border-brand-700 hover:bg-brand-50/40 text-ink-800"
+                                : "border-ink-100 bg-ink-50 text-ink-400 cursor-not-allowed"
                             )}
                           >
                             <span className="text-base shrink-0">{e.icon}</span>
@@ -179,7 +179,7 @@ export function LibrarySections({
                                 {e.lessonCount}
                               </span>
                             ) : (
-                              <span className="text-[10px] text-stone-400 shrink-0">
+                              <span className="text-[10px] text-ink-400 shrink-0">
                                 {t("categoryNoLessons")}
                               </span>
                             )}
@@ -214,10 +214,10 @@ export function LibrarySections({
       {recommended.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-bold flex items-center gap-2">
-              <Sparkles className="size-4 text-brand-500" /> {t("recommended")}
+            <h2 className="text-xl md:text-2xl font-bold tracking-tight flex items-center gap-2 text-ink-900">
+              <Sparkles className="size-5 text-brand-700" /> {t("recommended")}
             </h2>
-            <button className="text-sm text-brand-600 hover:underline">{t("viewAll")}</button>
+            <button className="text-sm text-brand-700 hover:underline">{t("viewAll")}</button>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
             {recommended.map((l) => (
@@ -228,7 +228,7 @@ export function LibrarySections({
       )}
 
       <section>
-        <h2 className="text-base font-bold mb-3">{t("allLessons")}</h2>
+        <h2 className="text-xl md:text-2xl font-bold tracking-tight text-ink-900 mb-4">{t("allLessons")}</h2>
         <LibraryToolbar
           filter={filter}
           onFilterChange={setFilter}
@@ -258,8 +258,8 @@ export function LibrarySections({
       {completed.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-bold">{t("completed")}</h2>
-            <span className="text-sm text-stone-500">{t("completedCount", { n: completed.length })}</span>
+            <h2 className="text-xl md:text-2xl font-bold tracking-tight text-ink-900">{t("completed")}</h2>
+            <span className="text-sm text-ink-500">{t("completedCount", { n: completed.length })}</span>
           </div>
           {view === "grid" ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3">
@@ -295,8 +295,8 @@ function CategoryChip({
       className={cn(
         "inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-sm font-medium transition border",
         active
-          ? "bg-brand-600 text-white border-brand-600"
-          : "bg-white border-stone-200 text-stone-600 hover:border-brand-300 hover:bg-brand-50/40"
+          ? "bg-brand-700 text-white border-brand-700"
+          : "bg-white border-ink-200 text-stone-600 hover:border-brand-700 hover:bg-brand-50/40"
       )}
     >
       {children}
@@ -307,7 +307,7 @@ function CategoryChip({
 function EmptyState() {
   const t = useTranslations("home");
   return (
-    <div className="rounded-xl border border-dashed border-stone-300 p-12 text-center text-stone-500">
+    <div className="rounded-xl border border-dashed border-ink-300 p-12 text-center text-ink-500">
       {t("empty")}
     </div>
   );

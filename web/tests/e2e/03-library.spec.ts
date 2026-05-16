@@ -7,16 +7,16 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
     await page.goto("/");
   });
 
-  test("TopNav: logo (+slogan) + streak chip + avatar; no Thư viện/Hồ sơ links", async ({ page }) => {
+  test("TopNav (Coursera-style): logo + slogan + search center + help/bell/avatar; no nav links + no inline chips", async ({ page }) => {
     await expect(page.locator("header").getByText("Vibe English").first()).toBeVisible();
     // Default locale is VI ("Tự do học, tự tin nói"); EN renders "Learn freely, speak confidently"
     await expect(page.locator("header").getByText(/Tự do học, tự tin nói|Learn freely, speak confidently/)).toBeVisible();
     // Library/Profile nav links removed (logo serves as library home, profile in dropdown)
     await expect(page.locator("header").getByRole("link", { name: "Thư viện" })).toHaveCount(0);
     await expect(page.locator("header").getByRole("link", { name: "Hồ sơ" })).toHaveCount(0);
-    // Streak chip (demo user has 4 day streak from seed)
-    await expect(page.locator("header").getByText("4").first()).toBeVisible();
-    // Avatar trigger
+    // Stats moved out of TopNav into hero — TopNav now has only help + bell + account
+    await expect(page.locator("header").getByTitle("Trợ giúp")).toBeVisible();
+    await expect(page.locator("header").getByTitle("Thông báo")).toBeVisible();
     await expect(page.locator("header").getByTitle("Tài khoản")).toBeVisible();
   });
 
@@ -121,13 +121,9 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
     await page.waitForURL(/\/lessons\/[^/]+$/);
   });
 
-  test("Topbar has global search + level→target chip", async ({ page }) => {
+  test("Topbar has global search", async ({ page }) => {
     const header = page.locator("header");
     await expect(header.getByPlaceholder(/Tìm bài học/)).toBeVisible();
-    // Level chip B1 → B2 (demo user from seed)
-    await expect(header.getByText(/B1/)).toBeVisible();
-    await expect(header.getByText("→").first()).toBeVisible();
-    await expect(header.getByText(/B2/)).toBeVisible();
   });
 });
 
@@ -142,10 +138,12 @@ test.describe("Lesson preview (Coursera-style)", () => {
     const href = (await firstCard.getAttribute("href"))!;
     await page.goto(href);
 
-    // Preview elements
+    // Preview elements (Coursera-style header + Overview/Modules/Reviews tabs + What you'll learn)
     await expect(page.getByRole("heading", { name: /Stand-up meeting|Daily English|Email opener|Pronunciation|Conditional|Listening|Reading/ }).first()).toBeVisible();
     await expect(page.getByRole("heading", { name: /Về bài học này/ })).toBeVisible();
-    await expect(page.getByRole("heading", { name: /Bạn sẽ luyện/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Bạn sẽ học được/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Tổng quan/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Nội dung bài/ })).toBeVisible();
 
     // CTA link to /study
     const cta = page.getByRole("link", { name: /Bắt đầu học|Tiếp tục học|Học lại/ }).first();

@@ -52,40 +52,46 @@ export default async function HomePage({
   const todayN = Math.max(1, Math.round(profile.dailyMinutes / 8));
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-white">
       <TopNav />
 
-      <main className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        <section className="flex flex-wrap items-center gap-x-6 gap-y-3">
-          <div className="min-w-0 flex-1">
-            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-stone-900 truncate">
-              {tGreeting(greetingKey())}, {firstName} <span aria-hidden>👋</span>
-            </h1>
-            <p className="mt-0.5 text-xs text-stone-500 truncate">
-              {tHome("levelToTarget", { level: profile.level, name: levelName, target: profile.targetLevel })}
-              {" · "}
-              {tHome("todayGoal", { n: todayN })}
-            </p>
+      {/* Coursera-style hero band with soft brand gradient backdrop */}
+      <section className="border-b border-ink-200 brand-gradient-soft">
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="min-w-0">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-ink-900">
+                {tGreeting(greetingKey())}, {firstName}{" "}
+                <span aria-hidden>👋</span>
+              </h1>
+              <p className="mt-2 text-sm md:text-base text-ink-500 max-w-2xl">
+                {tHome("levelToTarget", { level: profile.level, name: levelName, target: profile.targetLevel })}
+                {" · "}
+                {tHome("todayGoal", { n: todayN })}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <StatChip
+                icon={<Trophy className="size-3.5 text-brand-700" />}
+                label={tHome("statLearned")}
+                value={String(ctx.progress?.totalLessons ?? 0)}
+              />
+              <StatChip
+                icon={<Flame className="size-3.5 text-orange-500" />}
+                label={tHome("statStreak")}
+                value={tHome("streakDays", { n: ctx.progress?.streakDays ?? 0 })}
+              />
+              <StatChip
+                icon={<Target className="size-3.5 text-success-600" />}
+                label={tHome("statWeek")}
+                value={`${weeklyDone}/${weeklyTarget}`}
+              />
+            </div>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <StatChip
-              icon={<Trophy className="size-3.5 text-brand-600" />}
-              label={tHome("statLearned")}
-              value={String(ctx.progress?.totalLessons ?? 0)}
-            />
-            <StatChip
-              icon={<Flame className="size-3.5 text-orange-500" />}
-              label={tHome("statStreak")}
-              value={tHome("streakDays", { n: ctx.progress?.streakDays ?? 0 })}
-            />
-            <StatChip
-              icon={<Target className="size-3.5 text-emerald-600" />}
-              label={tHome("statWeek")}
-              value={`${weeklyDone}/${weeklyTarget}`}
-            />
-          </div>
-        </section>
+        </div>
+      </section>
 
+      <main className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 space-y-10">
         <LibrarySections
           all={all}
           recommended={recommended}
@@ -108,10 +114,10 @@ function StatChip({
   value: string;
 }) {
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-1.5">
+    <div className="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-white px-3 py-1.5 shadow-card">
       {icon}
-      <span className="text-xs text-stone-500">{label}</span>
-      <span className="text-sm font-semibold text-stone-900 tabular-nums">{value}</span>
+      <span className="text-xs text-ink-500">{label}</span>
+      <span className="text-sm font-semibold text-ink-900 tabular-nums">{value}</span>
     </div>
   );
 }
