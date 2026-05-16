@@ -4,7 +4,8 @@ test.describe("i18n EN/VI switching", () => {
   test("Auth page renders VI by default", async ({ page }) => {
     await page.goto("/auth");
     await expect(page.getByRole("heading", { name: /Chào mừng trở lại/ })).toBeVisible();
-    await expect(page.locator("h1").filter({ hasText: /Tự do học/ })).toBeVisible();
+    // Logo's slogan span (Tự do học, tự tin nói) is rendered above the form
+    await expect(page.locator("main").getByText(/Tự do học, tự tin nói/)).toBeVisible();
   });
 
   test("Setting NEXT_LOCALE=en cookie renders English", async ({ page, context }) => {
@@ -13,7 +14,7 @@ test.describe("i18n EN/VI switching", () => {
     ]);
     await page.goto("/auth");
     await expect(page.getByRole("heading", { name: /Welcome back/ })).toBeVisible();
-    await expect(page.locator("h1").filter({ hasText: /Learn freely/ })).toBeVisible();
+    await expect(page.locator("main").getByText(/Learn freely, speak confidently/)).toBeVisible();
     // Sign-in button text
     await expect(page.locator('form button[type="submit"]')).toContainText(/Sign in/);
   });

@@ -2,28 +2,25 @@ import { test, expect } from "@playwright/test";
 import { DEMO_USER } from "./_helpers";
 
 test.describe("Màn 1 — Auth (CONTEXT.md §5)", () => {
-  test("Split layout desktop: branding panel left, form right", async ({ page }) => {
-    await page.setViewportSize({ width: 1280, height: 800 });
+  test("Stacked layout (HD): logo + slogan on top, form below, feature list further down", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto("/auth");
 
-    // Branding panel
-    await expect(page.getByRole("heading", { name: /Tự do học/ })).toBeVisible();
+    // Logo + slogan on top
+    await expect(page.locator("main").getByText("Vibe English", { exact: true })).toBeVisible();
+    await expect(page.locator("main").getByText(/Tự do học, tự tin nói/)).toBeVisible();
+    // Form below (login by default)
+    await expect(page.getByRole("heading", { name: /Chào mừng trở lại/ })).toBeVisible();
+    // Feature list further down
     await expect(page.getByText("Cá nhân hoá sâu theo mục tiêu")).toBeVisible();
     await expect(page.getByText("AI chấm & feedback tức thì")).toBeVisible();
-
-    // Form panel
-    await expect(page.getByRole("heading", { name: /Chào mừng trở lại/ })).toBeVisible();
   });
 
-  test("Mobile: branding panel hidden, form visible with logo", async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 700 });
+  test("Mobile: same stacked layout with logo + form", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 800 });
     await page.goto("/auth");
-
-    // Branding panel hidden via lg:flex
-    const tagline = page.getByRole("heading", { name: /Tự do học/ });
-    await expect(tagline).toBeHidden();
-    // Small logo at top of form panel (text "Vibe English" exact)
     await expect(page.locator("main").getByText("Vibe English", { exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Chào mừng trở lại/ })).toBeVisible();
   });
 
   test("Tab switcher: Đăng nhập ↔ Đăng ký", async ({ page }) => {

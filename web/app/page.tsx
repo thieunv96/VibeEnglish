@@ -82,13 +82,13 @@ export default async function HomePage({
     <div className="min-h-screen bg-white">
       <TopNav />
 
-      <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 space-y-12">
-        {/* H1 personalized greeting — Coursera pattern: no hero, just a heading then content */}
-        <header className="space-y-1">
+      {/* Hero band — soft brand tint, full-width, just like Coursera's screenshot */}
+      <section className="bg-brand-50 border-b border-ink-200">
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-ink-900">
             {tHome("greetingPersonalized", { name: firstName })}
           </h1>
-          <p className="text-sm text-ink-500">
+          <p className="mt-1 text-sm text-ink-600">
             {tHome("greetingMeta", {
               level: profile.level,
               name: levelName,
@@ -96,7 +96,10 @@ export default async function HomePage({
               n: todayN,
             })}
           </p>
-        </header>
+        </div>
+      </section>
+
+      <main className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 space-y-12">
 
         {/* Continue learning (if any) */}
         {inProgress.length > 0 && (

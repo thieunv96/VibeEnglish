@@ -82,7 +82,7 @@ export default async function LessonPreviewPage({ params }: { params: Promise<{ 
 
       {/* ============================ HERO HEADER ============================ */}
       <header className="border-b border-ink-200 bg-white">
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-8 md:pb-10">
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-8 md:pb-10">
           <Link
             href="/"
             className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-900 mb-5"
@@ -195,7 +195,7 @@ export default async function LessonPreviewPage({ params }: { params: Promise<{ 
 
       {/* ============================ TAB NAV ============================ */}
       <nav className="sticky top-16 z-20 bg-white border-b border-ink-200">
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex gap-6 overflow-x-auto">
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-6 overflow-x-auto">
           {tabs.map((tab, idx) => (
             <a
               key={tab.id}
@@ -213,7 +213,7 @@ export default async function LessonPreviewPage({ params }: { params: Promise<{ 
         </div>
       </nav>
 
-      <main className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-14">
+      <main className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-14">
         {/* ============================ OVERVIEW ============================ */}
         <section id="overview" className="scroll-mt-32 space-y-8">
           {/* About */}

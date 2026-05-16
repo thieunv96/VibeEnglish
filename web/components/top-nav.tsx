@@ -24,7 +24,7 @@ export async function TopNav() {
 
   return (
     <header className="sticky top-0 z-30 bg-white border-b border-ink-200">
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-4 lg:gap-6">
+      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-4 lg:gap-6">
         <Link href={homeHref} className="flex items-center shrink-0" title="Vibe English">
           <Logo size="sm" withSlogan />
         </Link>

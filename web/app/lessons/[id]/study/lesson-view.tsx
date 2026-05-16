@@ -94,7 +94,7 @@ export function LessonView({ data, next }: { data: LessonData; next: Lesson | nu
     <div className="min-h-screen flex flex-col bg-stone-50">
       {/* Lesson sub-header — not sticky (TopNav is the only sticky chrome) */}
       <div className="bg-white border-b border-stone-200">
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center gap-4">
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center gap-4">
           <Link
             href={`/lessons/${lesson.id}`}
             className="flex items-center gap-1.5 text-sm font-medium text-stone-600 hover:text-stone-900"
@@ -126,7 +126,7 @@ export function LessonView({ data, next }: { data: LessonData; next: Lesson | nu
         </div>
       </div>
 
-      <div className="flex-1 max-w-[1920px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-6">
+      <div className="flex-1 max-w-screen-xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-6">
         {/* Left panel */}
         <div className="space-y-5 min-w-0">
           {video ? (

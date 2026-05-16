@@ -17,57 +17,47 @@ export default async function AuthPage({
   const t = await getTranslations("auth");
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left branding panel */}
-      <aside className="hidden lg:flex relative w-1/2 brand-gradient overflow-hidden">
-        <div className="absolute -top-32 -left-32 size-96 rounded-full bg-white/10 blur-2xl" />
-        <div className="absolute -bottom-40 -right-20 size-[28rem] rounded-full bg-white/5 blur-2xl" />
-        <div className="absolute inset-0 dotted-bg opacity-30" />
+    <div className="min-h-screen flex flex-col bg-ink-50 relative">
+      {/* Top locale switcher */}
+      <div className="absolute top-4 right-4 z-10">
+        <LocaleSwitcher variant="light" />
+      </div>
 
-        <div className="relative z-10 flex flex-col justify-between p-12 text-white w-full">
-          <Logo size="lg" className="text-white" />
-
-          <div className="space-y-8 max-w-md">
-            <div>
-              <h1 className="text-4xl font-bold leading-tight">
-                {t("brandingTitle")}<br />{t("brandingTitle2")}
-              </h1>
-              <p className="mt-4 text-white/85 text-lg">{t("brandingDesc")}</p>
-            </div>
-
-            <ul className="space-y-4">
-              {[
-                { icon: Sparkles, label: t("feature1") },
-                { icon: Brain, label: t("feature2") },
-                { icon: BarChart3, label: t("feature3") },
-                { icon: Zap, label: t("feature4") },
-              ].map(({ icon: Icon, label }) => (
-                <li key={label} className="flex items-center gap-3 text-white/90">
-                  <span className="size-9 rounded-lg bg-white/15 flex items-center justify-center">
-                    <Icon className="size-4.5" />
-                  </span>
-                  <span>{label}</span>
-                </li>
-              ))}
-            </ul>
+      <main className="flex-1 flex items-center justify-center px-4 py-10 sm:py-12">
+        <div className="w-full max-w-md flex flex-col items-center">
+          {/* Logo + slogan on top */}
+          <div className="mb-6 flex flex-col items-center text-center">
+            <Logo size="lg" withSlogan />
+            <p className="mt-4 text-sm text-ink-500 max-w-sm">{t("brandingDesc")}</p>
           </div>
 
-          <p className="text-white/60 text-xs">© Vibe English · {new Date().getFullYear()}</p>
-        </div>
-      </aside>
-
-      {/* Right form panel */}
-      <main className="flex-1 flex items-center justify-center px-4 py-8 sm:px-8 bg-white relative">
-        <div className="absolute top-4 right-4">
-          <LocaleSwitcher variant="light" />
-        </div>
-        <div className="w-full max-w-md">
-          <div className="lg:hidden mb-8 flex justify-center">
-            <Logo size="md" withSlogan />
+          {/* Auth form card */}
+          <div className="w-full rounded-lg border border-ink-200 bg-white shadow-card p-6 sm:p-8">
+            <AuthTabs defaultMode={sp.mode === "register" ? "register" : "login"} nextPath={sp.next} />
           </div>
-          <AuthTabs defaultMode={sp.mode === "register" ? "register" : "login"} nextPath={sp.next} />
+
+          {/* Feature list below the form (compact) */}
+          <ul className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 text-sm text-ink-600 max-w-md w-full">
+            {[
+              { icon: Sparkles, label: t("feature1") },
+              { icon: Brain, label: t("feature2") },
+              { icon: BarChart3, label: t("feature3") },
+              { icon: Zap, label: t("feature4") },
+            ].map(({ icon: Icon, label }) => (
+              <li key={label} className="flex items-center gap-2">
+                <span className="size-7 rounded-md bg-brand-50 text-brand-700 flex items-center justify-center shrink-0">
+                  <Icon className="size-3.5" />
+                </span>
+                <span className="truncate">{label}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </main>
+
+      <footer className="py-4 text-center text-xs text-ink-400">
+        © Vibe English · {new Date().getFullYear()}
+      </footer>
     </div>
   );
 }
