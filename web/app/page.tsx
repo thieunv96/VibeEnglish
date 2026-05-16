@@ -51,6 +51,9 @@ export default async function HomePage({
   const levelName = tCefr(`${profile.level}.name`);
   const todayN = Math.max(1, Math.round(profile.dailyMinutes / 8));
 
+  // Map for fast id → category lookup (used by LessonCard partner row)
+  const categoryMap = new Map(categories.map((c) => [c.id, c]));
+
   // Derived row buckets — keep them mutually exclusive so a lesson doesn't appear in 3 sections.
   const completedIds = new Set(completed.map((c) => c.id));
   const recommendedIds = new Set(recommended.map((r) => r.id));
@@ -97,7 +100,11 @@ export default async function HomePage({
 
         {/* Continue learning (if any) */}
         {inProgress.length > 0 && (
-          <LessonCarousel title={tHome("continueLearning")} lessons={inProgress} />
+          <LessonCarousel
+            title={tHome("continueLearning")}
+            lessons={inProgress}
+            categoryMap={categoryMap}
+          />
         )}
 
         {/* Recommended */}
@@ -107,6 +114,7 @@ export default async function HomePage({
             lessons={recommended}
             showRecommendationBar
             statusBadge={tHome("topRecommended")}
+            categoryMap={categoryMap}
           />
         )}
 
@@ -115,6 +123,7 @@ export default async function HomePage({
           <LessonCarousel
             title={tHome("byLevel", { level: profile.level })}
             lessons={byLevel}
+            categoryMap={categoryMap}
           />
         )}
 
@@ -123,7 +132,11 @@ export default async function HomePage({
 
         {/* Explore more */}
         {exploreMore.length > 0 && (
-          <LessonCarousel title={tHome("exploreMore")} lessons={exploreMore} />
+          <LessonCarousel
+            title={tHome("exploreMore")}
+            lessons={exploreMore}
+            categoryMap={categoryMap}
+          />
         )}
 
         {/* All lessons with power-filter (collapsed below; not part of the Coursera idiom but useful) */}

@@ -19,6 +19,24 @@ test.describe("Coursera-style redesign (per startup/*.html reference)", () => {
     await expect(page.getByRole("heading", { name: /^Tất cả bài học$/ })).toBeVisible();
   });
 
+  test("Lesson card anatomy (Coursera): partner row + title + rating + meta line", async ({ page }) => {
+    await page.goto("/");
+    // Pick the first card inside the "Gợi ý cho bạn" carousel (it has the topRecommended badge)
+    const recSection = page.locator("section").filter({ hasText: /Gợi ý cho bạn/ });
+    const firstCard = recSection.locator('a[href^="/lessons/"]:not([href$="/study"])').first();
+    await expect(firstCard).toBeVisible();
+    // Partner row: small icon + category name
+    await expect(firstCard.getByText(/Kinh doanh|Giao tiếp|Du lịch|Công nghệ|Giáo dục/).first()).toBeVisible();
+    // Bold title (h3)
+    await expect(firstCard.locator("h3")).toBeVisible();
+    // Rating row contains the star value (number with comma or dot)
+    await expect(firstCard.getByText(/\d[\.,]\d/)).toBeVisible();
+    // Meta line: Level · Type · Duration (contains "phút")
+    await expect(firstCard.getByText(/phút/)).toBeVisible();
+    // "Đề xuất hàng đầu" status badge on recommended carousel cards
+    await expect(firstCard.getByText(/Đề xuất hàng đầu/)).toBeVisible();
+  });
+
   test("Brand color #0056D2 applied (lesson preview CTA)", async ({ page }) => {
     // The home page no longer has a hero CTA. The lesson preview "Bắt đầu học"
     // button still uses bg-brand-700 = #0056d2.

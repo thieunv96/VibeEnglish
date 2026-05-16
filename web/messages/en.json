@@ -169,6 +169,11 @@
     "categoryNoLessons": "No lessons yet",
     "empty": "No lessons match the current filter."
   },
+  "lessonCard": {
+    "reviewCount": "{n} reviews",
+    "noRating": "No reviews yet",
+    "durationMin": "{n} min"
+  },
   "lessonTypes": {
     "video_quiz": "Video → Quiz",
     "quiz": "Quiz",

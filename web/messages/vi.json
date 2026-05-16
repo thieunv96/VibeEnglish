@@ -169,6 +169,11 @@
     "categoryNoLessons": "Chưa có bài",
     "empty": "Không có bài học phù hợp với bộ lọc hiện tại."
   },
+  "lessonCard": {
+    "reviewCount": "{n} đánh giá",
+    "noRating": "Chưa có đánh giá",
+    "durationMin": "{n} phút"
+  },
   "lessonTypes": {
     "video_quiz": "Video → Quiz",
     "quiz": "Quiz",

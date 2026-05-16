@@ -4,7 +4,7 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { LessonCard } from "@/components/lesson-card";
-import type { Lesson } from "@/db/schema";
+import type { Category, Lesson } from "@/db/schema";
 import { cn } from "@/lib/utils";
 
 type LessonWithScore = Lesson & { score?: number };
@@ -14,6 +14,7 @@ export function LessonCarousel({
   lessons,
   showRecommendationBar = false,
   statusBadge,
+  categoryMap,
   className,
 }: {
   title: string;
@@ -21,9 +22,12 @@ export function LessonCarousel({
   showRecommendationBar?: boolean;
   /** Optional badge to overlay on each card (e.g. "Top recommendation"). */
   statusBadge?: string;
+  /** Map of category id → category, used to render the partner row on each card. */
+  categoryMap?: Map<string, Category>;
   className?: string;
 }) {
   const t = useTranslations("home");
+  const tCat = useTranslations("categoriesList");
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -91,18 +95,31 @@ export function LessonCarousel({
         ref={scrollRef}
         className="-mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 flex gap-4 overflow-x-auto scrollbar-thin snap-x snap-mandatory scroll-smooth pb-2"
       >
-        {lessons.map((l) => (
-          <div
-            key={l.id}
-            className="w-[260px] sm:w-[280px] md:w-[300px] shrink-0 snap-start"
-          >
-            <LessonCard
-              lesson={l}
-              recommendation={showRecommendationBar ? l.score : undefined}
-              statusBadge={statusBadge}
-            />
-          </div>
-        ))}
+        {lessons.map((l) => {
+          const cat = l.categoryId ? categoryMap?.get(l.categoryId) : undefined;
+          let catName: string | undefined;
+          if (cat) {
+            try {
+              catName = tCat(cat.slug);
+            } catch {
+              catName = cat.title;
+            }
+          }
+          return (
+            <div
+              key={l.id}
+              className="w-[260px] sm:w-[280px] md:w-[300px] shrink-0 snap-start"
+            >
+              <LessonCard
+                lesson={l}
+                recommendation={showRecommendationBar ? l.score : undefined}
+                statusBadge={statusBadge}
+                category={cat ?? null}
+                categoryName={catName}
+              />
+            </div>
+          );
+        })}
         <div className="w-1 shrink-0" aria-hidden />
       </div>
     </section>
