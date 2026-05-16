@@ -9,7 +9,8 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
 
   test("TopNav: logo (+slogan) + streak chip + avatar; no Thư viện/Hồ sơ links", async ({ page }) => {
     await expect(page.locator("header").getByText("Vibe English").first()).toBeVisible();
-    await expect(page.locator("header").getByText(/Learn freely, speak confidently/)).toBeVisible();
+    // Default locale is VI ("Tự do học, tự tin nói"); EN renders "Learn freely, speak confidently"
+    await expect(page.locator("header").getByText(/Tự do học, tự tin nói|Learn freely, speak confidently/)).toBeVisible();
     // Library/Profile nav links removed (logo serves as library home, profile in dropdown)
     await expect(page.locator("header").getByRole("link", { name: "Thư viện" })).toHaveCount(0);
     await expect(page.locator("header").getByRole("link", { name: "Hồ sơ" })).toHaveCount(0);
@@ -31,9 +32,12 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
   test('"Khám phá theo chủ đề" categories chips visible', async ({ page }) => {
     await expect(page.getByRole("heading", { name: /Khám phá theo chủ đề/ })).toBeVisible();
     const catSection = page.locator("section").filter({ hasText: /Khám phá theo chủ đề/ });
-    // Seed has 8 categories
+    // Master list has 178 fixed categories; home only shows those with lessons
+    // (seed: business=4, communication=1, technology=1, travel=1, education=1).
     await expect(catSection.getByRole("button", { name: /Kinh doanh/ })).toBeVisible();
-    await expect(catSection.getByRole("button", { name: /Ẩm thực/ })).toBeVisible();
+    await expect(catSection.getByRole("button", { name: /Du lịch/ })).toBeVisible();
+    // "View all (178)" trigger opens modal with the full master list
+    await expect(catSection.getByRole("button", { name: /Xem tất cả \(178\)/ })).toBeVisible();
   });
 
   test('Section "Gợi ý cho bạn" with up to 3 recommended cards', async ({ page }) => {

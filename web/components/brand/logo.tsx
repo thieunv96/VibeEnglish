@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 export function Logo({
@@ -12,6 +15,7 @@ export function Logo({
   withSlogan?: boolean;
   size?: "sm" | "md" | "lg";
 }) {
+  const t = useTranslations("common");
   const dims = {
     sm: { box: 28, text: "text-base", slogan: "text-[10px]" },
     md: { box: 36, text: "text-lg", slogan: "text-[11px]" },
@@ -35,7 +39,7 @@ export function Logo({
           </span>
           {withSlogan && (
             <span className={cn("text-stone-400 font-normal -mt-0.5", dims.slogan)}>
-              Learn freely, speak confidently
+              {t("tagline")}
             </span>
           )}
         </div>

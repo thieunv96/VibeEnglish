@@ -23,6 +23,8 @@ import {
 } from "./schema";
 import argon2 from "argon2";
 import { sql, eq } from "drizzle-orm";
+import { CATEGORIES } from "../lib/categories";
+import enMessages from "../messages/en.json";
 
 const uid = () => crypto.randomUUID();
 
@@ -136,22 +138,23 @@ async function main() {
   }
 
   // ----- Categories -----
+  // Master list comes from web/lib/categories.ts (178 fixed entries).
+  // DB stores English title as a fallback; UI resolves display name via i18n key categoriesList.<slug>.
   console.log("Creating categories...");
-  const categoryDefs = [
-    { slug: "business", title: "Kinh doanh & Công sở", icon: "💼", description: "Email công việc, meeting, presentation" },
-    { slug: "communication", title: "Giao tiếp đời sống", icon: "💬", description: "Tiếng Anh hàng ngày, hội thoại tự nhiên" },
-    { slug: "tech", title: "Công nghệ", icon: "💻", description: "IT, lập trình, sản phẩm số" },
-    { slug: "food", title: "Ẩm thực", icon: "🍜", description: "Đồ ăn, nhà hàng, công thức nấu ăn" },
-    { slug: "culture", title: "Văn hoá", icon: "🎭", description: "Lễ hội, phong tục, lifestyle quốc tế" },
-    { slug: "travel", title: "Du lịch", icon: "✈️", description: "Đặt vé, sân bay, hỏi đường, trải nghiệm" },
-    { slug: "entertainment", title: "Giải trí", icon: "🎬", description: "Phim ảnh, âm nhạc, thể thao" },
-    { slug: "academic", title: "Học thuật", icon: "🎓", description: "TOEIC, IELTS, học thuật chuẩn quốc tế" },
-  ];
+  const enCategoryList = (enMessages as { categoriesList: Record<string, string> }).categoriesList;
   const categoryIds: Record<string, string> = {};
-  for (let i = 0; i < categoryDefs.length; i++) {
+  for (let i = 0; i < CATEGORIES.length; i++) {
+    const def = CATEGORIES[i];
     const id = uid();
-    categoryIds[categoryDefs[i].slug] = id;
-    await db.insert(categories).values({ id, ...categoryDefs[i], order: i });
+    categoryIds[def.slug] = id;
+    await db.insert(categories).values({
+      id,
+      slug: def.slug,
+      title: enCategoryList[def.slug] ?? def.slug,
+      icon: def.icon,
+      description: null,
+      order: i,
+    });
   }
 
   // ----- Series + Videos + Lessons -----
@@ -295,7 +298,7 @@ async function main() {
       title: "IELTS Speaking: describe a recent trip",
       type: "speaking",
       level: "B2",
-      categorySlug: "academic",
+      categorySlug: "education",
       description: "Đề bài Speaking IELTS Part 2 — mô tả chuyến đi gần nhất (cue card 2 phút).",
       duration: 240,
       speaking: { target: "I'd like to talk about a recent trip I took to the countryside last summer." },
@@ -305,7 +308,7 @@ async function main() {
       title: "Reading: a startup press release",
       type: "quiz",
       level: "B2",
-      categorySlug: "tech",
+      categorySlug: "technology",
       description: "Đọc hiểu một press release của startup công nghệ — funding, product launch, terminology.",
       duration: 360,
       quiz: [
