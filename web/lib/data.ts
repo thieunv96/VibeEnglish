@@ -140,6 +140,17 @@ export async function getLessonPreview(lessonId: string) {
   return { lesson, video, exercises: exs, series: seriesRow, category };
 }
 
+export async function getInProgressLessons(userId: string, limit = 6) {
+  const rows = await db
+    .select({ lesson: lessons, startedAt: lessonAttempts.startedAt })
+    .from(lessonAttempts)
+    .innerJoin(lessons, eq(lessons.id, lessonAttempts.lessonId))
+    .where(and(eq(lessonAttempts.userId, userId), eq(lessonAttempts.status, "in_progress")))
+    .orderBy(desc(lessonAttempts.startedAt))
+    .limit(limit);
+  return rows.map((r) => r.lesson);
+}
+
 export async function getLessonReviews(lessonId: string, limit = 6) {
   const rows = await db
     .select({

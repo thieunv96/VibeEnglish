@@ -28,19 +28,25 @@ export function LibrarySections({
   completed,
   categories,
   initialSearch = "",
+  initialCategory = "all",
+  hideTopChips = false,
+  hideRecommended = false,
 }: {
   all: Lesson[];
   recommended: LessonWithScore[];
   completed: CompletedLesson[];
   categories: Category[];
   initialSearch?: string;
+  initialCategory?: string | "all";
+  hideTopChips?: boolean;
+  hideRecommended?: boolean;
 }) {
   const t = useTranslations("home");
   const tCommon = useTranslations("common");
   const tCat = useTranslations("categoriesList");
   const [filter, setFilter] = useState<LibraryFilter>("all");
   const [search, setSearch] = useState(initialSearch);
-  const [category, setCategory] = useState<string | "all">("all");
+  const [category, setCategory] = useState<string | "all">(initialCategory);
   const [view, setView] = useState<"grid" | "list">("grid");
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSearch, setModalSearch] = useState("");
@@ -48,6 +54,10 @@ export function LibrarySections({
   useEffect(() => {
     setSearch(initialSearch);
   }, [initialSearch]);
+
+  useEffect(() => {
+    setCategory(initialCategory);
+  }, [initialCategory]);
 
   // Count lessons per category id (for "with lessons" filter + sort)
   const lessonCountByCategoryId = useMemo(() => {
@@ -118,7 +128,7 @@ export function LibrarySections({
   return (
     <>
       {/* Categories chip row */}
-      {visibleCategories.length > 0 && (
+      {!hideTopChips && visibleCategories.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl md:text-2xl font-bold tracking-tight text-ink-900">{t("discover")}</h2>
@@ -211,7 +221,7 @@ export function LibrarySections({
       )}
 
       {/* Recommended */}
-      {recommended.length > 0 && (
+      {!hideRecommended && recommended.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl md:text-2xl font-bold tracking-tight flex items-center gap-2 text-ink-900">

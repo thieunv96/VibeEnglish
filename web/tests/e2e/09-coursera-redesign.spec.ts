@@ -8,9 +8,10 @@ test.describe("Coursera-style redesign (per startup/*.html reference)", () => {
 
   test("Home: hero band + section headings are large + bold", async ({ page }) => {
     await page.goto("/");
-    // Hero greeting still present, headline is now h1 with bigger style
+    // h1 is now the value-prop headline; greeting is in a small chip above
     const h1 = page.getByRole("heading", { level: 1 }).first();
-    await expect(h1).toContainText(/Chào buổi.*/);
+    await expect(h1).toContainText(/Hôm nay bạn muốn học/);
+    await expect(page.getByText(/Chào buổi.*/).first()).toBeVisible();
     // Section h2s use the upgraded bold styling
     await expect(page.getByRole("heading", { name: /Khám phá theo chủ đề/ })).toBeVisible();
     await expect(page.getByRole("heading", { name: /Gợi ý cho bạn/ })).toBeVisible();
@@ -19,12 +20,10 @@ test.describe("Coursera-style redesign (per startup/*.html reference)", () => {
 
   test("Brand CTA buttons use Coursera blue (#0056D2)", async ({ page }) => {
     await page.goto("/");
-    // Find a category chip in selected state (after clicking)
-    const allChip = page.getByRole("button", { name: /^Tất cả$/ }).first();
-    await allChip.click();
-    // Check computed background color (should resolve to brand-700 = #0056d2)
-    const bgColor = await allChip.evaluate((el) => getComputedStyle(el).backgroundColor);
-    // rgb(0, 86, 210) is brand-700
+    // Hero primary CTA "Tiếp tục lộ trình" uses bg-brand-700 = #0056d2
+    const heroCta = page.getByRole("link", { name: /Tiếp tục lộ trình/ }).first();
+    await expect(heroCta).toBeVisible();
+    const bgColor = await heroCta.evaluate((el) => getComputedStyle(el).backgroundColor);
     expect(bgColor).toBe("rgb(0, 86, 210)");
   });
 
@@ -40,7 +39,7 @@ test.describe("Coursera-style redesign (per startup/*.html reference)", () => {
 
   test("Lesson preview: hero header (title + meta + CTA) + cover on right", async ({ page }) => {
     await page.goto("/");
-    const firstCard = page.locator('a[href^="/lessons/"]').first();
+    const firstCard = page.locator('a[href^="/lessons/"]:not([href$="/study"])').first();
     const href = (await firstCard.getAttribute("href"))!;
     await page.goto(href);
 
@@ -54,7 +53,7 @@ test.describe("Coursera-style redesign (per startup/*.html reference)", () => {
 
   test("Lesson preview: sticky tabs with Overview / Modules / Reviews", async ({ page }) => {
     await page.goto("/");
-    const firstCard = page.locator('a[href^="/lessons/"]').first();
+    const firstCard = page.locator('a[href^="/lessons/"]:not([href$="/study"])').first();
     const href = (await firstCard.getAttribute("href"))!;
     await page.goto(href);
 
@@ -67,7 +66,7 @@ test.describe("Coursera-style redesign (per startup/*.html reference)", () => {
 
   test('Lesson preview: "Bạn sẽ học được" card with skill bullets', async ({ page }) => {
     await page.goto("/");
-    const firstCard = page.locator('a[href^="/lessons/"]').first();
+    const firstCard = page.locator('a[href^="/lessons/"]:not([href$="/study"])').first();
     const href = (await firstCard.getAttribute("href"))!;
     await page.goto(href);
 
@@ -81,7 +80,7 @@ test.describe("Coursera-style redesign (per startup/*.html reference)", () => {
 
   test("Lesson preview: modules accordion + FAQ accordion render", async ({ page }) => {
     await page.goto("/");
-    const firstCard = page.locator('a[href^="/lessons/"]').first();
+    const firstCard = page.locator('a[href^="/lessons/"]:not([href$="/study"])').first();
     const href = (await firstCard.getAttribute("href"))!;
     await page.goto(href);
 
@@ -99,7 +98,7 @@ test.describe("Coursera-style redesign (per startup/*.html reference)", () => {
 
   test("Lesson preview: footer CTA banner with Ready / Bắt đầu học", async ({ page }) => {
     await page.goto("/");
-    const firstCard = page.locator('a[href^="/lessons/"]').first();
+    const firstCard = page.locator('a[href^="/lessons/"]:not([href$="/study"])').first();
     const href = (await firstCard.getAttribute("href"))!;
     await page.goto(href);
 
@@ -115,7 +114,7 @@ test.describe("Coursera-style redesign (per startup/*.html reference)", () => {
       { name: "NEXT_LOCALE", value: "en", domain: "localhost", path: "/" },
     ]);
     await page.goto("/");
-    const firstCard = page.locator('a[href^="/lessons/"]').first();
+    const firstCard = page.locator('a[href^="/lessons/"]:not([href$="/study"])').first();
     const href = (await firstCard.getAttribute("href"))!;
     await page.goto(href);
 

@@ -8,19 +8,19 @@ test.describe("Categories i18n + master modal (per requirement)", () => {
     await loginViaApi(page, DEMO_USER);
   });
 
-  test("Default VI: slogan + category chips render in Vietnamese", async ({ page }) => {
+  test("Default VI: slogan + category tiles render in Vietnamese", async ({ page }) => {
     await page.goto("/");
     // Slogan in TopNav (VI)
     await expect(page.locator("header").getByText("Tự do học, tự tin nói")).toBeVisible();
     // Category section heading (VI)
     await expect(page.getByRole("heading", { name: /Khám phá theo chủ đề/ })).toBeVisible();
-    // Visible chips use VI translations
+    // Visible tiles use VI translations
     const catSection = page.locator("section").filter({ hasText: /Khám phá theo chủ đề/ });
-    await expect(catSection.getByRole("button", { name: /Kinh doanh/ })).toBeVisible();
-    await expect(catSection.getByRole("button", { name: /Du lịch/ })).toBeVisible();
+    await expect(catSection.getByRole("link", { name: /Kinh doanh/ })).toBeVisible();
+    await expect(catSection.getByRole("link", { name: /Du lịch/ })).toBeVisible();
   });
 
-  test("EN locale via cookie: slogan + chips render in English", async ({ page, context }) => {
+  test("EN locale via cookie: slogan + tiles render in English", async ({ page, context }) => {
     await context.addCookies([
       { name: "NEXT_LOCALE", value: "en", domain: "localhost", path: "/" },
     ]);
@@ -28,17 +28,17 @@ test.describe("Categories i18n + master modal (per requirement)", () => {
     await expect(page.locator("header").getByText("Learn freely, speak confidently")).toBeVisible();
     await expect(page.getByRole("heading", { name: /Discover by topic/ })).toBeVisible();
     const catSection = page.locator("section").filter({ hasText: /Discover by topic/ });
-    await expect(catSection.getByRole("button", { name: /Business/ })).toBeVisible();
-    await expect(catSection.getByRole("button", { name: /Travel/ })).toBeVisible();
+    await expect(catSection.getByRole("link", { name: /Business/ })).toBeVisible();
+    await expect(catSection.getByRole("link", { name: /Travel/ })).toBeVisible();
   });
 
   test("Home only shows categories that have at least 1 lesson", async ({ page }) => {
     await page.goto("/");
     const catSection = page.locator("section").filter({ hasText: /Khám phá theo chủ đề/ });
-    // "Fitness" exists in master list but has 0 lessons → must not appear as a top chip
-    await expect(catSection.getByRole("button", { name: /^Fitness$|^Thể hình$/ })).toHaveCount(0);
+    // "Fitness" exists in master list but has 0 lessons → must not appear as a top tile
+    await expect(catSection.getByRole("link", { name: /^Fitness$|^Thể hình$/ })).toHaveCount(0);
     // "Cryptocurrency" / "Tiền điện tử" also 0 lessons
-    await expect(catSection.getByRole("button", { name: /Cryptocurrency|Tiền điện tử/ })).toHaveCount(0);
+    await expect(catSection.getByRole("link", { name: /Cryptocurrency|Tiền điện tử/ })).toHaveCount(0);
   });
 
   test('"Xem tất cả (178)" opens modal with all 178 entries + search filter', async ({ page }) => {
@@ -51,42 +51,42 @@ test.describe("Categories i18n + master modal (per requirement)", () => {
     // Search "fitness" → should match the Vietnamese name "Thể hình" via slug filter
     const searchBox = page.getByPlaceholder(/Tìm chủ đề/);
     await searchBox.fill("fitness");
-    await expect(page.getByRole("button", { name: /Thể hình/ })).toBeVisible();
-    // Clear → all 178 visible again (we sample a few far-apart entries)
+    // Modal entries are now <Link>s with data-slug, scoped by dialog
+    const dialog = page.getByRole("dialog");
+    await expect(dialog.locator('a[data-slug="fitness"]')).toBeVisible();
+    // Clear → all 178 visible again
     await searchBox.fill("");
-    await expect(page.getByRole("button", { name: /Kinh doanh/ }).first()).toBeVisible();
-    await expect(page.getByRole("button", { name: /Tâm lý học/ })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Robot học/ })).toBeVisible();
+    await expect(dialog.locator('a[data-slug="business"]')).toBeVisible();
+    await expect(dialog.locator('a[data-slug="psychology"]')).toBeVisible();
+    await expect(dialog.locator('a[data-slug="robotics"]')).toBeVisible();
   });
 
-  test("Category-with-no-lessons in modal is disabled (no click filter)", async ({ page }) => {
+  test("Category-with-no-lessons in modal is non-clickable (pointer-events: none)", async ({ page }) => {
     await page.goto("/");
     const catSection = page.locator("section").filter({ hasText: /Khám phá theo chủ đề/ });
     await catSection.getByRole("button", { name: new RegExp(`Xem tất cả \\(${TOTAL_CATEGORIES}\\)`) }).click();
     // Find a category that has no lessons (e.g. Fitness) via stable data-slug
-    const fitnessBtn = page.locator('button[data-slug="fitness"]');
-    await expect(fitnessBtn).toBeVisible();
-    await expect(fitnessBtn).toBeDisabled();
+    const fitnessLink = page.locator('a[data-slug="fitness"]');
+    await expect(fitnessLink).toBeVisible();
+    // No-lesson entries get cursor-not-allowed + pointer-events-none + href "#"
+    await expect(fitnessLink).toHaveAttribute("href", "#");
+    await expect(fitnessLink).toHaveClass(/pointer-events-none/);
   });
 
-  test("Clicking a lesson-bearing category from modal applies filter + closes modal", async ({ page }) => {
+  test("Clicking a lesson-bearing category from modal navigates to ?cat= + closes modal", async ({ page }) => {
     await page.goto("/");
     const catSection = page.locator("section").filter({ hasText: /Khám phá theo chủ đề/ });
-    const allSection = page.locator("section").filter({ hasText: /Tất cả bài học/ });
-    const beforeCount = await allSection.locator('a[href^="/lessons/"]').count();
-    expect(beforeCount).toBeGreaterThan(0);
-
     await catSection.getByRole("button", { name: new RegExp(`Xem tất cả \\(${TOTAL_CATEGORIES}\\)`) }).click();
-    // Scope to dialog so we don't accidentally hit the home-page chip with the same label
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
     // Click "Giao tiếp" (communication, has 1 lesson) inside the dialog via stable data-slug
-    await dialog.locator('button[data-slug="communication"]').click();
+    await dialog.locator('a[data-slug="communication"]').click();
+    await page.waitForURL(/\?cat=/);
     // Modal closes
     await expect(dialog).toBeHidden();
-    // Lesson list narrows
-    const afterCount = await allSection.locator('a[href^="/lessons/"]').count();
-    expect(afterCount).toBeLessThanOrEqual(beforeCount);
+    // All-lessons section narrows (communication has 1 lesson)
+    const allSection = page.locator("section").filter({ hasText: /Tất cả bài học/ });
+    const afterCount = await allSection.locator('a[href^="/lessons/"]:not([href$="/study"])').count();
     expect(afterCount).toBeGreaterThan(0);
   });
 });

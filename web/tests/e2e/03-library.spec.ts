@@ -20,33 +20,36 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
     await expect(page.locator("header").getByTitle("Tài khoản")).toBeVisible();
   });
 
-  test("Single-line hero: greeting + 3 stat chips (no bg)", async ({ page }) => {
-    await expect(page.getByRole("heading", { level: 1 }).first()).toContainText(/Chào buổi.*/);
-    // 3 inline chips with abbreviated labels
+  test("Hero (Coursera-style): greeting chip + value-prop h1 + 3 stat chips", async ({ page }) => {
+    // Greeting now appears in a small Sparkles chip, not h1
+    await expect(page.getByText(/Chào buổi.*/).first()).toBeVisible();
+    // h1 is the value proposition
+    await expect(page.getByRole("heading", { level: 1 }).first()).toContainText(/Hôm nay bạn muốn học/);
+    // Stat chips in hero (text may appear in floating illustration badges too — accept first match)
     const hero = page.locator("section").first();
-    await expect(hero.getByText("Đã học")).toBeVisible();
-    await expect(hero.getByText("Streak")).toBeVisible();
-    await expect(hero.getByText("Tuần", { exact: true })).toBeVisible();
+    await expect(hero.getByText("Đã học").first()).toBeVisible();
+    await expect(hero.getByText("Streak").first()).toBeVisible();
+    await expect(hero.getByText("Tuần", { exact: true }).first()).toBeVisible();
   });
 
-  test('"Khám phá theo chủ đề" categories chips visible', async ({ page }) => {
+  test('"Khám phá theo chủ đề" category tiles visible', async ({ page }) => {
     await expect(page.getByRole("heading", { name: /Khám phá theo chủ đề/ })).toBeVisible();
     const catSection = page.locator("section").filter({ hasText: /Khám phá theo chủ đề/ });
-    // Master list has 178 fixed categories; home only shows those with lessons
+    // Master list has 178 fixed categories; home only shows those with lessons as tile links
     // (seed: business=4, communication=1, technology=1, travel=1, education=1).
-    await expect(catSection.getByRole("button", { name: /Kinh doanh/ })).toBeVisible();
-    await expect(catSection.getByRole("button", { name: /Du lịch/ })).toBeVisible();
+    await expect(catSection.getByRole("link", { name: /Kinh doanh/ })).toBeVisible();
+    await expect(catSection.getByRole("link", { name: /Du lịch/ })).toBeVisible();
     // "View all (178)" trigger opens modal with the full master list
     await expect(catSection.getByRole("button", { name: /Xem tất cả \(178\)/ })).toBeVisible();
   });
 
-  test('Section "Gợi ý cho bạn" with up to 3 recommended cards', async ({ page }) => {
+  test('Section "Gợi ý cho bạn" carousel with recommended cards', async ({ page }) => {
     await expect(page.getByRole("heading", { name: /Gợi ý cho bạn/ })).toBeVisible();
     const recSection = page.locator("section").filter({ hasText: /Gợi ý cho bạn/ });
-    const recCards = recSection.locator('a[href^="/lessons/"]');
+    const recCards = recSection.locator('a[href^="/lessons/"]:not([href$="/study"])');
     const count = await recCards.count();
     expect(count).toBeGreaterThanOrEqual(1);
-    expect(count).toBeLessThanOrEqual(3);
+    expect(count).toBeLessThanOrEqual(6);
   });
 
   test('Section "Tất cả bài học" with filter chips + grid/list toggle', async ({ page }) => {
@@ -73,17 +76,17 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
     expect(await allSection.locator('a[href^="/lessons/"]').count()).toEqual(beforeCount);
   });
 
-  test("Category filter narrows lessons", async ({ page }) => {
+  test("Category tile click narrows lessons via ?cat= URL", async ({ page }) => {
     const allSection = page.locator("section").filter({ hasText: /Tất cả bài học/ });
-    const beforeCount = await allSection.locator('a[href^="/lessons/"]').count();
-    // Filter by "Kinh doanh" (3 published lessons in seed are business)
+    const beforeCount = await allSection.locator('a[href^="/lessons/"]:not([href$="/study"])').count();
+    // Clicking a category tile navigates to /?cat=ID#all
     await page
       .locator("section")
       .filter({ hasText: /Khám phá theo chủ đề/ })
-      .getByRole("button", { name: /Kinh doanh/ })
+      .getByRole("link", { name: /Kinh doanh/ })
       .click();
-    await page.waitForTimeout(200);
-    const afterCount = await allSection.locator('a[href^="/lessons/"]').count();
+    await page.waitForURL(/\?cat=/);
+    const afterCount = await allSection.locator('a[href^="/lessons/"]:not([href$="/study"])').count();
     expect(afterCount).toBeLessThanOrEqual(beforeCount);
     expect(afterCount).toBeGreaterThan(0);
   });
@@ -114,7 +117,7 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
   });
 
   test("Click lesson card navigates to preview /lessons/[id] (not /study)", async ({ page }) => {
-    const firstCard = page.locator('a[href^="/lessons/"]').first();
+    const firstCard = page.locator('a[href^="/lessons/"]:not([href$="/study"])').first();
     const href = await firstCard.getAttribute("href");
     expect(href).toMatch(/^\/lessons\/[^/]+$/);
     await firstCard.click();
@@ -134,7 +137,7 @@ test.describe("Lesson preview (Coursera-style)", () => {
   });
 
   test("Preview shows lesson info + Bắt đầu học CTA → /study", async ({ page }) => {
-    const firstCard = page.locator('a[href^="/lessons/"]').first();
+    const firstCard = page.locator('a[href^="/lessons/"]:not([href$="/study"])').first();
     const href = (await firstCard.getAttribute("href"))!;
     await page.goto(href);
 
