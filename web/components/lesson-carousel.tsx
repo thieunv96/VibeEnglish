@@ -15,6 +15,7 @@ export function LessonCarousel({
   showRecommendationBar = false,
   statusBadge,
   categoryMap,
+  compact = false,
   className,
 }: {
   title: string;
@@ -24,6 +25,8 @@ export function LessonCarousel({
   statusBadge?: string;
   /** Map of category id → category, used to render the partner row on each card. */
   categoryMap?: Map<string, Category>;
+  /** Compact mode: narrower cards (~220px), no bleeding negative margins — fits inside a constrained column. */
+  compact?: boolean;
   className?: string;
 }) {
   const t = useTranslations("home");
@@ -93,7 +96,10 @@ export function LessonCarousel({
 
       <div
         ref={scrollRef}
-        className="-mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 flex gap-4 overflow-x-auto scrollbar-thin snap-x snap-mandatory scroll-smooth pb-2"
+        className={cn(
+          "flex gap-4 overflow-x-auto scrollbar-thin snap-x snap-mandatory scroll-smooth pb-2",
+          compact ? "" : "-mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8"
+        )}
       >
         {lessons.map((l) => {
           const cat = l.categoryId ? categoryMap?.get(l.categoryId) : undefined;
@@ -108,7 +114,10 @@ export function LessonCarousel({
           return (
             <div
               key={l.id}
-              className="w-[260px] sm:w-[280px] md:w-[300px] shrink-0 snap-start"
+              className={cn(
+                "shrink-0 snap-start",
+                compact ? "w-[calc(50%-0.5rem)] min-w-[200px]" : "w-[260px] sm:w-[280px] md:w-[300px]"
+              )}
             >
               <LessonCard
                 lesson={l}
@@ -120,7 +129,7 @@ export function LessonCarousel({
             </div>
           );
         })}
-        <div className="w-1 shrink-0" aria-hidden />
+        {!compact && <div className="w-1 shrink-0" aria-hidden />}
       </div>
     </section>
   );

@@ -150,62 +150,37 @@ export default async function HomePage({
               </div>
             </div>
 
-            {/* Right — brand gradient illustration with floating accent cards */}
-            <div className="relative hidden lg:block">
-              <div className="aspect-[5/4] rounded-2xl brand-gradient relative overflow-hidden shadow-card">
-                <div className="dotted-bg absolute inset-0 opacity-60" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-white/95 text-center px-8">
-                    <GraduationCap className="size-16 mx-auto mb-3 drop-shadow-sm" />
-                    <p className="text-2xl font-bold tracking-tight">Vibe English</p>
-                    <p className="text-sm opacity-90 mt-1">
-                      {profile.level} → {profile.targetLevel}
-                    </p>
+            {/* Right — Continue learning (compact, max 2 visible w/ stride scroll) */}
+            <div className="hidden lg:block min-w-0">
+              {inProgress.length > 0 ? (
+                <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
+                  <LessonCarousel
+                    title={tHome("continueLearning")}
+                    lessons={inProgress.slice(0, 6)}
+                    categoryMap={categoryMap}
+                    compact
+                  />
+                </div>
+              ) : (
+                <div className="aspect-[5/4] rounded-2xl brand-gradient relative overflow-hidden shadow-card">
+                  <div className="dotted-bg absolute inset-0 opacity-60" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-white/95 text-center px-8">
+                      <GraduationCap className="size-16 mx-auto mb-3 drop-shadow-sm" />
+                      <p className="text-2xl font-bold tracking-tight">Vibe English</p>
+                      <p className="text-sm opacity-90 mt-1">
+                        {profile.level} → {profile.targetLevel}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-              {/* Floating accent cards */}
-              <div className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-card-hover p-3 flex items-center gap-2 border border-ink-100">
-                <div className="size-9 rounded-lg bg-success-50 flex items-center justify-center">
-                  <Flame className="size-5 text-orange-500" />
-                </div>
-                <div>
-                  <div className="text-[10px] uppercase tracking-wide text-ink-400 font-semibold">
-                    {tHome("statStreak")}
-                  </div>
-                  <div className="text-sm font-bold text-ink-900">
-                    {tHome("streakDays", { n: ctx.progress?.streakDays ?? 0 })}
-                  </div>
-                </div>
-              </div>
-              <div className="absolute -top-4 -right-4 bg-white rounded-xl shadow-card-hover p-3 flex items-center gap-2 border border-ink-100">
-                <div className="size-9 rounded-lg bg-brand-50 flex items-center justify-center">
-                  <Trophy className="size-5 text-brand-700" />
-                </div>
-                <div>
-                  <div className="text-[10px] uppercase tracking-wide text-ink-400 font-semibold">
-                    {tHome("statLearned")}
-                  </div>
-                  <div className="text-sm font-bold text-ink-900 tabular-nums">
-                    {ctx.progress?.totalLessons ?? 0}
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
       </section>
 
       <main className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-12 space-y-12">
-        {/* Continue learning */}
-        {inProgress.length > 0 && (
-          <LessonCarousel
-            title={tHome("continueLearning")}
-            lessons={inProgress}
-            categoryMap={categoryMap}
-          />
-        )}
-
         {/* Recommended */}
         {recommended.length > 0 && (
           <LessonCarousel
