@@ -85,13 +85,10 @@ export function CategoryTiles({
 
   return (
     <section className="space-y-5">
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-ink-900">
-            {t("discover")}
-          </h2>
-          <p className="mt-1 text-sm md:text-base text-ink-500">{t("discoverSubtitle")}</p>
-        </div>
+      <div className="flex items-center justify-between gap-4">
+        <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-ink-900">
+          {t("discover")}
+        </h2>
         <Dialog
           open={modalOpen}
           onOpenChange={(o) => {

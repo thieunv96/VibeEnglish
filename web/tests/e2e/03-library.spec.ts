@@ -20,16 +20,13 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
     await expect(page.locator("header").getByTitle("Tài khoản")).toBeVisible();
   });
 
-  test("Hero (Coursera-style): greeting chip + value-prop h1 + 3 stat chips", async ({ page }) => {
-    // Greeting now appears in a small Sparkles chip, not h1
-    await expect(page.getByText(/Chào buổi.*/).first()).toBeVisible();
-    // h1 is the value proposition
-    await expect(page.getByRole("heading", { level: 1 }).first()).toContainText(/Hôm nay bạn muốn học/);
-    // Stat chips in hero (text may appear in floating illustration badges too — accept first match)
-    const hero = page.locator("section").first();
-    await expect(hero.getByText("Đã học").first()).toBeVisible();
-    await expect(hero.getByText("Streak").first()).toBeVisible();
-    await expect(hero.getByText("Tuần", { exact: true }).first()).toBeVisible();
+  test("Header (Coursera-style): personalized h1 + thin meta line, no hero CTA", async ({ page }) => {
+    // h1 is the Coursera-style personalized greeting
+    await expect(page.getByRole("heading", { level: 1 }).first()).toContainText(/Rất vui được gặp bạn/);
+    // Meta line below — level + target + today goal
+    await expect(page.getByText(/B1.*mục tiêu B2/)).toBeVisible();
+    // No hero CTA button (Coursera homepage dives straight into content)
+    await expect(page.getByRole("link", { name: /Tiếp tục lộ trình/ })).toHaveCount(0);
   });
 
   test('"Khám phá theo chủ đề" category tiles visible', async ({ page }) => {

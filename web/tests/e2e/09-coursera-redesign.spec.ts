@@ -6,24 +6,29 @@ test.describe("Coursera-style redesign (per startup/*.html reference)", () => {
     await loginViaApi(page, DEMO_USER);
   });
 
-  test("Home: hero band + section headings are large + bold", async ({ page }) => {
+  test("Home: h1 personalized greeting + section headings (Coursera logged-in idiom)", async ({ page }) => {
     await page.goto("/");
-    // h1 is now the value-prop headline; greeting is in a small chip above
+    // Coursera idiom: h1 is just a personalized greeting, no marketing hero
     const h1 = page.getByRole("heading", { level: 1 }).first();
-    await expect(h1).toContainText(/Hôm nay bạn muốn học/);
-    await expect(page.getByText(/Chào buổi.*/).first()).toBeVisible();
-    // Section h2s use the upgraded bold styling
-    await expect(page.getByRole("heading", { name: /Khám phá theo chủ đề/ })).toBeVisible();
-    await expect(page.getByRole("heading", { name: /Gợi ý cho bạn/ })).toBeVisible();
-    await expect(page.getByRole("heading", { name: /Tất cả bài học/ })).toBeVisible();
+    await expect(h1).toContainText(/Rất vui được gặp bạn/);
+    // No hero gradient illustration card / CTA button
+    await expect(page.getByRole("link", { name: /Tiếp tục lộ trình/ })).toHaveCount(0);
+    // Section h2s (bare, no subtitles)
+    await expect(page.getByRole("heading", { name: /^Khám phá theo chủ đề$/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^Gợi ý cho bạn$/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^Tất cả bài học$/ })).toBeVisible();
   });
 
-  test("Brand CTA buttons use Coursera blue (#0056D2)", async ({ page }) => {
+  test("Brand color #0056D2 applied (lesson preview CTA)", async ({ page }) => {
+    // The home page no longer has a hero CTA. The lesson preview "Bắt đầu học"
+    // button still uses bg-brand-700 = #0056d2.
     await page.goto("/");
-    // Hero primary CTA "Tiếp tục lộ trình" uses bg-brand-700 = #0056d2
-    const heroCta = page.getByRole("link", { name: /Tiếp tục lộ trình/ }).first();
-    await expect(heroCta).toBeVisible();
-    const bgColor = await heroCta.evaluate((el) => getComputedStyle(el).backgroundColor);
+    const firstCard = page.locator('a[href^="/lessons/"]:not([href$="/study"])').first();
+    const href = (await firstCard.getAttribute("href"))!;
+    await page.goto(href);
+    const cta = page.getByRole("link", { name: /Bắt đầu học|Tiếp tục học|Học lại/ }).first();
+    await expect(cta).toBeVisible();
+    const bgColor = await cta.evaluate((el) => getComputedStyle(el).backgroundColor);
     expect(bgColor).toBe("rgb(0, 86, 210)");
   });
 
