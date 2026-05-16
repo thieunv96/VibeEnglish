@@ -51,7 +51,7 @@ test.describe("Màn 10 — Admin Panel (CONTEXT.md §5)", () => {
 
   test("Admin topbar: search + locale switcher + help + bell", async ({ page }) => {
     const header = page.locator("header").first();
-    await expect(header.getByPlaceholder(/Tìm bài học/)).toBeVisible();
+    await expect(header.getByPlaceholder(/Bạn muốn học gì|Tìm bài học/)).toBeVisible();
     await expect(header.getByRole("button", { name: /^vi$/i })).toBeVisible();
     await expect(header.getByRole("button", { name: /^en$/i })).toBeVisible();
     await expect(header.getByTitle("Trợ giúp")).toBeVisible();

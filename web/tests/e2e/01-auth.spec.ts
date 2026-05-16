@@ -60,7 +60,7 @@ test.describe("Màn 1 — Auth (CONTEXT.md §5)", () => {
     await page.getByLabel("Mật khẩu").fill(DEMO_USER.password);
     await page.locator('form button[type="submit"]').click();
     await page.waitForURL("/", { timeout: 15_000 });
-    await expect(page.getByRole("heading", { level: 1 }).first()).toContainText(/Rất vui|Welcome back/);
+    await expect(page.getByRole("heading", { level: 1 }).first()).toContainText(/Hôm nay bạn muốn học|What do you want to learn/);
   });
 
   test("Login with wrong password shows error, stays on /auth", async ({ page }) => {

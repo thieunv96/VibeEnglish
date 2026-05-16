@@ -31,6 +31,9 @@ export function LibrarySections({
   initialCategory = "all",
   hideTopChips = false,
   hideRecommended = false,
+  useCarouselSizing = false,
+  maxLessons,
+  categoryMap,
 }: {
   all: Lesson[];
   recommended: LessonWithScore[];
@@ -40,6 +43,12 @@ export function LibrarySections({
   initialCategory?: string | "all";
   hideTopChips?: boolean;
   hideRecommended?: boolean;
+  /** When true, the "All lessons" grid uses the same card width as the carousel rows (4-col grid). */
+  useCarouselSizing?: boolean;
+  /** Optional cap on the number of lessons rendered in the "All lessons" grid. */
+  maxLessons?: number;
+  /** Map id → category, used by LessonCard to render the partner row. */
+  categoryMap?: Map<string, Category>;
 }) {
   const t = useTranslations("home");
   const tCommon = useTranslations("common");
@@ -124,6 +133,30 @@ export function LibrarySections({
 
   const completedIds = new Set(completed.map((c) => c.id));
   const pending = filteredAll.filter((l) => !completedIds.has(l.id));
+  const capped = typeof maxLessons === "number" ? pending.slice(0, maxLessons) : pending;
+
+  // Resolve category info per lesson (for the LessonCard partner row)
+  const renderCard = (l: Lesson, opts?: { completed?: boolean; view?: "grid" | "list" }) => {
+    const cat = l.categoryId ? categoryMap?.get(l.categoryId) : undefined;
+    let catName: string | undefined;
+    if (cat) {
+      try {
+        catName = tCat(cat.slug);
+      } catch {
+        catName = cat.title;
+      }
+    }
+    return (
+      <LessonCard
+        key={l.id}
+        lesson={l}
+        completed={opts?.completed}
+        view={opts?.view}
+        category={cat ?? null}
+        categoryName={catName}
+      />
+    );
+  };
 
   return (
     <>
@@ -239,27 +272,33 @@ export function LibrarySections({
 
       <section>
         <h2 className="text-xl md:text-2xl font-bold tracking-tight text-ink-900 mb-4">{t("allLessons")}</h2>
-        <LibraryToolbar
-          filter={filter}
-          onFilterChange={setFilter}
-          view={view}
-          onViewChange={setView}
-        />
+        {!useCarouselSizing && (
+          <LibraryToolbar
+            filter={filter}
+            onFilterChange={setFilter}
+            view={view}
+            onViewChange={setView}
+          />
+        )}
 
-        <div className="mt-4 min-h-[480px]" style={{ contain: "layout" }}>
-          {pending.length === 0 ? (
+        <div
+          className={useCarouselSizing ? "mt-4" : "mt-4 min-h-[480px]"}
+          style={useCarouselSizing ? undefined : { contain: "layout" }}
+        >
+          {capped.length === 0 ? (
             <EmptyState />
+          ) : useCarouselSizing ? (
+            // Carousel-sized grid: same card width as the rows above (~300px), capped at 4 cards
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {capped.map((l) => renderCard(l))}
+            </div>
           ) : view === "grid" ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3">
-              {pending.map((l) => (
-                <LessonCard key={l.id} lesson={l} />
-              ))}
+              {capped.map((l) => renderCard(l))}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-1.5">
-              {pending.map((l) => (
-                <LessonCard key={l.id} lesson={l} view="list" />
-              ))}
+              {capped.map((l) => renderCard(l, { view: "list" }))}
             </div>
           )}
         </div>
@@ -271,17 +310,17 @@ export function LibrarySections({
             <h2 className="text-xl md:text-2xl font-bold tracking-tight text-ink-900">{t("completed")}</h2>
             <span className="text-sm text-ink-500">{t("completedCount", { n: completed.length })}</span>
           </div>
-          {view === "grid" ? (
+          {useCarouselSizing ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {completed.slice(0, 4).map((l) => renderCard(l, { completed: true }))}
+            </div>
+          ) : view === "grid" ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3">
-              {completed.slice(0, 12).map((l) => (
-                <LessonCard key={l.id} lesson={l} completed />
-              ))}
+              {completed.slice(0, 12).map((l) => renderCard(l, { completed: true }))}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-1.5">
-              {completed.slice(0, 12).map((l) => (
-                <LessonCard key={l.id} lesson={l} completed view="list" />
-              ))}
+              {completed.slice(0, 12).map((l) => renderCard(l, { completed: true, view: "list" }))}
             </div>
           )}
         </section>

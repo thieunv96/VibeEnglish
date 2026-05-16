@@ -24,20 +24,42 @@ export async function TopNav() {
 
   return (
     <header className="sticky top-0 z-30 bg-white border-b border-ink-200">
-      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-4 lg:gap-6">
+      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-3 lg:gap-5">
         <Link href={homeHref} className="flex items-center shrink-0" title="Vibe English">
           <Logo size="sm" withSlogan />
         </Link>
 
-        {/* Global search — center, takes available width */}
+        {/* Center nav links — Coursera pattern: Khám phá · Việc học của tôi */}
+        <nav className="hidden lg:flex items-center gap-1 shrink-0">
+          <Link
+            href="/"
+            className="px-3 py-2 text-sm font-medium text-ink-700 hover:text-brand-700 rounded-md hover:bg-ink-50 transition-colors"
+          >
+            {tNav("discover")}
+          </Link>
+          <Link
+            href="/profile"
+            className="px-3 py-2 text-sm font-medium text-ink-700 hover:text-brand-700 rounded-md hover:bg-ink-50 transition-colors"
+          >
+            {tNav("myLearning")}
+          </Link>
+        </nav>
+
+        {/* Global search — pill style with rounded ends, blue search button on the right (Coursera) */}
         <form action={homeHref} method="get" className="hidden md:flex relative flex-1 max-w-2xl">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-[18px] text-ink-400" />
           <input
             type="search"
             name="q"
             placeholder={tNav("search")}
-            className="h-10 w-full rounded-md border border-ink-200 bg-white pl-10 pr-3 text-sm placeholder:text-ink-400 focus-visible:outline-none focus-visible:border-brand-700 focus-visible:ring-2 focus-visible:ring-brand-700/20"
+            className="h-10 w-full rounded-full border border-ink-300 bg-white pl-5 pr-12 text-sm placeholder:text-ink-400 focus-visible:outline-none focus-visible:border-brand-700 focus-visible:ring-2 focus-visible:ring-brand-700/20"
           />
+          <button
+            type="submit"
+            aria-label={tNav("search")}
+            className="absolute right-1 top-1/2 -translate-y-1/2 size-8 inline-flex items-center justify-center rounded-full bg-brand-700 text-white hover:bg-brand-800 transition-colors"
+          >
+            <Search className="size-4" />
+          </button>
         </form>
 
         <div className="ml-auto flex items-center gap-1.5 sm:gap-2">

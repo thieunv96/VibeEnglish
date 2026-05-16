@@ -29,8 +29,10 @@
     "help": "Help",
     "notifications": "Notifications",
     "streak": "Current streak",
-    "search": "Search lessons, topics...",
-    "levelTooltip": "Current level → target"
+    "search": "What do you want to learn?",
+    "levelTooltip": "Current level → target",
+    "discover": "Explore",
+    "myLearning": "My learning"
   },
   "account": {
     "trigger": "Account",
@@ -154,6 +156,9 @@
     "completed": "Completed",
     "greetingPersonalized": "Welcome back, {name}",
     "greetingMeta": "{level} ({name}) → target {target} · {n} lessons today",
+    "heroCallout": "What do you want to learn today?",
+    "heroCalloutSubtitle": "Learn from real videos, AI grades every answer, and your path adapts to you.",
+    "heroCalloutCta": "Continue your path",
     "topRecommended": "Top recommendation",
     "lessonTypeCourse": "Course · {duration} min",
     "scrollPrev": "Previous",

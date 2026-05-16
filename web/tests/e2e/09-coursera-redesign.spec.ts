@@ -6,13 +6,14 @@ test.describe("Coursera-style redesign (per startup/*.html reference)", () => {
     await loginViaApi(page, DEMO_USER);
   });
 
-  test("Home: h1 personalized greeting + section headings (Coursera logged-in idiom)", async ({ page }) => {
+  test("Home: 2-col hero with greeting + value-prop h1 + bare section headings", async ({ page }) => {
     await page.goto("/");
-    // Coursera idiom: h1 is just a personalized greeting, no marketing hero
     const h1 = page.getByRole("heading", { level: 1 }).first();
-    await expect(h1).toContainText(/Rất vui được gặp bạn/);
-    // No hero gradient illustration card / CTA button
-    await expect(page.getByRole("link", { name: /Tiếp tục lộ trình/ })).toHaveCount(0);
+    await expect(h1).toContainText(/Hôm nay bạn muốn học/);
+    // Hero CTA exists (links to in-progress /study or first lesson)
+    await expect(page.getByRole("link", { name: /Tiếp tục lộ trình/ }).first()).toBeVisible();
+    // Greeting chip above the h1
+    await expect(page.getByText(/Chào buổi.*/).first()).toBeVisible();
     // Section h2s (bare, no subtitles)
     await expect(page.getByRole("heading", { name: /^Khám phá theo chủ đề$/ })).toBeVisible();
     await expect(page.getByRole("heading", { name: /^Gợi ý cho bạn$/ })).toBeVisible();

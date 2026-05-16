@@ -20,13 +20,15 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
     await expect(page.locator("header").getByTitle("Tài khoản")).toBeVisible();
   });
 
-  test("Header (Coursera-style): personalized h1 + thin meta line, no hero CTA", async ({ page }) => {
-    // h1 is the Coursera-style personalized greeting
-    await expect(page.getByRole("heading", { level: 1 }).first()).toContainText(/Rất vui được gặp bạn/);
-    // Meta line below — level + target + today goal
+  test("Hero (2-col): greeting chip + value-prop h1 + CTA + stat chips + illustration", async ({ page }) => {
+    // Greeting in a small Sparkles chip above the h1
+    await expect(page.getByText(/Chào buổi.*/).first()).toBeVisible();
+    // h1 is the value proposition
+    await expect(page.getByRole("heading", { level: 1 }).first()).toContainText(/Hôm nay bạn muốn học/);
+    // Primary CTA "Tiếp tục lộ trình" links to /lessons/.../study
+    await expect(page.getByRole("link", { name: /Tiếp tục lộ trình/ }).first()).toBeVisible();
+    // Level → target meta next to the CTA
     await expect(page.getByText(/B1.*mục tiêu B2/)).toBeVisible();
-    // No hero CTA button (Coursera homepage dives straight into content)
-    await expect(page.getByRole("link", { name: /Tiếp tục lộ trình/ })).toHaveCount(0);
   });
 
   test('"Khám phá theo chủ đề" category tiles visible', async ({ page }) => {
@@ -49,28 +51,16 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
     expect(count).toBeLessThanOrEqual(6);
   });
 
-  test('Section "Tất cả bài học" with filter chips + grid/list toggle', async ({ page }) => {
+  test('Section "Tất cả bài học" — compact 4-card teaser (no filter toolbar)', async ({ page }) => {
     await expect(page.getByRole("heading", { name: /Tất cả bài học/ })).toBeVisible();
     const allSection = page.locator("section").filter({ hasText: /Tất cả bài học/ });
-    await expect(allSection.getByRole("button", { name: "Tất cả", exact: true })).toBeVisible();
-    await expect(allSection.getByRole("button", { name: /Video → Quiz/ })).toBeVisible();
-    await expect(allSection.getByRole("button", { name: /Speaking/ }).first()).toBeVisible();
-    await expect(allSection.getByRole("button", { name: /Writing/ }).first()).toBeVisible();
-  });
-
-  test("Filter chip narrows lessons in realtime", async ({ page }) => {
-    const allSection = page.locator("section").filter({ hasText: /Tất cả bài học/ });
-    const beforeCount = await allSection.locator('a[href^="/lessons/"]').count();
-    expect(beforeCount).toBeGreaterThan(0);
-
-    await allSection.getByRole("button", { name: /Video → Quiz/ }).click();
-    await page.waitForTimeout(200);
-    const afterCount = await allSection.locator('a[href^="/lessons/"]').count();
-    expect(afterCount).toBeLessThanOrEqual(beforeCount);
-
-    await allSection.getByRole("button", { name: "Tất cả", exact: true }).click();
-    await page.waitForTimeout(200);
-    expect(await allSection.locator('a[href^="/lessons/"]').count()).toEqual(beforeCount);
+    // Filter toolbar (type chips + grid/list toggle) is hidden on the home compact mode.
+    // Filter chips like "Video → Quiz", "Writing", "Speaking" should not appear inside this section.
+    await expect(allSection.getByRole("button", { name: /Video → Quiz/ })).toHaveCount(0);
+    await expect(allSection.getByRole("button", { name: /^Writing$/ })).toHaveCount(0);
+    // At most 4 cards rendered
+    const cards = allSection.locator('a[href^="/lessons/"]:not([href$="/study"])');
+    expect(await cards.count()).toBeLessThanOrEqual(4);
   });
 
   test("Category tile click narrows lessons via ?cat= URL", async ({ page }) => {
@@ -89,7 +79,7 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
   });
 
   test("Topbar global search filters via ?q= param", async ({ page }) => {
-    const searchBox = page.locator("header").getByPlaceholder(/Tìm bài học/);
+    const searchBox = page.locator("header").getByPlaceholder(/Bạn muốn học gì|Tìm bài học/);
     await searchBox.fill("Stand-up");
     await searchBox.press("Enter");
     await page.waitForURL(/q=Stand-up/);
@@ -97,15 +87,15 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
   });
 
 
-  test("Grid → List toggle changes layout", async ({ page }) => {
-    // List toggle button (icon-only)
-    const toggles = page.locator("button[title='Grid'], button[title='List']");
-    await expect(toggles).toHaveCount(2);
-    await page.locator("button[title='List']").click();
-    // After switching to list, items should be in flex-col layout
-    // Verify by checking the first list-style row has the icon + title + badge structure (no aspect-video)
-    const firstRow = page.locator("section").filter({ hasText: /Tất cả bài học/ }).locator('a[href^="/lessons/"]').first();
-    await expect(firstRow.locator(".aspect-video")).toHaveCount(0);
+  test('"Tất cả bài học" renders compact 4-card grid (carousel sizing, no toolbar)', async ({ page }) => {
+    const allSection = page.locator("section").filter({ hasText: /Tất cả bài học/ });
+    // Carousel sizing means no Grid/List toggle buttons are rendered for this section
+    await expect(allSection.locator("button[title='Grid'], button[title='List']")).toHaveCount(0);
+    // Section is capped at 4 lessons
+    const cards = allSection.locator('a[href^="/lessons/"]:not([href$="/study"])');
+    expect(await cards.count()).toBeLessThanOrEqual(4);
+    // Cards still use the cover-image-on-top grid look (aspect-video present)
+    await expect(cards.first().locator(".aspect-video")).toHaveCount(1);
   });
 
   test('Section "Đã hoàn thành" shows when user has completed lessons', async ({ page }) => {
@@ -123,7 +113,7 @@ test.describe("Màn 3 — Content Library (CONTEXT.md §5)", () => {
 
   test("Topbar has global search", async ({ page }) => {
     const header = page.locator("header");
-    await expect(header.getByPlaceholder(/Tìm bài học/)).toBeVisible();
+    await expect(header.getByPlaceholder(/Bạn muốn học gì|Tìm bài học/)).toBeVisible();
   });
 });
 

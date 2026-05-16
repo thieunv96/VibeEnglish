@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { onboardingProfiles } from "@/db/schema";
@@ -8,6 +9,8 @@ import { TopNav } from "@/components/top-nav";
 import { LibrarySections } from "./_library/sections";
 import { LessonCarousel } from "@/components/lesson-carousel";
 import { CategoryTiles } from "./_library/category-tiles";
+import { Button } from "@/components/ui/button";
+import { greetingKey } from "@/lib/utils";
 import {
   getCompletedLessons,
   getPublishedLessons,
@@ -16,6 +19,15 @@ import {
   getUserContext,
   getAllCategories,
 } from "@/lib/data";
+import {
+  ArrowRight,
+  Flame,
+  Sparkles,
+  Trophy,
+  Target,
+  Play,
+  GraduationCap,
+} from "lucide-react";
 
 export default async function HomePage({
   searchParams,
@@ -34,7 +46,7 @@ export default async function HomePage({
   if (!profile?.completedAt) redirect("/onboarding");
 
   const sp = await searchParams;
-  await getUserContext(session.user.id); // populate session-side caches if any
+  const ctx = await getUserContext(session.user.id);
   const [all, recommended, completed, categories, inProgress] = await Promise.all([
     getPublishedLessons(),
     getRecommendedLessons(session.user.id, profile.level, 8),
@@ -48,13 +60,13 @@ export default async function HomePage({
   const tCefr = await getTranslations("cefr");
 
   const firstName = session.user.name?.split(" ").slice(-1)[0] || tGreeting("you");
+  const weeklyTarget = Math.max(3, Math.ceil((profile.dailyMinutes / 15) * 5));
+  const weeklyDone = Math.min(weeklyTarget, completed.length);
   const levelName = tCefr(`${profile.level}.name`);
-  const todayN = Math.max(1, Math.round(profile.dailyMinutes / 8));
 
-  // Map for fast id → category lookup (used by LessonCard partner row)
   const categoryMap = new Map(categories.map((c) => [c.id, c]));
 
-  // Derived row buckets — keep them mutually exclusive so a lesson doesn't appear in 3 sections.
+  // Mutually-exclusive row buckets so a lesson appears in exactly one section.
   const completedIds = new Set(completed.map((c) => c.id));
   const recommendedIds = new Set(recommended.map((r) => r.id));
   const inProgressIds = new Set(inProgress.map((p) => p.id));
@@ -78,30 +90,114 @@ export default async function HomePage({
     )
     .slice(0, 10);
 
+  const ctaTarget = inProgress[0]?.id
+    ? `/lessons/${inProgress[0].id}/study`
+    : recommended[0]?.id
+      ? `/lessons/${recommended[0].id}`
+      : "#all";
+
   return (
     <div className="min-h-screen bg-white">
       <TopNav />
 
-      {/* Hero band — soft brand tint, full-width, just like Coursera's screenshot */}
-      <section className="bg-brand-50 border-b border-ink-200">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-ink-900">
-            {tHome("greetingPersonalized", { name: firstName })}
-          </h1>
-          <p className="mt-1 text-sm text-ink-600">
-            {tHome("greetingMeta", {
-              level: profile.level,
-              name: levelName,
-              target: profile.targetLevel,
-              n: todayN,
-            })}
-          </p>
+      {/* ============================ HERO (2-col, restored from commit e8cf0eb) ============================ */}
+      <section className="border-b border-ink-200 bg-white">
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-12 lg:py-14">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-10 lg:gap-12 items-center">
+            {/* Left */}
+            <div className="space-y-5">
+              <div className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
+                <Sparkles className="size-3.5" />
+                {tGreeting(greetingKey())}, {firstName}
+              </div>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.1] tracking-tight text-ink-900">
+                {tHome("heroCallout")}
+              </h1>
+              <p className="text-base md:text-lg text-ink-500 max-w-xl leading-relaxed">
+                {tHome("heroCalloutSubtitle")}
+              </p>
+              <div className="flex flex-wrap items-center gap-3 pt-1">
+                <Button asChild size="lg" className="bg-brand-700 hover:bg-brand-800">
+                  <Link href={ctaTarget}>
+                    <Play className="size-4" /> {tHome("heroCalloutCta")}
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </Button>
+                <span className="text-sm text-ink-500">
+                  {tHome("levelToTarget", {
+                    level: profile.level,
+                    name: levelName,
+                    target: profile.targetLevel,
+                  })}
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-4">
+                <StatChip
+                  icon={<Trophy className="size-3.5 text-brand-700" />}
+                  label={tHome("statLearned")}
+                  value={String(ctx.progress?.totalLessons ?? 0)}
+                />
+                <StatChip
+                  icon={<Flame className="size-3.5 text-orange-500" />}
+                  label={tHome("statStreak")}
+                  value={tHome("streakDays", { n: ctx.progress?.streakDays ?? 0 })}
+                />
+                <StatChip
+                  icon={<Target className="size-3.5 text-success-600" />}
+                  label={tHome("statWeek")}
+                  value={`${weeklyDone}/${weeklyTarget}`}
+                />
+              </div>
+            </div>
+
+            {/* Right — brand gradient illustration with floating accent cards */}
+            <div className="relative hidden lg:block">
+              <div className="aspect-[5/4] rounded-2xl brand-gradient relative overflow-hidden shadow-card">
+                <div className="dotted-bg absolute inset-0 opacity-60" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-white/95 text-center px-8">
+                    <GraduationCap className="size-16 mx-auto mb-3 drop-shadow-sm" />
+                    <p className="text-2xl font-bold tracking-tight">Vibe English</p>
+                    <p className="text-sm opacity-90 mt-1">
+                      {profile.level} → {profile.targetLevel}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              {/* Floating accent cards */}
+              <div className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-card-hover p-3 flex items-center gap-2 border border-ink-100">
+                <div className="size-9 rounded-lg bg-success-50 flex items-center justify-center">
+                  <Flame className="size-5 text-orange-500" />
+                </div>
+                <div>
+                  <div className="text-[10px] uppercase tracking-wide text-ink-400 font-semibold">
+                    {tHome("statStreak")}
+                  </div>
+                  <div className="text-sm font-bold text-ink-900">
+                    {tHome("streakDays", { n: ctx.progress?.streakDays ?? 0 })}
+                  </div>
+                </div>
+              </div>
+              <div className="absolute -top-4 -right-4 bg-white rounded-xl shadow-card-hover p-3 flex items-center gap-2 border border-ink-100">
+                <div className="size-9 rounded-lg bg-brand-50 flex items-center justify-center">
+                  <Trophy className="size-5 text-brand-700" />
+                </div>
+                <div>
+                  <div className="text-[10px] uppercase tracking-wide text-ink-400 font-semibold">
+                    {tHome("statLearned")}
+                  </div>
+                  <div className="text-sm font-bold text-ink-900 tabular-nums">
+                    {ctx.progress?.totalLessons ?? 0}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <main className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 space-y-12">
-
-        {/* Continue learning (if any) */}
+      <main className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-12 space-y-12">
+        {/* Continue learning */}
         {inProgress.length > 0 && (
           <LessonCarousel
             title={tHome("continueLearning")}
@@ -130,7 +226,7 @@ export default async function HomePage({
           />
         )}
 
-        {/* Browse by topic — tile grid + master modal (Coursera "Categories" idiom) */}
+        {/* Browse by topic — tile grid + master modal */}
         <CategoryTiles all={all} categories={categories} />
 
         {/* Explore more */}
@@ -142,7 +238,7 @@ export default async function HomePage({
           />
         )}
 
-        {/* All lessons with power-filter (collapsed below; not part of the Coursera idiom but useful) */}
+        {/* All lessons — compact carousel with max 4 cards, same sizing as rows above */}
         <div id="all">
           <LibrarySections
             all={all}
@@ -151,11 +247,32 @@ export default async function HomePage({
             categories={categories}
             initialSearch={sp.q ?? ""}
             initialCategory={sp.cat ?? "all"}
+            categoryMap={categoryMap}
             hideTopChips
             hideRecommended
+            useCarouselSizing
+            maxLessons={4}
           />
         </div>
       </main>
+    </div>
+  );
+}
+
+function StatChip({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-white px-3 py-1.5 shadow-card">
+      {icon}
+      <span className="text-xs text-ink-500">{label}</span>
+      <span className="text-sm font-semibold text-ink-900 tabular-nums">{value}</span>
     </div>
   );
 }
