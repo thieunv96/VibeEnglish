@@ -5,7 +5,7 @@ async function loginAsAdmin(page: import("@playwright/test").Page) {
   await page.getByTestId("login-email").fill("thieunv96@gmail.com");
   await page.getByTestId("login-password").fill("123");
   await page.getByTestId("login-submit").click({ force: true });
-  await page.waitForURL(/\/dashboard/);
+  await page.waitForURL(/\/admin(\?|$|\/)/, { timeout: 20_000 });
 }
 
 test("admin can create, edit, delete a lesson", async ({ page }) => {

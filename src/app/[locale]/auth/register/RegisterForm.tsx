@@ -58,7 +58,7 @@ export function RegisterForm({ labels }: Props) {
         toast.error("Account created but login failed. Please try again.");
         return;
       }
-      router.push("/dashboard");
+      router.push("/profile");
       router.refresh();
     });
   }

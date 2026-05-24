@@ -34,7 +34,7 @@ export function LoginForm({ labels }: Props) {
         toast.error(labels.invalid);
         return;
       }
-      router.push("/dashboard");
+      router.push("/profile");
       router.refresh();
     });
   }

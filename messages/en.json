@@ -10,7 +10,29 @@
     "profile": "Profile",
     "adminHome": "Admin",
     "exercises": "Exercises",
-    "analytics": "Analytics"
+    "analytics": "Analytics",
+    "searchPlaceholder": "Search lessons & exercises…",
+    "menu": {
+      "profile": "Profile",
+      "vocab": "My vocabulary",
+      "history": "Learning history",
+      "signOut": "Sign out"
+    },
+    "mobile": {
+      "open": "Open menu",
+      "close": "Close menu",
+      "menu": "Menu",
+      "search": "Search"
+    }
+  },
+  "search": {
+    "title": "Search",
+    "hint": "Type a word, phrase, or lesson title in the search bar above.",
+    "summary": "{count, plural, =0 {No results for {q}} =1 {1 result for {q}} other {# results for {q}}}",
+    "lessons": "Lessons",
+    "exercises": "Exercises",
+    "noLessons": "No lessons match.",
+    "noExercises": "No exercises match."
   },
   "footer": {
     "tagline": "The free English learning platform built around real listening practice.",
@@ -152,12 +174,70 @@
   "profile": {
     "title": "Your profile",
     "sub": "Update your account details.",
+    "memberSince": "Member since {date}",
     "email": "Email",
     "name": "Name",
     "birthYear": "Birth year",
     "country": "Country",
+    "occupation": "Occupation",
+    "nativeLanguage": "Native language (ISO code)",
+    "dailyTimeGoalMin": "Daily study goal (min)",
+    "learningGoals": "Learning goals",
     "save": "Save changes",
-    "saved": "Saved"
+    "saved": "Saved",
+    "goalNames": {
+      "toeic": "TOEIC",
+      "toefl": "TOEFL",
+      "ielts": "IELTS",
+      "oet": "OET",
+      "conversation": "Daily conversation",
+      "business": "Business English",
+      "travel": "Travel",
+      "movies-tv": "Movies & TV",
+      "academic": "Academic"
+    },
+    "avatar": {
+      "upload": "Upload",
+      "remove": "Remove",
+      "cropTitle": "Crop your avatar",
+      "save": "Save avatar",
+      "cancel": "Cancel",
+      "zoom": "Zoom",
+      "saved": "Avatar updated",
+      "removed": "Avatar removed",
+      "tooLarge": "Image is too large (max 5 MB before crop)"
+    }
+  },
+  "rating": {
+    "title": "Rate this lesson",
+    "avgLabel": "average",
+    "count": "{n, plural, =0 {no ratings yet} =1 {1 rating} other {# ratings}}",
+    "countLabel": "ratings",
+    "youRated": "You rated {stars}★",
+    "signInToRate": "Sign in to rate this lesson.",
+    "thanks": "Thanks for rating!",
+    "saveFailed": "Could not save rating."
+  },
+  "vocabPage": {
+    "title": "My vocabulary",
+    "sub": "{count, plural, =0 {No words saved yet} =1 {1 saved word} other {# saved words}}"
+  },
+  "historyPage": {
+    "title": "Learning history",
+    "sub": "Everything you've worked on, most recent first.",
+    "lessons": "Lessons",
+    "exercises": "Exercises",
+    "lesson": "Lesson",
+    "exercise": "Exercise",
+    "category": "Category",
+    "skill": "Skill",
+    "accuracy": "Accuracy",
+    "score": "Score",
+    "segments": "Segments",
+    "lastOpened": "Last opened",
+    "completed": "Completed",
+    "noLessons": "No lesson history yet.",
+    "noExercises": "No exercise attempts yet."
   },
   "dashboard": {
     "title": "Your Dashboard",

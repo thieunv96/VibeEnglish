@@ -4,8 +4,11 @@ import { Container } from "@/components/Container";
 import { CefrBadge } from "@/components/CefrBadge";
 import { DictationPlayer } from "@/components/DictationPlayer";
 import { SaveWordButton } from "@/components/SaveWordButton";
+import { LessonRatingWidget } from "@/components/LessonRatingWidget";
 import { Link } from "@/i18n/navigation";
 import { getLesson, isCategory } from "@/lib/content";
+import { auth } from "@/auth";
+import { prisma } from "@/lib/db";
 
 interface PageProps {
   params: Promise<{ locale: string; category: string; slug: string }>;
@@ -21,8 +24,24 @@ export default async function LessonDetailPage({ params }: PageProps) {
 
   const tCat = await getTranslations("categories");
   const tL = await getTranslations("lesson");
+  // Rating aggregate + current user's rating (if any).
+  const session = await auth();
+  const userId = (session?.user as { id?: string } | undefined)?.id;
+  const [agg, yourRating] = await Promise.all([
+    prisma.lessonRating.aggregate({
+      where: { lessonId: lesson.id },
+      _avg: { stars: true },
+      _count: { _all: true },
+    }),
+    userId
+      ? prisma.lessonRating.findUnique({
+          where: { userId_lessonId: { userId, lessonId: lesson.id } },
+          select: { stars: true },
+        })
+      : Promise.resolve(null),
+  ]);
 
-  // Pull a few "interesting" words from transcript for save buttons (length > 5, dedup, first 6).
+  // Pull a few "interesting" words from transcript for save buttons.
   const interestingWords = Array.from(
     new Set(
       lesson.transcript
@@ -73,6 +92,15 @@ export default async function LessonDetailPage({ params }: PageProps) {
           loginToSave: tL("loginToSave"),
         }}
       />
+
+      <div className="mt-6">
+        <LessonRatingWidget
+          lessonId={lesson.id}
+          initialAvg={agg._avg.stars ?? 0}
+          initialCount={agg._count._all}
+          initialYou={yourRating?.stars ?? null}
+        />
+      </div>
 
       <section className="mt-10">
         <h2 className="text-xl font-semibold mb-4">{tL("transcript")}</h2>

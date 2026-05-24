@@ -10,7 +10,29 @@
     "profile": "Hồ sơ",
     "adminHome": "Quản trị",
     "exercises": "Bài luyện",
-    "analytics": "Thống kê"
+    "analytics": "Thống kê",
+    "searchPlaceholder": "Tìm bài học & bài luyện…",
+    "menu": {
+      "profile": "Hồ sơ",
+      "vocab": "Quản lý kiến thức",
+      "history": "Lịch sử học",
+      "signOut": "Đăng xuất"
+    },
+    "mobile": {
+      "open": "Mở menu",
+      "close": "Đóng menu",
+      "menu": "Menu",
+      "search": "Tìm kiếm"
+    }
+  },
+  "search": {
+    "title": "Tìm kiếm",
+    "hint": "Gõ từ khoá, cụm từ hoặc tên bài học vào thanh tìm kiếm.",
+    "summary": "{count, plural, other {# kết quả cho {q}}}",
+    "lessons": "Bài học",
+    "exercises": "Bài luyện",
+    "noLessons": "Không có bài học phù hợp.",
+    "noExercises": "Không có bài luyện phù hợp."
   },
   "footer": {
     "tagline": "Nền tảng học tiếng Anh miễn phí xoay quanh luyện nghe thực tế.",
@@ -152,12 +174,70 @@
   "profile": {
     "title": "Hồ sơ của bạn",
     "sub": "Cập nhật thông tin tài khoản.",
+    "memberSince": "Thành viên từ {date}",
     "email": "Email",
     "name": "Tên",
     "birthYear": "Năm sinh",
     "country": "Quốc gia",
+    "occupation": "Nghề nghiệp",
+    "nativeLanguage": "Ngôn ngữ mẹ đẻ (mã ISO)",
+    "dailyTimeGoalMin": "Mục tiêu mỗi ngày (phút)",
+    "learningGoals": "Mục tiêu học",
     "save": "Lưu thay đổi",
-    "saved": "Đã lưu"
+    "saved": "Đã lưu",
+    "goalNames": {
+      "toeic": "TOEIC",
+      "toefl": "TOEFL",
+      "ielts": "IELTS",
+      "oet": "OET",
+      "conversation": "Giao tiếp hằng ngày",
+      "business": "Tiếng Anh thương mại",
+      "travel": "Du lịch",
+      "movies-tv": "Phim & TV",
+      "academic": "Học thuật"
+    },
+    "avatar": {
+      "upload": "Tải lên",
+      "remove": "Xoá",
+      "cropTitle": "Cắt ảnh đại diện",
+      "save": "Lưu ảnh",
+      "cancel": "Huỷ",
+      "zoom": "Phóng",
+      "saved": "Đã cập nhật ảnh",
+      "removed": "Đã xoá ảnh",
+      "tooLarge": "Ảnh quá lớn (tối đa 5 MB)"
+    }
+  },
+  "rating": {
+    "title": "Đánh giá bài học",
+    "avgLabel": "trung bình",
+    "count": "{n, plural, other {# đánh giá}}",
+    "countLabel": "đánh giá",
+    "youRated": "Bạn đã đánh giá {stars}★",
+    "signInToRate": "Đăng nhập để đánh giá bài học.",
+    "thanks": "Cảm ơn bạn đã đánh giá!",
+    "saveFailed": "Không lưu được đánh giá."
+  },
+  "vocabPage": {
+    "title": "Quản lý kiến thức",
+    "sub": "{count, plural, other {# từ đã lưu}}"
+  },
+  "historyPage": {
+    "title": "Lịch sử học",
+    "sub": "Tất cả nội dung bạn đã học, mới nhất trước.",
+    "lessons": "Bài học",
+    "exercises": "Bài luyện",
+    "lesson": "Bài học",
+    "exercise": "Bài luyện",
+    "category": "Danh mục",
+    "skill": "Kỹ năng",
+    "accuracy": "Độ chính xác",
+    "score": "Điểm",
+    "segments": "Đoạn",
+    "lastOpened": "Mở gần nhất",
+    "completed": "Hoàn thành",
+    "noLessons": "Chưa có lịch sử bài học.",
+    "noExercises": "Chưa có lần luyện nào."
   },
   "dashboard": {
     "title": "Bảng điều khiển của bạn",

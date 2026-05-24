@@ -8,19 +8,25 @@ datasource db {
 }
 
 model User {
-  id           String            @id @default(cuid())
-  email        String            @unique
-  passwordHash String
-  name         String?
-  locale       String            @default("en")
-  isAdmin      Boolean           @default(false)
-  birthYear    Int?
-  country      String?
-  createdAt    DateTime          @default(now())
-  progress     LessonProgress[]
-  attempts     ExerciseAttempt[]
-  vocab        VocabItem[]
-  activity     UserActivity[]
+  id               String            @id @default(cuid())
+  email            String            @unique
+  passwordHash     String
+  name             String?
+  locale           String            @default("en")
+  isAdmin          Boolean           @default(false)
+  birthYear        Int?
+  country          String?
+  avatarUrl        String?
+  occupation       String?
+  learningGoals    String?           @db.Text   // JSON array of slugs
+  dailyTimeGoalMin Int?
+  nativeLanguage   String?
+  createdAt        DateTime          @default(now())
+  progress         LessonProgress[]
+  attempts         ExerciseAttempt[]
+  vocab            VocabItem[]
+  activity         UserActivity[]
+  ratings          LessonRating[]
 }
 
 model UserActivity {
@@ -44,9 +50,24 @@ model Lesson {
   segments    Json     // [{ text, hint? }]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  ratings     LessonRating[]
 
   @@unique([category, slug])
   @@index([category, level])
+}
+
+model LessonRating {
+  id        String   @id @default(cuid())
+  userId    String
+  lessonId  String
+  stars     Int      // 1..5 (validated in API)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@index([lessonId])
 }
 
 model Exercise {

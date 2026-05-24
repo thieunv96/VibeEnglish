@@ -11,7 +11,7 @@ test("register → auto-login → dashboard", async ({ page }) => {
   await page.getByTestId("register-email").fill(email);
   await page.getByTestId("register-password").fill("supersecret");
   await page.getByTestId("register-submit").click({ force: true });
-  await page.waitForURL(/\/dashboard/, { timeout: 15_000 });
+  await page.waitForURL(/\/profile/, { timeout: 15_000 });
   await expect(page.getByTestId("page-title")).toBeVisible();
 });
 

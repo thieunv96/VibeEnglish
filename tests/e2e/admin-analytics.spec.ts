@@ -47,7 +47,7 @@ test("non-admin cannot see /admin/analytics", async ({ page }) => {
   await page.getByTestId("register-email").fill(email);
   await page.getByTestId("register-password").fill("supersecret");
   await page.getByTestId("register-submit").click({ force: true });
-  await page.waitForURL(/\/dashboard/);
+  await page.waitForURL(/\/profile/);
 
   await page.goto("/admin/analytics");
   await expect(page.getByTestId("page-title")).toContainText(/403|Admins only/);

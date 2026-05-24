@@ -6,7 +6,7 @@ test("learner heartbeat ping creates a UserActivity row", async ({ page }) => {
   await page.getByTestId("register-email").fill(email);
   await page.getByTestId("register-password").fill("supersecret");
   await page.getByTestId("register-submit").click({ force: true });
-  await page.waitForURL(/\/dashboard/);
+  await page.waitForURL(/\/profile/);
 
   // The HeartbeatPing component fires on mount of any [locale]/* page for a
   // logged-in learner. Hit the API directly too (same as the component would).

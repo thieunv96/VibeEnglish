@@ -7,7 +7,7 @@ test("save a word from lesson → appears on dashboard → delete works", async 
   await page.getByTestId("register-email").fill(email);
   await page.getByTestId("register-password").fill("supersecret");
   await page.getByTestId("register-submit").click({ force: true });
-  await page.waitForURL(/\/dashboard/);
+  await page.waitForURL(/\/profile/);
 
   await page.goto(`/lessons/${SHORT_STORY.category}/${SHORT_STORY.slug}`);
   const firstSave = page.getByTestId("save-word").first();
@@ -19,7 +19,8 @@ test("save a word from lesson → appears on dashboard → delete works", async 
   await firstSave.click({ force: true });
   await expect(firstSave).toContainText("Saved");
 
-  await page.goto("/dashboard");
+  await page.goto("/vocab");
+  await page.waitForURL(/\/vocab/, { timeout: 10_000 });
   await expect(page.getByTestId(`vocab-${word}`)).toBeVisible();
 
   await page.getByTestId(`delete-vocab-${word}`).click({ force: true });

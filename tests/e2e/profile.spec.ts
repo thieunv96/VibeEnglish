@@ -7,10 +7,12 @@ test("learner can set birth year on /profile and it persists", async ({ page }) 
   await page.getByTestId("register-password").fill("supersecret");
   await page.getByTestId("register-birth-year").fill("1995");
   await page.getByTestId("register-submit").click({ force: true });
-  await page.waitForURL(/\/dashboard/);
+  await page.waitForURL(/\/profile/);
 
   await page.goto("/profile");
-  await expect(page.getByTestId("page-title")).toContainText(/Your profile/i);
+  // The hero h1 (page-title) is the display name; ensure profile form rendered.
+  await expect(page.getByTestId("page-title")).toBeVisible();
+  await expect(page.getByTestId("profile-form")).toBeVisible();
   await expect(page.getByTestId("profile-birth-year")).toHaveValue("1995");
 
   await page.getByTestId("profile-birth-year").fill("1990");

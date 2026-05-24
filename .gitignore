@@ -52,3 +52,7 @@ next-env.d.ts
 /playwright-report/
 /playwright/.cache/
 
+# user avatar uploads (only keep .gitkeep so the dir exists)
+/public/avatars/*
+!/public/avatars/.gitkeep
+

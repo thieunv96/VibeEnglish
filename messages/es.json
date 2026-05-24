@@ -10,7 +10,29 @@
     "profile": "Perfil",
     "adminHome": "Admin",
     "exercises": "Ejercicios",
-    "analytics": "Analíticas"
+    "analytics": "Analíticas",
+    "searchPlaceholder": "Buscar lecciones y ejercicios…",
+    "menu": {
+      "profile": "Perfil",
+      "vocab": "Mi vocabulario",
+      "history": "Historial",
+      "signOut": "Cerrar sesión"
+    },
+    "mobile": {
+      "open": "Abrir menú",
+      "close": "Cerrar menú",
+      "menu": "Menú",
+      "search": "Buscar"
+    }
+  },
+  "search": {
+    "title": "Buscar",
+    "hint": "Escribe una palabra, frase o título en la barra de búsqueda.",
+    "summary": "{count, plural, =0 {Sin resultados para {q}} =1 {1 resultado para {q}} other {# resultados para {q}}}",
+    "lessons": "Lecciones",
+    "exercises": "Ejercicios",
+    "noLessons": "No hay lecciones.",
+    "noExercises": "No hay ejercicios."
   },
   "footer": {
     "tagline": "La plataforma gratuita de inglés basada en la escucha real.",
@@ -152,12 +174,70 @@
   "profile": {
     "title": "Tu perfil",
     "sub": "Actualiza los datos de tu cuenta.",
+    "memberSince": "Miembro desde {date}",
     "email": "Correo electrónico",
     "name": "Nombre",
     "birthYear": "Año de nacimiento",
     "country": "País",
+    "occupation": "Ocupación",
+    "nativeLanguage": "Lengua materna (código ISO)",
+    "dailyTimeGoalMin": "Meta diaria (min)",
+    "learningGoals": "Objetivos de aprendizaje",
     "save": "Guardar cambios",
-    "saved": "Guardado"
+    "saved": "Guardado",
+    "goalNames": {
+      "toeic": "TOEIC",
+      "toefl": "TOEFL",
+      "ielts": "IELTS",
+      "oet": "OET",
+      "conversation": "Conversación diaria",
+      "business": "Inglés de negocios",
+      "travel": "Viajes",
+      "movies-tv": "Películas y TV",
+      "academic": "Académico"
+    },
+    "avatar": {
+      "upload": "Subir",
+      "remove": "Eliminar",
+      "cropTitle": "Recorta tu avatar",
+      "save": "Guardar avatar",
+      "cancel": "Cancelar",
+      "zoom": "Zoom",
+      "saved": "Avatar actualizado",
+      "removed": "Avatar eliminado",
+      "tooLarge": "La imagen es demasiado grande (máx 5 MB)"
+    }
+  },
+  "rating": {
+    "title": "Valora esta lección",
+    "avgLabel": "promedio",
+    "count": "{n, plural, =0 {sin valoraciones} =1 {1 valoración} other {# valoraciones}}",
+    "countLabel": "valoraciones",
+    "youRated": "Tu valoración: {stars}★",
+    "signInToRate": "Inicia sesión para valorar.",
+    "thanks": "¡Gracias por valorar!",
+    "saveFailed": "No se pudo guardar."
+  },
+  "vocabPage": {
+    "title": "Mi vocabulario",
+    "sub": "{count, plural, =0 {Sin palabras guardadas} =1 {1 palabra} other {# palabras}}"
+  },
+  "historyPage": {
+    "title": "Historial",
+    "sub": "Todo lo que has practicado, más reciente primero.",
+    "lessons": "Lecciones",
+    "exercises": "Ejercicios",
+    "lesson": "Lección",
+    "exercise": "Ejercicio",
+    "category": "Categoría",
+    "skill": "Habilidad",
+    "accuracy": "Precisión",
+    "score": "Puntuación",
+    "segments": "Segmentos",
+    "lastOpened": "Último acceso",
+    "completed": "Completado",
+    "noLessons": "Sin historial de lecciones.",
+    "noExercises": "Sin intentos."
   },
   "dashboard": {
     "title": "Tu panel",

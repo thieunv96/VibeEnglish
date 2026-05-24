@@ -1,97 +1,104 @@
-import { auth, signOut } from "@/auth";
-import { getLocale, getTranslations } from "next-intl/server";
+import { auth } from "@/auth";
+import { getTranslations } from "next-intl/server";
+import { prisma } from "@/lib/db";
 import { Container } from "./Container";
 import { Logo } from "./Logo";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { SearchBar } from "./SearchBar";
+import { MobileNav } from "./MobileNav";
+import { AvatarMenu } from "./AvatarMenu";
 import { Link } from "@/i18n/navigation";
-import { routing } from "@/i18n/routing";
-
-async function SignOutButton({ label, locale }: { label: string; locale: string }) {
-  const redirectTo = locale === routing.defaultLocale ? "/" : `/${locale}`;
-  return (
-    <form
-      action={async () => {
-        "use server";
-        await signOut({ redirectTo });
-      }}
-    >
-      <button
-        type="submit"
-        className="text-sm font-medium text-foreground hover:text-brand transition-colors"
-      >
-        {label}
-      </button>
-    </form>
-  );
-}
 
 export async function Header() {
   const t = await getTranslations("nav");
-  const locale = await getLocale();
   const session = await auth();
-  const user = session?.user as { isAdmin?: boolean } | undefined;
-  const isAdmin = Boolean(user?.isAdmin);
+  const sessionUser = session?.user as { id?: string; isAdmin?: boolean } | undefined;
+  const isAdmin = Boolean(sessionUser?.isAdmin);
+  const isAuthed = Boolean(sessionUser?.id);
+
+  let displayName = "";
+  let displayEmail = "";
+  let avatarUrl: string | null = null;
+  if (isAuthed) {
+    const user = await prisma.user.findUnique({
+      where: { id: sessionUser!.id! },
+      select: { name: true, email: true, avatarUrl: true },
+    });
+    if (user) {
+      displayName = user.name || user.email;
+      displayEmail = user.email;
+      avatarUrl = user.avatarUrl;
+    }
+  }
+
+  const learnerLinks = [
+    { href: "/lessons" as const, label: t("lessons") },
+    { href: "/practice" as const, label: t("practice") },
+    { href: "/learn-from-youtube" as const, label: t("youtube") },
+  ];
+  const adminLinks = [
+    { href: "/admin" as const, label: t("adminHome") },
+    { href: "/admin/lessons" as const, label: t("lessons") },
+    { href: "/admin/exercises" as const, label: t("exercises") },
+    { href: "/admin/analytics" as const, label: t("analytics") },
+  ];
+  const links = isAdmin ? adminLinks : learnerLinks;
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/70">
       <Container size="wide">
-        <div className="flex h-16 items-center justify-between gap-4">
-          <Logo />
-          <nav
-            className="hidden md:flex items-center gap-6 text-sm font-medium"
-            aria-label="Primary"
-          >
-            {isAdmin ? (
-              <>
-                <Link href="/admin" className="text-foreground hover:text-brand transition-colors">
-                  {t("adminHome")}
+        <div className="flex h-16 items-center gap-3 sm:gap-4">
+          {/* Mobile hamburger */}
+          <MobileNav
+            items={links}
+            labels={{ open: t("mobile.open"), close: t("mobile.close"), menu: t("mobile.menu") }}
+          />
+
+          {/* Left cluster: logo + (desktop) primary nav */}
+          <div className="flex items-center gap-6">
+            <Logo />
+            <nav
+              className="hidden md:flex items-center gap-5 text-sm font-medium"
+              aria-label="Primary"
+            >
+              {links.map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className="text-foreground hover:text-brand transition-colors"
+                >
+                  {l.label}
                 </Link>
-                <Link href="/admin/lessons" className="text-foreground hover:text-brand transition-colors">
-                  {t("lessons")}
-                </Link>
-                <Link href="/admin/exercises" className="text-foreground hover:text-brand transition-colors">
-                  {t("exercises")}
-                </Link>
-                <Link href="/admin/analytics" className="text-foreground hover:text-brand transition-colors">
-                  {t("analytics")}
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link href="/lessons" className="text-foreground hover:text-brand transition-colors">
-                  {t("lessons")}
-                </Link>
-                <Link href="/practice" className="text-foreground hover:text-brand transition-colors">
-                  {t("practice")}
-                </Link>
-                <Link href="/learn-from-youtube" className="text-foreground hover:text-brand transition-colors">
-                  {t("youtube")}
-                </Link>
-              </>
-            )}
-          </nav>
-          <div className="flex items-center gap-4">
+              ))}
+            </nav>
+          </div>
+
+          {/* Center: search */}
+          <SearchBar placeholder={t("searchPlaceholder")} openLabel={t("mobile.search")} />
+
+          {/* Right cluster */}
+          <div className="ml-auto flex items-center gap-3 sm:gap-4">
             <LanguageSwitcher />
-            {user ? (
-              <>
-                {!isAdmin && (
-                  <>
-                    <Link
-                      href="/dashboard"
-                      className="hidden sm:inline text-sm font-medium text-foreground hover:text-brand transition-colors"
-                    >
-                      {t("dashboard")}
-                    </Link>
-                    <Link
-                      href="/profile"
-                      className="hidden sm:inline text-sm font-medium text-foreground hover:text-brand transition-colors"
-                    >
-                      {t("profile")}
-                    </Link>
-                  </>
-                )}
-                <SignOutButton label={t("signOut")} locale={locale} />
-              </>
+            {isAuthed ? (
+              <AvatarMenu
+                name={displayName}
+                email={displayEmail}
+                avatarUrl={avatarUrl}
+                items={
+                  isAdmin
+                    ? [
+                        { href: "/admin", label: t("adminHome"), testId: "avatar-menu-admin" },
+                        { href: "/admin/lessons", label: t("lessons"), testId: "avatar-menu-admin-lessons" },
+                        { href: "/admin/analytics", label: t("analytics"), testId: "avatar-menu-admin-analytics" },
+                      ]
+                    : [
+                        { href: "/profile", label: t("menu.profile"), testId: "avatar-menu-profile" },
+                        { href: "/vocab", label: t("menu.vocab"), testId: "avatar-menu-vocab" },
+                        { href: "/history", label: t("menu.history"), testId: "avatar-menu-history" },
+                      ]
+                }
+                signOutLabel={t("menu.signOut")}
+              />
             ) : (
               <Link
                 href="/auth/login"

@@ -6,6 +6,7 @@ interface VocabRow {
   id: string;
   word: string;
   addedAt: string;
+  sourceLessonSlug?: string | null;
 }
 
 interface Props {

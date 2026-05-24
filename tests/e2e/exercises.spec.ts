@@ -22,13 +22,13 @@ test("logged-in attempt appears on dashboard", async ({ page }) => {
   await page.getByTestId("register-email").fill(email);
   await page.getByTestId("register-password").fill("supersecret");
   await page.getByTestId("register-submit").click({ force: true });
-  await page.waitForURL(/\/dashboard/);
+  await page.waitForURL(/\/profile/);
 
   await page.goto(`/practice/${GRAMMAR_MCQ.skill}/${GRAMMAR_MCQ.slug}`);
   await answerAll(page);
   await expect(page.getByTestId("exercise-score")).toBeVisible();
   await page.waitForTimeout(500);
 
-  await page.goto("/dashboard");
-  await expect(page.getByTestId(`attempt-${GRAMMAR_MCQ.slug}`)).toBeVisible();
+  await page.goto("/history");
+  await expect(page.getByTestId(`history-attempt-${GRAMMAR_MCQ.slug}`)).toBeVisible();
 });
