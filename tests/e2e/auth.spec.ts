@@ -27,5 +27,6 @@ test("login form rejects bad credentials", async ({ page }) => {
   await page.getByTestId("login-email").fill("nope@example.com");
   await page.getByTestId("login-password").fill("wrongpass");
   await page.getByTestId("login-submit").click({ force: true });
-  await expect(page.getByTestId("login-error")).toBeVisible();
+  // Sonner toast: error text shows in the live region.
+  await expect(page.getByText(/Invalid email or password/i)).toBeVisible();
 });

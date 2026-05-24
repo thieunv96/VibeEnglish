@@ -15,7 +15,7 @@ export default async function ExerciseDetail({ params }: PageProps) {
   setRequestLocale(locale);
   if (!isSkill(skill)) notFound();
 
-  const exercise = getExercise(skill, slug);
+  const exercise = await getExercise(skill, slug);
   if (!exercise) notFound();
 
   const tSkill = await getTranslations("skills");

@@ -16,7 +16,7 @@ export default async function LessonDetailPage({ params }: PageProps) {
   setRequestLocale(locale);
   if (!isCategory(category)) notFound();
 
-  const lesson = getLesson(category, slug);
+  const lesson = await getLesson(category, slug);
   if (!lesson) notFound();
 
   const tCat = await getTranslations("categories");

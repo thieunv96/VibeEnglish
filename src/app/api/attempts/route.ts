@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
+import { requireLearner } from "@/lib/api-auth";
 
 const bodySchema = z.object({
   exerciseSlug: z.string(),
@@ -11,9 +11,9 @@ const bodySchema = z.object({
 });
 
 export async function POST(req: Request) {
-  const session = await auth();
-  const userId = (session?.user as { id?: string } | undefined)?.id;
-  if (!userId) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireLearner();
+  if ("error" in gate) return gate.error;
+  const userId = gate.userId;
 
   const json = await req.json().catch(() => null);
   const parsed = bodySchema.safeParse(json);

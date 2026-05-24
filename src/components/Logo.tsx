@@ -1,21 +1,20 @@
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { cn } from "@/lib/cn";
 
 interface Props {
   withTagline?: boolean;
   size?: "sm" | "md" | "lg";
 }
 
-const dim = { sm: 28, md: 36, lg: 56 } as const;
-const text = {
-  sm: "text-base",
-  md: "text-lg",
-  lg: "text-2xl",
+const sizes = {
+  sm: { box: "h-7 w-7 text-xs", text: "text-base" },
+  md: { box: "h-9 w-9 text-sm", text: "text-lg" },
+  lg: { box: "h-12 w-12 text-base", text: "text-2xl" },
 } as const;
 
 export async function Logo({ withTagline = false, size = "md" }: Props) {
-  const d = dim[size];
+  const dims = sizes[size];
   let tagline: string | null = null;
   if (withTagline) {
     const t = await getTranslations("brand");
@@ -27,16 +26,17 @@ export async function Logo({ withTagline = false, size = "md" }: Props) {
       className="inline-flex items-center gap-2 group"
       data-testid="logo"
     >
-      <Image
-        src="/brand/logo.png"
-        alt="VibeEnglish"
-        width={d}
-        height={d}
-        priority
-        className="rounded-lg"
-      />
+      <span
+        className={cn(
+          "grid place-items-center rounded-lg bg-brand text-white font-extrabold tracking-tight shadow-sm group-hover:bg-brand-strong transition-colors",
+          dims.box,
+        )}
+        aria-hidden
+      >
+        VE
+      </span>
       <span className="flex flex-col leading-tight">
-        <span className={`font-bold tracking-tight text-foreground ${text[size]}`}>
+        <span className={cn("font-bold tracking-tight text-foreground", dims.text)}>
           VibeEnglish
         </span>
         {tagline && (

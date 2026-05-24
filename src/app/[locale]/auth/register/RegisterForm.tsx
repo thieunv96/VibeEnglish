@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { signIn } from "next-auth/react";
+import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
     name: string;
     email: string;
     password: string;
+    birthYear: string;
     submit: string;
     exists: string;
     weak: string;
@@ -17,7 +19,6 @@ interface Props {
 
 export function RegisterForm({ labels }: Props) {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -26,10 +27,11 @@ export function RegisterForm({ labels }: Props) {
     const email = String(fd.get("email") ?? "").trim();
     const password = String(fd.get("password") ?? "");
     const name = String(fd.get("name") ?? "");
-    setError(null);
+    const birthYearRaw = String(fd.get("birthYear") ?? "").trim();
+    const birthYear = birthYearRaw ? Number(birthYearRaw) : undefined;
 
     if (password.length < 6) {
-      setError(labels.weak);
+      toast.error(labels.weak);
       return;
     }
 
@@ -37,14 +39,14 @@ export function RegisterForm({ labels }: Props) {
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, name }),
+        body: JSON.stringify({ email, password, name, birthYear }),
       });
       if (res.status === 409) {
-        setError(labels.exists);
+        toast.error(labels.exists);
         return;
       }
       if (!res.ok) {
-        setError("Could not register.");
+        toast.error("Could not register.");
         return;
       }
       const signInRes = await signIn("credentials", {
@@ -53,7 +55,7 @@ export function RegisterForm({ labels }: Props) {
         redirect: false,
       });
       if (signInRes?.error) {
-        setError("Account created but login failed. Please try again.");
+        toast.error("Account created but login failed. Please try again.");
         return;
       }
       router.push("/dashboard");
@@ -96,9 +98,19 @@ export function RegisterForm({ labels }: Props) {
           className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand"
         />
       </label>
-      {error && (
-        <p className="text-sm text-red-600" data-testid="register-error">{error}</p>
-      )}
+      <label className="block">
+        <span className="text-sm font-medium">{labels.birthYear}</span>
+        <input
+          name="birthYear"
+          type="number"
+          min={1900}
+          max={2030}
+          inputMode="numeric"
+          autoComplete="bday-year"
+          data-testid="register-birth-year"
+          className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand"
+        />
+      </label>
       <button
         type="submit"
         disabled={isPending}

@@ -7,6 +7,7 @@ const bodySchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
   name: z.string().optional(),
+  birthYear: z.coerce.number().int().min(1900).max(2030).optional(),
 });
 
 export async function POST(req: Request) {
@@ -28,6 +29,7 @@ export async function POST(req: Request) {
       email,
       passwordHash,
       name: parsed.data.name ?? null,
+      birthYear: parsed.data.birthYear ?? null,
     },
   });
 

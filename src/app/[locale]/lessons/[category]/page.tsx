@@ -24,7 +24,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   const t = await getTranslations("category");
   const tL = await getTranslations("lessons");
 
-  const all = getLessons(category);
+  const all = await getLessons(category);
   const counts: Record<string, number> = { All: all.length };
   all.forEach((l) => {
     counts[l.level] = (counts[l.level] ?? 0) + 1;

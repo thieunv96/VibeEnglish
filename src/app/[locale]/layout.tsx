@@ -6,9 +6,12 @@ import { notFound } from "next/navigation";
 import { SessionProvider } from "next-auth/react";
 import "../globals.css";
 
+import { Toaster } from "sonner";
 import { routing } from "@/i18n/routing";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { HeartbeatPing } from "@/components/HeartbeatPing";
+import { auth } from "@/auth";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -20,9 +23,9 @@ export const metadata: Metadata = {
   description:
     "Learn English with 1,745+ free audio and video lessons. Listening, dictation, grammar, vocabulary — A1 to C2.",
   icons: {
-    icon: "/brand/logo.png",
-    shortcut: "/brand/logo.png",
-    apple: "/brand/logo.png",
+    icon: "/brand/favicon.svg",
+    shortcut: "/brand/favicon.svg",
+    apple: "/brand/favicon.svg",
   },
 };
 
@@ -41,6 +44,10 @@ export default async function LocaleLayout({
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
+  const session = await auth();
+  const sessionUser = session?.user as { id?: string; isAdmin?: boolean } | undefined;
+  const isLearner = Boolean(sessionUser?.id) && !sessionUser?.isAdmin;
+
   return (
     <html lang={locale} className={inter.variable}>
       <body className="min-h-screen flex flex-col antialiased">
@@ -49,6 +56,14 @@ export default async function LocaleLayout({
             <Header />
             <main className="flex-1">{children}</main>
             <Footer />
+            {isLearner && <HeartbeatPing />}
+            <Toaster
+              position="top-right"
+              richColors
+              closeButton
+              duration={4000}
+              toastOptions={{ classNames: { toast: "font-sans" } }}
+            />
           </SessionProvider>
         </NextIntlClientProvider>
       </body>

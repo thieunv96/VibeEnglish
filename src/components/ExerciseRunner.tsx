@@ -97,7 +97,7 @@ export function ExerciseRunner({ exercise, labels }: Props) {
               data-testid={`question-${idx}`}
               className={cn(
                 "rounded-xl border bg-white p-5",
-                fb === "correct" && "border-blue-300 bg-blue-50",
+                fb === "correct" && "border-emerald-300 bg-emerald-50",
                 fb === "incorrect" && "border-red-300 bg-red-50",
                 !fb && "border-border",
               )}
@@ -111,7 +111,7 @@ export function ExerciseRunner({ exercise, labels }: Props) {
                   <span
                     className={cn(
                       "text-xs font-semibold px-2 py-0.5 rounded",
-                      fb === "correct" ? "bg-blue-100 text-blue-800" : "bg-red-100 text-red-800",
+                      fb === "correct" ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800",
                     )}
                     data-testid={`feedback-${idx}`}
                   >
@@ -133,7 +133,7 @@ export function ExerciseRunner({ exercise, labels }: Props) {
                         className={cn(
                           "flex items-center gap-2 rounded-md border px-3 py-2 cursor-pointer",
                           selected ? "border-brand bg-brand-soft/40" : "border-border hover:bg-surface",
-                          reveal && isAnswer && "border-blue-400 bg-blue-50",
+                          reveal && isAnswer && "border-emerald-400 bg-emerald-50",
                         )}
                       >
                         <input
@@ -192,7 +192,7 @@ export function ExerciseRunner({ exercise, labels }: Props) {
                 <p className="mt-3 text-sm text-muted">💡 {q.explanation}</p>
               )}
               {reveal && !fb && (
-                <p className="mt-3 text-sm text-blue-700">
+                <p className="mt-3 text-sm text-emerald-700">
                   Answer: <strong>{Array.isArray(q.answer) ? q.answer.join(", ") : q.answer}</strong>
                 </p>
               )}

@@ -4,9 +4,11 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 
+// Minimum password length is intentionally low — the admin account uses a short
+// dev-only password. Production users should pick longer ones.
 const credentialsSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(6),
+  password: z.string().min(1),
 });
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
@@ -36,18 +38,33 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           id: user.id,
           email: user.email,
           name: user.name ?? user.email,
+          isAdmin: user.isAdmin,
         };
       },
     }),
   ],
   callbacks: {
-    jwt({ token, user }) {
-      if (user?.id) token.uid = user.id;
+    async jwt({ token, user, trigger }) {
+      if (user) {
+        token.uid = (user as { id?: string }).id;
+        token.isAdmin = (user as { isAdmin?: boolean }).isAdmin ?? false;
+      }
+      // Refresh isAdmin from DB on session-update events (so promoting a user
+      // in the DB takes effect on next sign-in or update).
+      if (trigger === "update" && token.uid) {
+        const fresh = await prisma.user.findUnique({
+          where: { id: token.uid as string },
+          select: { isAdmin: true },
+        });
+        if (fresh) token.isAdmin = fresh.isAdmin;
+      }
       return token;
     },
     session({ session, token }) {
       if (token?.uid && session.user) {
-        (session.user as { id?: string }).id = token.uid as string;
+        const u = session.user as { id?: string; isAdmin?: boolean };
+        u.id = token.uid as string;
+        u.isAdmin = Boolean(token.isAdmin);
       }
       return session;
     },

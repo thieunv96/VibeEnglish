@@ -6,7 +6,11 @@
     "signIn": "Sign In",
     "signOut": "Sign Out",
     "dashboard": "Dashboard",
-    "register": "Register"
+    "register": "Register",
+    "profile": "Profile",
+    "adminHome": "Admin",
+    "exercises": "Exercises",
+    "analytics": "Analytics"
   },
   "footer": {
     "tagline": "The free English learning platform built around real listening practice.",
@@ -142,7 +146,18 @@
     "registerLink": "Create one",
     "invalid": "Invalid email or password.",
     "exists": "An account with that email already exists.",
-    "weak": "Password must be at least 6 characters."
+    "weak": "Password must be at least 6 characters.",
+    "birthYear": "Birth year (optional)"
+  },
+  "profile": {
+    "title": "Your profile",
+    "sub": "Update your account details.",
+    "email": "Email",
+    "name": "Name",
+    "birthYear": "Birth year",
+    "country": "Country",
+    "save": "Save changes",
+    "saved": "Saved"
   },
   "dashboard": {
     "title": "Your Dashboard",

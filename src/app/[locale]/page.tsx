@@ -62,8 +62,9 @@ export default async function HomePage({
   const tExam = await getTranslations("exams");
   const tLessons = await getTranslations("lessons");
 
-  const catCounts = Object.fromEntries(categoryStats().map((c) => [c.slug, c.count]));
-  const skillCounts = Object.fromEntries(skillStats().map((s) => [s.slug, s.count]));
+  const [catCountsArr, skillCountsArr] = await Promise.all([categoryStats(), skillStats()]);
+  const catCounts = Object.fromEntries(catCountsArr.map((c) => [c.slug, c.count]));
+  const skillCounts = Object.fromEntries(skillCountsArr.map((s) => [s.slug, s.count]));
 
   const faqItems: FaqItem[] = [
     { q: "Is VibeEnglish really 100% free?", a: "Yes — every lesson, every exercise, every feature. No paywalls, no premium tier, no trial that expires." },
@@ -87,7 +88,7 @@ export default async function HomePage({
           </span>
           <h1 className="mx-auto max-w-4xl text-4xl sm:text-6xl font-extrabold tracking-tight text-foreground" data-testid="hero-title">
             From Struggling Listener to{" "}
-            <span className="bg-gradient-to-r from-blue-600 via-indigo-500 to-violet-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 bg-clip-text text-transparent">
               Confident English Speaker
             </span>
           </h1>
@@ -107,7 +108,7 @@ export default async function HomePage({
             </Link>
           </div>
           <div className="mt-6 inline-flex items-center gap-2 text-sm text-muted">
-            <span className="inline-block h-2 w-2 rounded-full bg-violet-500 animate-pulse"></span>
+            <span className="inline-block h-2 w-2 rounded-full bg-emerald-600 animate-pulse"></span>
             {t("trust")}
           </div>
         </Container>
@@ -341,13 +342,13 @@ export default async function HomePage({
       </Section>
 
       {/* CTA STRIP */}
-      <section className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 text-white">
+      <section className="bg-gradient-to-r from-emerald-700 via-green-700 to-teal-700 text-white">
         <Container size="wide" className="py-16 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold">{t("ctaStripTitle")}</h2>
           <p className="mt-3 text-white/90 max-w-xl mx-auto">{t("ctaStripSub")}</p>
           <Link
             href="/lessons"
-            className="mt-6 inline-flex items-center justify-center rounded-md bg-white text-brand-strong font-semibold px-6 py-3 hover:bg-brand-soft transition-colors"
+            className="mt-6 inline-flex items-center justify-center rounded-md bg-white !text-emerald-700 font-semibold px-6 py-3 hover:bg-emerald-50 shadow-sm transition-colors"
           >
             {t("ctaStripBtn")}
           </Link>

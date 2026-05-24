@@ -25,7 +25,7 @@ export default async function PracticeIndex({
   const t = await getTranslations("practice");
   const tSkill = await getTranslations("skills");
   const tSkillDesc = await getTranslations("skillsDesc");
-  const counts = Object.fromEntries(skillStats().map((s) => [s.slug, s.count]));
+  const counts = Object.fromEntries((await skillStats()).map((s) => [s.slug, s.count]));
 
   return (
     <Container size="wide" className="py-12">

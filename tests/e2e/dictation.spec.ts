@@ -1,20 +1,10 @@
 import { test, expect } from "@playwright/test";
-import fs from "node:fs";
-import path from "node:path";
-
-function loadFirstLesson(category: string): { slug: string; firstSegmentText: string } {
-  const dir = path.join(process.cwd(), "src", "content", "lessons", category);
-  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".json")).sort();
-  const data = JSON.parse(fs.readFileSync(path.join(dir, files[0]), "utf8"));
-  return { slug: data.slug, firstSegmentText: data.segments[0].text };
-}
+import { SHORT_STORY } from "./_fixtures";
 
 test("dictation marks correct input as all-ok", async ({ page }) => {
-  const { slug, firstSegmentText } = loadFirstLesson("short-stories");
-  await page.goto(`/lessons/short-stories/${slug}`);
-
+  await page.goto(`/lessons/${SHORT_STORY.category}/${SHORT_STORY.slug}`);
   await expect(page.getByTestId("dictation-player")).toBeVisible();
-  await page.getByTestId("dictation-input").fill(firstSegmentText);
+  await page.getByTestId("dictation-input").fill(SHORT_STORY.firstSegmentText);
   await page.getByTestId("dictation-submit").click({ force: true });
 
   const diff = page.getByTestId("dictation-diff");
@@ -25,19 +15,15 @@ test("dictation marks correct input as all-ok", async ({ page }) => {
 });
 
 test("dictation flags wrong input as miss", async ({ page }) => {
-  const { slug } = loadFirstLesson("short-stories");
-  await page.goto(`/lessons/short-stories/${slug}`);
-
+  await page.goto(`/lessons/${SHORT_STORY.category}/${SHORT_STORY.slug}`);
   await page.getByTestId("dictation-input").fill("complete garbage absolutely wrong text");
   await page.getByTestId("dictation-submit").click({ force: true });
-
   const missWords = page.getByTestId("dictation-diff").locator(".dict-miss");
   expect(await missWords.count()).toBeGreaterThan(0);
 });
 
 test("show-answer reveals correct text", async ({ page }) => {
-  const { slug, firstSegmentText } = loadFirstLesson("short-stories");
-  await page.goto(`/lessons/short-stories/${slug}`);
+  await page.goto(`/lessons/${SHORT_STORY.category}/${SHORT_STORY.slug}`);
   await page.getByTestId("dictation-show-answer").click({ force: true });
-  await expect(page.getByTestId("dictation-answer")).toContainText(firstSegmentText);
+  await expect(page.getByTestId("dictation-answer")).toContainText(SHORT_STORY.firstSegmentText);
 });

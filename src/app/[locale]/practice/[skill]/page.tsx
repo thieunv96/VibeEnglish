@@ -19,7 +19,7 @@ export default async function SkillPage({ params }: PageProps) {
   const t = await getTranslations("category");
   const tL = await getTranslations("lessons");
 
-  const exercises = getExercises(skill);
+  const exercises = await getExercises(skill);
 
   return (
     <Container size="wide" className="py-10">

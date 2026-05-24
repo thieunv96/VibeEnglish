@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 import type { Lesson } from "@/lib/content";
 import { scoreDictation, type DiffWord } from "@/lib/dictation";
 import { cn } from "@/lib/cn";
@@ -36,6 +37,7 @@ export function DictationPlayer({ lesson, labels }: Props) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [perSegment, setPerSegment] = useState<Record<number, number>>({});
   const [hasReportedProgress, setHasReportedProgress] = useState(false);
+  const loginToastShown = useRef(false);
 
   const segments = lesson.segments;
   const segment = segments[idx];
@@ -77,6 +79,13 @@ export function DictationPlayer({ lesson, labels }: Props) {
     setDiff(result.diff);
     setAccuracy(result.accuracy);
     setPerSegment((prev) => ({ ...prev, [idx]: result.accuracy }));
+
+    // Nudge unauthenticated learners once per page so they know progress
+    // could be saved if they sign in.
+    if (status === "unauthenticated" && !loginToastShown.current) {
+      toast.info(labels.loginToSave);
+      loginToastShown.current = true;
+    }
   }
 
   async function reportProgress(completed: number, acc: number) {
@@ -234,17 +243,13 @@ export function DictationPlayer({ lesson, labels }: Props) {
           </div>
         )}
         {showAnswer && (
-          <div data-testid="dictation-answer" className="rounded-md border border-blue-200 bg-blue-50 p-3 text-blue-900">
-            <div className="text-xs text-blue-700 mb-1">Answer:</div>
+          <div data-testid="dictation-answer" className="rounded-md border border-emerald-200 bg-emerald-50 p-3 text-emerald-900">
+            <div className="text-xs text-emerald-700 mb-1">Answer:</div>
             <p className="leading-relaxed font-medium">{segment.text}</p>
           </div>
         )}
       </div>
 
-      {/* Progress hint */}
-      {status === "unauthenticated" && (
-        <p className="text-sm text-muted text-center">{labels.loginToSave}</p>
-      )}
       {finished && (
         <div className="rounded-xl border border-brand-soft bg-brand-soft/40 p-4 text-center" data-testid="lesson-finished">
           🎉 Lesson complete! Overall accuracy: <strong>{Math.round(overallAccuracy * 100)}%</strong>

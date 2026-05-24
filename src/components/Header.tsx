@@ -7,8 +7,6 @@ import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
 async function SignOutButton({ label, locale }: { label: string; locale: string }) {
-  // Default-locale (en) is unprefixed because of `localePrefix: "as-needed"`,
-  // so send those users back to "/" and prefixed locales to "/<locale>".
   const redirectTo = locale === routing.defaultLocale ? "/" : `/${locale}`;
   return (
     <form
@@ -31,6 +29,8 @@ export async function Header() {
   const t = await getTranslations("nav");
   const locale = await getLocale();
   const session = await auth();
+  const user = session?.user as { isAdmin?: boolean } | undefined;
+  const isAdmin = Boolean(user?.isAdmin);
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/70">
@@ -41,35 +41,55 @@ export async function Header() {
             className="hidden md:flex items-center gap-6 text-sm font-medium"
             aria-label="Primary"
           >
-            <Link
-              href="/lessons"
-              className="text-foreground hover:text-brand transition-colors"
-            >
-              {t("lessons")}
-            </Link>
-            <Link
-              href="/practice"
-              className="text-foreground hover:text-brand transition-colors"
-            >
-              {t("practice")}
-            </Link>
-            <Link
-              href="/learn-from-youtube"
-              className="text-foreground hover:text-brand transition-colors"
-            >
-              {t("youtube")}
-            </Link>
+            {isAdmin ? (
+              <>
+                <Link href="/admin" className="text-foreground hover:text-brand transition-colors">
+                  {t("adminHome")}
+                </Link>
+                <Link href="/admin/lessons" className="text-foreground hover:text-brand transition-colors">
+                  {t("lessons")}
+                </Link>
+                <Link href="/admin/exercises" className="text-foreground hover:text-brand transition-colors">
+                  {t("exercises")}
+                </Link>
+                <Link href="/admin/analytics" className="text-foreground hover:text-brand transition-colors">
+                  {t("analytics")}
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/lessons" className="text-foreground hover:text-brand transition-colors">
+                  {t("lessons")}
+                </Link>
+                <Link href="/practice" className="text-foreground hover:text-brand transition-colors">
+                  {t("practice")}
+                </Link>
+                <Link href="/learn-from-youtube" className="text-foreground hover:text-brand transition-colors">
+                  {t("youtube")}
+                </Link>
+              </>
+            )}
           </nav>
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
-            {session?.user ? (
+            {user ? (
               <>
-                <Link
-                  href="/dashboard"
-                  className="hidden sm:inline text-sm font-medium text-foreground hover:text-brand transition-colors"
-                >
-                  {t("dashboard")}
-                </Link>
+                {!isAdmin && (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      className="hidden sm:inline text-sm font-medium text-foreground hover:text-brand transition-colors"
+                    >
+                      {t("dashboard")}
+                    </Link>
+                    <Link
+                      href="/profile"
+                      className="hidden sm:inline text-sm font-medium text-foreground hover:text-brand transition-colors"
+                    >
+                      {t("profile")}
+                    </Link>
+                  </>
+                )}
                 <SignOutButton label={t("signOut")} locale={locale} />
               </>
             ) : (

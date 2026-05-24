@@ -13,10 +13,56 @@ model User {
   passwordHash String
   name         String?
   locale       String            @default("en")
+  isAdmin      Boolean           @default(false)
+  birthYear    Int?
+  country      String?
   createdAt    DateTime          @default(now())
   progress     LessonProgress[]
   attempts     ExerciseAttempt[]
   vocab        VocabItem[]
+  activity     UserActivity[]
+}
+
+model UserActivity {
+  id        String   @id @default(cuid())
+  userId    String
+  minuteTs  DateTime // start-of-minute (UTC)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, minuteTs])
+  @@index([minuteTs])
+}
+
+model Lesson {
+  id          String   @id @default(cuid())
+  slug        String
+  category    String
+  title       String
+  level       String   // CEFR A1..C2
+  description String?  @db.Text
+  transcript  String   @db.Text
+  segments    Json     // [{ text, hint? }]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([category, slug])
+  @@index([category, level])
+}
+
+model Exercise {
+  id          String   @id @default(cuid())
+  slug        String
+  skill       String
+  title       String
+  level       String
+  type        String   // mcq | fill | match
+  description String?  @db.Text
+  questions   Json     // ExerciseQuestion[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([skill, slug])
+  @@index([skill, level])
 }
 
 model LessonProgress {

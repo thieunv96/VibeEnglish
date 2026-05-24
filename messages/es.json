@@ -6,7 +6,11 @@
     "signIn": "Iniciar sesión",
     "signOut": "Cerrar sesión",
     "dashboard": "Panel",
-    "register": "Registrarse"
+    "register": "Registrarse",
+    "profile": "Perfil",
+    "adminHome": "Admin",
+    "exercises": "Ejercicios",
+    "analytics": "Analíticas"
   },
   "footer": {
     "tagline": "La plataforma gratuita de inglés basada en la escucha real.",
@@ -142,7 +146,18 @@
     "registerLink": "Crear una",
     "invalid": "Correo o contraseña no válidos.",
     "exists": "Ya existe una cuenta con ese correo.",
-    "weak": "La contraseña debe tener al menos 6 caracteres."
+    "weak": "La contraseña debe tener al menos 6 caracteres.",
+    "birthYear": "Año de nacimiento (opcional)"
+  },
+  "profile": {
+    "title": "Tu perfil",
+    "sub": "Actualiza los datos de tu cuenta.",
+    "email": "Correo electrónico",
+    "name": "Nombre",
+    "birthYear": "Año de nacimiento",
+    "country": "País",
+    "save": "Guardar cambios",
+    "saved": "Guardado"
   },
   "dashboard": {
     "title": "Tu panel",

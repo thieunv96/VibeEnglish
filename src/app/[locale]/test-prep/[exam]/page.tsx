@@ -34,7 +34,7 @@ export default async function TestPrepPage({
   const tExam = await getTranslations("exams");
   const tL = await getTranslations("lessons");
   const cat = examToCategory[exam as Exam];
-  const lessons = getLessons(cat);
+  const lessons = await getLessons(cat);
 
   return (
     <Container size="wide" className="py-12">

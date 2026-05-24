@@ -1,5 +1,4 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import Image from "next/image";
 import { Container } from "@/components/Container";
 import { Link } from "@/i18n/navigation";
 import { RegisterForm } from "./RegisterForm";
@@ -18,7 +17,12 @@ export default async function RegisterPage({
     <Container size="narrow" className="py-16">
       <div className="rounded-2xl border border-border bg-white p-8 shadow-sm">
         <div className="flex flex-col items-center text-center mb-6">
-          <Image src="/brand/logo.png" alt="VibeEnglish" width={56} height={56} className="rounded-xl" priority />
+          <span
+            aria-hidden
+            className="grid place-items-center h-14 w-14 rounded-xl bg-brand text-white font-extrabold text-xl shadow-sm"
+          >
+            VE
+          </span>
           <p className="mt-2 text-sm font-medium text-brand">{tBrand("tagline")}</p>
         </div>
         <h1 className="text-2xl font-bold text-center" data-testid="page-title">{t("registerTitle")}</h1>
@@ -29,6 +33,7 @@ export default async function RegisterPage({
             name: t("name"),
             email: t("email"),
             password: t("password"),
+            birthYear: t("birthYear"),
             submit: t("registerBtn"),
             exists: t("exists"),
             weak: t("weak"),

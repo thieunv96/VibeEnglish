@@ -14,7 +14,7 @@ export default async function LearnFromYouTubePage({
 
   const t = await getTranslations("youtubePage");
   const tL = await getTranslations("lessons");
-  const lessons = getLessons("youtube-random");
+  const lessons = await getLessons("youtube-random");
 
   return (
     <Container size="wide" className="py-12">

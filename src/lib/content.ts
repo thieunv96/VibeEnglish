@@ -1,5 +1,4 @@
-import fs from "node:fs";
-import path from "node:path";
+import { prisma } from "@/lib/db";
 
 export type CefrLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
 
@@ -9,6 +8,7 @@ export interface LessonSegment {
 }
 
 export interface Lesson {
+  id: string;
   slug: string;
   title: string;
   level: CefrLevel;
@@ -31,6 +31,7 @@ export interface ExerciseQuestion {
 }
 
 export interface Exercise {
+  id: string;
   slug: string;
   title: string;
   level: CefrLevel;
@@ -39,8 +40,6 @@ export interface Exercise {
   description?: string;
   questions: ExerciseQuestion[];
 }
-
-const ROOT = path.join(process.cwd(), "src", "content");
 
 const LESSON_CATEGORIES = [
   "short-stories",
@@ -71,46 +70,88 @@ export type Skill = (typeof SKILLS)[number];
 export const lessonCategories = LESSON_CATEGORIES;
 export const skills = SKILLS;
 
-function readJson<T>(file: string): T {
-  return JSON.parse(fs.readFileSync(file, "utf8")) as T;
+interface DbLessonRow {
+  id: string;
+  slug: string;
+  category: string;
+  title: string;
+  level: string;
+  description: string | null;
+  transcript: string;
+  segments: unknown;
 }
 
-export function getLessons(category: LessonCategory): Lesson[] {
-  const dir = path.join(ROOT, "lessons", category);
-  if (!fs.existsSync(dir)) return [];
-  return fs
-    .readdirSync(dir)
-    .filter((f) => f.endsWith(".json"))
-    .map((f) => {
-      const data = readJson<Lesson>(path.join(dir, f));
-      return { ...data, category };
-    })
-    .sort((a, b) => a.title.localeCompare(b.title));
+interface DbExerciseRow {
+  id: string;
+  slug: string;
+  skill: string;
+  title: string;
+  level: string;
+  type: string;
+  description: string | null;
+  questions: unknown;
 }
 
-export function getLesson(category: LessonCategory, slug: string): Lesson | null {
-  const file = path.join(ROOT, "lessons", category, `${slug}.json`);
-  if (!fs.existsSync(file)) return null;
-  return { ...readJson<Lesson>(file), category };
+function rowToLesson(row: DbLessonRow): Lesson {
+  return {
+    id: row.id,
+    slug: row.slug,
+    category: row.category,
+    title: row.title,
+    level: row.level as CefrLevel,
+    description: row.description ?? undefined,
+    transcript: row.transcript,
+    segments: (row.segments ?? []) as LessonSegment[],
+  };
 }
 
-export function getExercises(skill: Skill): Exercise[] {
-  const dir = path.join(ROOT, "exercises", skill);
-  if (!fs.existsSync(dir)) return [];
-  return fs
-    .readdirSync(dir)
-    .filter((f) => f.endsWith(".json"))
-    .map((f) => {
-      const data = readJson<Exercise>(path.join(dir, f));
-      return { ...data, skill };
-    })
-    .sort((a, b) => a.title.localeCompare(b.title));
+function rowToExercise(row: DbExerciseRow): Exercise {
+  return {
+    id: row.id,
+    slug: row.slug,
+    skill: row.skill,
+    title: row.title,
+    level: row.level as CefrLevel,
+    type: row.type as ExerciseType,
+    description: row.description ?? undefined,
+    questions: (row.questions ?? []) as ExerciseQuestion[],
+  };
 }
 
-export function getExercise(skill: Skill, slug: string): Exercise | null {
-  const file = path.join(ROOT, "exercises", skill, `${slug}.json`);
-  if (!fs.existsSync(file)) return null;
-  return { ...readJson<Exercise>(file), skill };
+export async function getLessons(category: LessonCategory): Promise<Lesson[]> {
+  const rows = await prisma.lesson.findMany({
+    where: { category },
+    orderBy: { title: "asc" },
+  });
+  return rows.map(rowToLesson);
+}
+
+export async function getLesson(
+  category: LessonCategory,
+  slug: string,
+): Promise<Lesson | null> {
+  const row = await prisma.lesson.findUnique({
+    where: { category_slug: { category, slug } },
+  });
+  return row ? rowToLesson(row) : null;
+}
+
+export async function getExercises(skill: Skill): Promise<Exercise[]> {
+  const rows = await prisma.exercise.findMany({
+    where: { skill },
+    orderBy: { title: "asc" },
+  });
+  return rows.map(rowToExercise);
+}
+
+export async function getExercise(
+  skill: Skill,
+  slug: string,
+): Promise<Exercise | null> {
+  const row = await prisma.exercise.findUnique({
+    where: { skill_slug: { skill, slug } },
+  });
+  return row ? rowToExercise(row) : null;
 }
 
 export function isCategory(value: string): value is LessonCategory {
@@ -121,16 +162,24 @@ export function isSkill(value: string): value is Skill {
   return (SKILLS as readonly string[]).includes(value);
 }
 
-export function categoryStats() {
-  return lessonCategories.map((cat) => ({
-    slug: cat,
-    count: getLessons(cat).length,
-  }));
+export async function categoryStats(): Promise<Array<{ slug: LessonCategory; count: number }>> {
+  const grouped = await prisma.lesson.groupBy({
+    by: ["category"],
+    _count: { _all: true },
+  });
+  const map = new Map<string, number>(
+    grouped.map((g) => [g.category, g._count._all]),
+  );
+  return lessonCategories.map((cat) => ({ slug: cat, count: map.get(cat) ?? 0 }));
 }
 
-export function skillStats() {
-  return skills.map((sk) => ({
-    slug: sk,
-    count: getExercises(sk).length,
-  }));
+export async function skillStats(): Promise<Array<{ slug: Skill; count: number }>> {
+  const grouped = await prisma.exercise.groupBy({
+    by: ["skill"],
+    _count: { _all: true },
+  });
+  const map = new Map<string, number>(
+    grouped.map((g) => [g.skill, g._count._all]),
+  );
+  return skills.map((sk) => ({ slug: sk, count: map.get(sk) ?? 0 }));
 }

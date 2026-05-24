@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { signIn } from "next-auth/react";
+import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 
 interface Props {
@@ -15,7 +16,6 @@ interface Props {
 
 export function LoginForm({ labels }: Props) {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -23,7 +23,6 @@ export function LoginForm({ labels }: Props) {
     const fd = new FormData(e.currentTarget);
     const email = String(fd.get("email") ?? "");
     const password = String(fd.get("password") ?? "");
-    setError(null);
 
     startTransition(async () => {
       const res = await signIn("credentials", {
@@ -32,11 +31,11 @@ export function LoginForm({ labels }: Props) {
         redirect: false,
       });
       if (res?.error) {
-        setError(labels.invalid);
-      } else {
-        router.push("/dashboard");
-        router.refresh();
+        toast.error(labels.invalid);
+        return;
       }
+      router.push("/dashboard");
+      router.refresh();
     });
   }
 
@@ -60,16 +59,10 @@ export function LoginForm({ labels }: Props) {
           type="password"
           required
           autoComplete="current-password"
-          minLength={6}
           data-testid="login-password"
           className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand"
         />
       </label>
-      {error && (
-        <p className="text-sm text-red-600" data-testid="login-error">
-          {error}
-        </p>
-      )}
       <button
         type="submit"
         disabled={isPending}

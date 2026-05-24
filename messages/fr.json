@@ -6,7 +6,11 @@
     "signIn": "Se connecter",
     "signOut": "Se déconnecter",
     "dashboard": "Tableau de bord",
-    "register": "S'inscrire"
+    "register": "S'inscrire",
+    "profile": "Profil",
+    "adminHome": "Admin",
+    "exercises": "Exercices",
+    "analytics": "Statistiques"
   },
   "footer": {
     "tagline": "La plateforme gratuite d'anglais centrée sur l'écoute réelle.",
@@ -142,7 +146,18 @@
     "registerLink": "En créer un",
     "invalid": "Email ou mot de passe invalide.",
     "exists": "Un compte avec cet email existe déjà.",
-    "weak": "Le mot de passe doit comporter au moins 6 caractères."
+    "weak": "Le mot de passe doit comporter au moins 6 caractères.",
+    "birthYear": "Année de naissance (optionnel)"
+  },
+  "profile": {
+    "title": "Votre profil",
+    "sub": "Mettez à jour les informations de votre compte.",
+    "email": "Email",
+    "name": "Nom",
+    "birthYear": "Année de naissance",
+    "country": "Pays",
+    "save": "Enregistrer",
+    "saved": "Enregistré"
   },
   "dashboard": {
     "title": "Votre tableau de bord",

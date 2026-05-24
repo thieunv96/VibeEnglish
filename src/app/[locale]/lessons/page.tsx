@@ -26,7 +26,7 @@ export default async function LessonsIndex({
   const t = await getTranslations("lessons");
   const tCat = await getTranslations("categories");
   const tCatDesc = await getTranslations("categoriesDesc");
-  const counts = Object.fromEntries(categoryStats().map((c) => [c.slug, c.count]));
+  const counts = Object.fromEntries((await categoryStats()).map((c) => [c.slug, c.count]));
 
   return (
     <Container size="wide" className="py-12">

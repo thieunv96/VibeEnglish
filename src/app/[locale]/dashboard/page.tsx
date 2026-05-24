@@ -15,8 +15,10 @@ export default async function Dashboard({
   setRequestLocale(locale);
 
   const session = await auth();
-  const userId = (session?.user as { id?: string } | undefined)?.id;
-  if (!userId) redirect("/auth/login");
+  const u = session?.user as { id?: string; isAdmin?: boolean } | undefined;
+  if (!u?.id) redirect("/auth/login");
+  if (u.isAdmin) redirect("/admin");
+  const userId = u.id;
 
   const t = await getTranslations("dashboard");
 

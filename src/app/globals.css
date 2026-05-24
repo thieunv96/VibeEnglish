@@ -2,15 +2,15 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #0f172a;
-  --brand: #2563EB;         /* blue-600 — matches the V's body */
-  --brand-strong: #1E40AF;  /* blue-800 — hover/active */
-  --brand-soft: #DBEAFE;    /* blue-100 — chip backgrounds */
-  --accent: #8B5CF6;        /* violet-500 — V's right edge + gradient end */
-  --accent-strong: #6D28D9; /* violet-700 */
-  --muted: #64748b;         /* slate-500 */
-  --surface: #f8fafc;       /* slate-50 */
-  --border: #e2e8f0;        /* slate-200 */
+  --foreground: #0a1813;     /* near-black with a deeper green tint */
+  --brand: #059669;          /* emerald-600 — deeper soft green */
+  --brand-strong: #065F46;   /* emerald-800 — hover/active */
+  --brand-soft: #A7F3D0;     /* emerald-200 — chip backgrounds */
+  --accent: #0D9488;         /* teal-600 — deeper accent */
+  --accent-strong: #115E59;  /* teal-800 */
+  --muted: #475569;          /* slate-600 — body text helper */
+  --surface: #ECFDF5;        /* emerald-50 — slightly greener wash */
+  --border: #BBF7D0;         /* green-200 — more visible borders */
 }
 
 @theme inline {
@@ -37,7 +37,7 @@ html, body {
 a { color: inherit; }
 
 /* Dictation word-diff helpers used by DictationPlayer */
-.dict-ok    { color: #1D4ED8; font-weight: 600; }
+.dict-ok    { color: #065F46; font-weight: 600; }
 .dict-miss  { color: #b91c1c; text-decoration: line-through; }
 .dict-extra { color: #b45309; }
 .dict-pending { color: #6b7280; }

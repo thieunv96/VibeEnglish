@@ -6,7 +6,11 @@
     "signIn": "Đăng nhập",
     "signOut": "Đăng xuất",
     "dashboard": "Bảng điều khiển",
-    "register": "Đăng ký"
+    "register": "Đăng ký",
+    "profile": "Hồ sơ",
+    "adminHome": "Quản trị",
+    "exercises": "Bài luyện",
+    "analytics": "Thống kê"
   },
   "footer": {
     "tagline": "Nền tảng học tiếng Anh miễn phí xoay quanh luyện nghe thực tế.",
@@ -142,7 +146,18 @@
     "registerLink": "Tạo mới",
     "invalid": "Email hoặc mật khẩu không hợp lệ.",
     "exists": "Đã có tài khoản với email này.",
-    "weak": "Mật khẩu phải có ít nhất 6 ký tự."
+    "weak": "Mật khẩu phải có ít nhất 6 ký tự.",
+    "birthYear": "Năm sinh (tuỳ chọn)"
+  },
+  "profile": {
+    "title": "Hồ sơ của bạn",
+    "sub": "Cập nhật thông tin tài khoản.",
+    "email": "Email",
+    "name": "Tên",
+    "birthYear": "Năm sinh",
+    "country": "Quốc gia",
+    "save": "Lưu thay đổi",
+    "saved": "Đã lưu"
   },
   "dashboard": {
     "title": "Bảng điều khiển của bạn",
