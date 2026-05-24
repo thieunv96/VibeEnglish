@@ -1,0 +1,25 @@
+{
+  "slug": "phone-message-vendor",
+  "title": "Vendor Phone Message",
+  "level": "B1",
+  "category": "toeic-listening",
+  "description": "TOEIC Part 4 — voicemail.",
+  "segments": [
+    {
+      "text": "Hi, this is David from Acme Supplies returning your call about the order."
+    },
+    {
+      "text": "I checked our inventory, and we do have the items you requested in stock."
+    },
+    {
+      "text": "We can ship them out tomorrow morning by express delivery."
+    },
+    {
+      "text": "The total comes to four hundred and twenty dollars, including shipping."
+    },
+    {
+      "text": "Please give me a call back at your earliest convenience to confirm."
+    }
+  ],
+  "transcript": "Hi, this is David from Acme Supplies returning your call about the order. I checked our inventory, and we do have the items you requested in stock. We can ship them out tomorrow morning by express delivery. The total comes to four hundred and twenty dollars, including shipping. Please give me a call back at your earliest convenience to confirm."
+}

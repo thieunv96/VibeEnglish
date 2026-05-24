@@ -1,0 +1,34 @@
+{
+  "slug": "everyday-objects",
+  "title": "Everyday Objects",
+  "level": "A1",
+  "skill": "vocabulary",
+  "type": "match",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "match",
+      "prompt": "Match each object with its use.",
+      "pairs": [
+        {
+          "left": "pen",
+          "right": "to write"
+        },
+        {
+          "left": "umbrella",
+          "right": "for rain"
+        },
+        {
+          "left": "key",
+          "right": "to open doors"
+        },
+        {
+          "left": "phone",
+          "right": "to call people"
+        }
+      ],
+      "answer": "auto"
+    }
+  ]
+}

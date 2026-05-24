@@ -1,0 +1,34 @@
+{
+  "slug": "idioms-common",
+  "title": "Common Idioms",
+  "level": "B2",
+  "skill": "word-skills",
+  "type": "match",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "match",
+      "prompt": "Match each idiom with its meaning.",
+      "pairs": [
+        {
+          "left": "Hit the books",
+          "right": "Study hard"
+        },
+        {
+          "left": "Piece of cake",
+          "right": "Very easy"
+        },
+        {
+          "left": "Under the weather",
+          "right": "Feeling ill"
+        },
+        {
+          "left": "Cost an arm and a leg",
+          "right": "Very expensive"
+        }
+      ],
+      "answer": "auto"
+    }
+  ]
+}

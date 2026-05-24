@@ -1,0 +1,70 @@
+{
+  "slug": "collocations-make-do",
+  "title": "Collocations: make vs do",
+  "level": "B1",
+  "skill": "word-skills",
+  "type": "mcq",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "mcq",
+      "prompt": "We need to ____ a decision.",
+      "options": [
+        "make",
+        "do",
+        "have",
+        "take"
+      ],
+      "answer": "make"
+    },
+    {
+      "id": "q2",
+      "type": "mcq",
+      "prompt": "She has to ____ her homework.",
+      "options": [
+        "make",
+        "do",
+        "have",
+        "take"
+      ],
+      "answer": "do"
+    },
+    {
+      "id": "q3",
+      "type": "mcq",
+      "prompt": "I always ____ my bed in the morning.",
+      "options": [
+        "make",
+        "do",
+        "have",
+        "take"
+      ],
+      "answer": "make"
+    },
+    {
+      "id": "q4",
+      "type": "mcq",
+      "prompt": "Please ____ me a favor.",
+      "options": [
+        "make",
+        "do",
+        "have",
+        "take"
+      ],
+      "answer": "do"
+    },
+    {
+      "id": "q5",
+      "type": "mcq",
+      "prompt": "They will ____ a profit this year.",
+      "options": [
+        "make",
+        "do",
+        "have",
+        "take"
+      ],
+      "answer": "make"
+    }
+  ]
+}

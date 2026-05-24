@@ -1,0 +1,70 @@
+{
+  "slug": "prefixes-un-in-dis",
+  "title": "Prefixes: un- / in- / dis-",
+  "level": "B1",
+  "skill": "word-skills",
+  "type": "mcq",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "mcq",
+      "prompt": "Opposite of \"happy\":",
+      "options": [
+        "unhappy",
+        "inhappy",
+        "dishappy",
+        "anhappy"
+      ],
+      "answer": "unhappy"
+    },
+    {
+      "id": "q2",
+      "type": "mcq",
+      "prompt": "Opposite of \"agree\":",
+      "options": [
+        "unagree",
+        "inagree",
+        "disagree",
+        "misagree"
+      ],
+      "answer": "disagree"
+    },
+    {
+      "id": "q3",
+      "type": "mcq",
+      "prompt": "Opposite of \"possible\":",
+      "options": [
+        "unpossible",
+        "impossible",
+        "dispossible",
+        "anpossible"
+      ],
+      "answer": "impossible"
+    },
+    {
+      "id": "q4",
+      "type": "mcq",
+      "prompt": "Opposite of \"like\":",
+      "options": [
+        "unlike",
+        "dislike",
+        "inlike",
+        "mislike"
+      ],
+      "answer": "dislike"
+    },
+    {
+      "id": "q5",
+      "type": "mcq",
+      "prompt": "Opposite of \"polite\":",
+      "options": [
+        "unpolite",
+        "impolite",
+        "dispolite",
+        "anpolite"
+      ],
+      "answer": "impolite"
+    }
+  ]
+}

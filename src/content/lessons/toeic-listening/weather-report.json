@@ -1,0 +1,28 @@
+{
+  "slug": "weather-report",
+  "title": "Weather Report",
+  "level": "A2",
+  "category": "toeic-listening",
+  "description": "TOEIC Part 4 — weather/news.",
+  "segments": [
+    {
+      "text": "Good evening."
+    },
+    {
+      "text": "Here is your local forecast."
+    },
+    {
+      "text": "Tonight will be cool and clear with a low of twelve degrees."
+    },
+    {
+      "text": "Tomorrow expect partly cloudy skies in the morning followed by light showers in the afternoon."
+    },
+    {
+      "text": "Highs will reach twenty-one degrees."
+    },
+    {
+      "text": "The weekend looks sunny and warm, with temperatures climbing into the mid-twenties."
+    }
+  ],
+  "transcript": "Good evening. Here is your local forecast. Tonight will be cool and clear with a low of twelve degrees. Tomorrow expect partly cloudy skies in the morning followed by light showers in the afternoon. Highs will reach twenty-one degrees. The weekend looks sunny and warm, with temperatures climbing into the mid-twenties."
+}

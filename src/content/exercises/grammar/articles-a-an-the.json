@@ -1,0 +1,70 @@
+{
+  "slug": "articles-a-an-the",
+  "title": "Articles: a / an / the",
+  "level": "A1",
+  "skill": "grammar",
+  "type": "mcq",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "mcq",
+      "prompt": "I saw ____ elephant at the zoo.",
+      "options": [
+        "a",
+        "an",
+        "the",
+        "—"
+      ],
+      "answer": "an"
+    },
+    {
+      "id": "q2",
+      "type": "mcq",
+      "prompt": "She is ____ best singer in the school.",
+      "options": [
+        "a",
+        "an",
+        "the",
+        "—"
+      ],
+      "answer": "the"
+    },
+    {
+      "id": "q3",
+      "type": "mcq",
+      "prompt": "I'd like ____ apple, please.",
+      "options": [
+        "a",
+        "an",
+        "the",
+        "—"
+      ],
+      "answer": "an"
+    },
+    {
+      "id": "q4",
+      "type": "mcq",
+      "prompt": "He plays ____ guitar every weekend.",
+      "options": [
+        "a",
+        "an",
+        "the",
+        "—"
+      ],
+      "answer": "the"
+    },
+    {
+      "id": "q5",
+      "type": "mcq",
+      "prompt": "There is ____ man at the door.",
+      "options": [
+        "a",
+        "an",
+        "the",
+        "—"
+      ],
+      "answer": "a"
+    }
+  ]
+}

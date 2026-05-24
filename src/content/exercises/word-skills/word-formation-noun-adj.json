@@ -1,0 +1,40 @@
+{
+  "slug": "word-formation-noun-adj",
+  "title": "Word Formation: Noun ↔ Adjective",
+  "level": "B2",
+  "skill": "word-skills",
+  "type": "fill",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "fill",
+      "prompt": "danger → adjective: ____",
+      "answer": "dangerous"
+    },
+    {
+      "id": "q2",
+      "type": "fill",
+      "prompt": "beauty → adjective: ____",
+      "answer": "beautiful"
+    },
+    {
+      "id": "q3",
+      "type": "fill",
+      "prompt": "decide → noun: ____",
+      "answer": "decision"
+    },
+    {
+      "id": "q4",
+      "type": "fill",
+      "prompt": "happy → noun: ____",
+      "answer": "happiness"
+    },
+    {
+      "id": "q5",
+      "type": "fill",
+      "prompt": "create → noun: ____",
+      "answer": "creation"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "slug": "introducing-yourself",
+  "title": "Introducing Yourself",
+  "level": "A1",
+  "skill": "speaking",
+  "type": "fill",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "fill",
+      "prompt": "Complete: \"Hello, my name ____ Maria.\"",
+      "answer": "is"
+    },
+    {
+      "id": "q2",
+      "type": "fill",
+      "prompt": "Complete: \"I'm ____ Spain.\"",
+      "answer": "from"
+    },
+    {
+      "id": "q3",
+      "type": "fill",
+      "prompt": "Complete: \"I ____ in Madrid.\"",
+      "answer": "live"
+    },
+    {
+      "id": "q4",
+      "type": "fill",
+      "prompt": "Complete: \"I ____ 27 years old.\"",
+      "answer": "am"
+    },
+    {
+      "id": "q5",
+      "type": "fill",
+      "prompt": "Complete: \"Nice to ____ you.\"",
+      "answer": "meet"
+    }
+  ]
+}

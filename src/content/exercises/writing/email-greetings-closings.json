@@ -1,0 +1,70 @@
+{
+  "slug": "email-greetings-closings",
+  "title": "Email Greetings & Closings",
+  "level": "B1",
+  "skill": "writing",
+  "type": "mcq",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "mcq",
+      "prompt": "Best opening for a job application:",
+      "options": [
+        "Hey there",
+        "Dear Hiring Manager,",
+        "Yo",
+        "Hi y'all"
+      ],
+      "answer": "Dear Hiring Manager,"
+    },
+    {
+      "id": "q2",
+      "type": "mcq",
+      "prompt": "Best closing for a formal email:",
+      "options": [
+        "TTYL",
+        "Cheers!",
+        "Kind regards,",
+        "Bye"
+      ],
+      "answer": "Kind regards,"
+    },
+    {
+      "id": "q3",
+      "type": "mcq",
+      "prompt": "Informal greeting to a colleague:",
+      "options": [
+        "To whom it may concern",
+        "Hi James,",
+        "Esteemed Mr. James,",
+        "Greetings"
+      ],
+      "answer": "Hi James,"
+    },
+    {
+      "id": "q4",
+      "type": "mcq",
+      "prompt": "Polite ask in email body:",
+      "options": [
+        "Send me this now.",
+        "Could you please send it?",
+        "I want it now.",
+        "Where is it?!"
+      ],
+      "answer": "Could you please send it?"
+    },
+    {
+      "id": "q5",
+      "type": "mcq",
+      "prompt": "Closing if you don't know the recipient's name:",
+      "options": [
+        "Yours sincerely,",
+        "Yours faithfully,",
+        "Love,",
+        "XOXO,"
+      ],
+      "answer": "Yours faithfully,"
+    }
+  ]
+}

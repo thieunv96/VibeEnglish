@@ -1,0 +1,70 @@
+{
+  "slug": "small-talk",
+  "title": "Small Talk Starters",
+  "level": "A2",
+  "skill": "speaking",
+  "type": "mcq",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "mcq",
+      "prompt": "Best small-talk opener at work on Monday?",
+      "options": [
+        "What are your political views?",
+        "How was your weekend?",
+        "How much do you earn?",
+        "Why are you late?"
+      ],
+      "answer": "How was your weekend?"
+    },
+    {
+      "id": "q2",
+      "type": "mcq",
+      "prompt": "Polite weather opener:",
+      "options": [
+        "The weather is terrible, isn't it?",
+        "Lovely day, isn't it?",
+        "Why is it so hot in here?",
+        "Don't talk to me about weather."
+      ],
+      "answer": "Lovely day, isn't it?"
+    },
+    {
+      "id": "q3",
+      "type": "mcq",
+      "prompt": "Safe travel question:",
+      "options": [
+        "Why did you go alone?",
+        "Have you been on holiday recently?",
+        "How much did your trip cost?",
+        "Did you cheat on your taxes?"
+      ],
+      "answer": "Have you been on holiday recently?"
+    },
+    {
+      "id": "q4",
+      "type": "mcq",
+      "prompt": "Friendly response to \"How are you?\":",
+      "options": [
+        "None of your business.",
+        "Pretty good, thanks. You?",
+        "What do you mean?",
+        "I'd rather not say."
+      ],
+      "answer": "Pretty good, thanks. You?"
+    },
+    {
+      "id": "q5",
+      "type": "mcq",
+      "prompt": "Good way to end a chat politely:",
+      "options": [
+        "I have to go now, nice talking to you!",
+        "Bye, I'm bored.",
+        "Stop talking to me.",
+        "I don't want to talk."
+      ],
+      "answer": "I have to go now, nice talking to you!"
+    }
+  ]
+}

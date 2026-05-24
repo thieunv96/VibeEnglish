@@ -1,0 +1,70 @@
+{
+  "slug": "job-titles-departments",
+  "title": "Job Titles & Departments",
+  "level": "B1",
+  "skill": "business",
+  "type": "mcq",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "mcq",
+      "prompt": "Who designs the brand and ad campaigns?",
+      "options": [
+        "Engineering",
+        "Marketing",
+        "Finance",
+        "Legal"
+      ],
+      "answer": "Marketing"
+    },
+    {
+      "id": "q2",
+      "type": "mcq",
+      "prompt": "Who handles employee benefits and hiring?",
+      "options": [
+        "HR",
+        "Sales",
+        "IT",
+        "Operations"
+      ],
+      "answer": "HR"
+    },
+    {
+      "id": "q3",
+      "type": "mcq",
+      "prompt": "Who writes the code?",
+      "options": [
+        "Engineering",
+        "Marketing",
+        "HR",
+        "Procurement"
+      ],
+      "answer": "Engineering"
+    },
+    {
+      "id": "q4",
+      "type": "mcq",
+      "prompt": "Who handles money matters?",
+      "options": [
+        "Finance",
+        "Sales",
+        "Legal",
+        "HR"
+      ],
+      "answer": "Finance"
+    },
+    {
+      "id": "q5",
+      "type": "mcq",
+      "prompt": "The top executive of a company is the ____.",
+      "options": [
+        "CEO",
+        "CIO",
+        "CTO",
+        "CMO"
+      ],
+      "answer": "CEO"
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "slug": "conditionals-first-and-second",
+  "title": "First & Second Conditionals",
+  "level": "B1",
+  "skill": "grammar",
+  "type": "mcq",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "mcq",
+      "prompt": "If it rains tomorrow, we ____ at home.",
+      "options": [
+        "stay",
+        "will stay",
+        "would stay",
+        "stayed"
+      ],
+      "answer": "will stay"
+    },
+    {
+      "id": "q2",
+      "type": "mcq",
+      "prompt": "If I ____ rich, I would travel the world.",
+      "options": [
+        "am",
+        "was",
+        "were",
+        "will be"
+      ],
+      "answer": "were"
+    },
+    {
+      "id": "q3",
+      "type": "mcq",
+      "prompt": "She ____ pass if she studies.",
+      "options": [
+        "will",
+        "would",
+        "is",
+        "did"
+      ],
+      "answer": "will"
+    },
+    {
+      "id": "q4",
+      "type": "mcq",
+      "prompt": "If you heated ice, it ____.",
+      "options": [
+        "melts",
+        "would melt",
+        "melted",
+        "is melting"
+      ],
+      "answer": "would melt"
+    },
+    {
+      "id": "q5",
+      "type": "mcq",
+      "prompt": "If I ____ you, I would apologize.",
+      "options": [
+        "am",
+        "was",
+        "were",
+        "be"
+      ],
+      "answer": "were"
+    }
+  ]
+}

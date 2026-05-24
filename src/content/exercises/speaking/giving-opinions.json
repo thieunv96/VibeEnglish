@@ -1,0 +1,40 @@
+{
+  "slug": "giving-opinions",
+  "title": "Giving Opinions",
+  "level": "B2",
+  "skill": "speaking",
+  "type": "fill",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "fill",
+      "prompt": "\"In my ____, this is the best option.\"",
+      "answer": "opinion"
+    },
+    {
+      "id": "q2",
+      "type": "fill",
+      "prompt": "\"As ____ as I'm concerned, the data is clear.\"",
+      "answer": "far"
+    },
+    {
+      "id": "q3",
+      "type": "fill",
+      "prompt": "\"It seems to ____ that we need more time.\"",
+      "answer": "me"
+    },
+    {
+      "id": "q4",
+      "type": "fill",
+      "prompt": "\"From my ____ of view, it's a fair offer.\"",
+      "answer": "point"
+    },
+    {
+      "id": "q5",
+      "type": "fill",
+      "prompt": "\"I'd say it's ____ a great idea.\" (filler/intensifier)",
+      "answer": "really"
+    }
+  ]
+}

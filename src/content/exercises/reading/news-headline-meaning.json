@@ -1,0 +1,70 @@
+{
+  "slug": "news-headline-meaning",
+  "title": "Reading: News Headlines",
+  "level": "B2",
+  "skill": "reading",
+  "type": "mcq",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "mcq",
+      "prompt": "\"Tech giant slashes prices ahead of holiday\" — what does \"slashes\" mean?",
+      "options": [
+        "raises",
+        "removes",
+        "lowers sharply",
+        "keeps the same"
+      ],
+      "answer": "lowers sharply"
+    },
+    {
+      "id": "q2",
+      "type": "mcq",
+      "prompt": "\"Government to unveil new climate plan\" — \"unveil\" means:",
+      "options": [
+        "cancel",
+        "introduce publicly",
+        "vote against",
+        "delay"
+      ],
+      "answer": "introduce publicly"
+    },
+    {
+      "id": "q3",
+      "type": "mcq",
+      "prompt": "\"Talks stall as deadline looms\" — \"stall\" means:",
+      "options": [
+        "accelerate",
+        "stop progressing",
+        "improve",
+        "finish successfully"
+      ],
+      "answer": "stop progressing"
+    },
+    {
+      "id": "q4",
+      "type": "mcq",
+      "prompt": "\"Storm batters coast\" — \"batters\" means:",
+      "options": [
+        "lightly touches",
+        "hits violently",
+        "avoids",
+        "warms"
+      ],
+      "answer": "hits violently"
+    },
+    {
+      "id": "q5",
+      "type": "mcq",
+      "prompt": "\"Inflation eases for third month\" — \"eases\" means:",
+      "options": [
+        "worsens",
+        "ends",
+        "lessens",
+        "doubles"
+      ],
+      "answer": "lessens"
+    }
+  ]
+}

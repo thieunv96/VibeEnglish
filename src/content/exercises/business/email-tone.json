@@ -1,0 +1,70 @@
+{
+  "slug": "email-tone",
+  "title": "Email Tone",
+  "level": "B2",
+  "skill": "business",
+  "type": "mcq",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "mcq",
+      "prompt": "Most professional opening:",
+      "options": [
+        "Hey,",
+        "Hi there!",
+        "Dear Mr. Lee,",
+        "Yo Lee"
+      ],
+      "answer": "Dear Mr. Lee,"
+    },
+    {
+      "id": "q2",
+      "type": "mcq",
+      "prompt": "Best way to follow up after no response:",
+      "options": [
+        "WHY HAVEN'T YOU REPLIED?!",
+        "I'm following up on my email below.",
+        "Are you ignoring me?",
+        "Just checking — did you see it lol"
+      ],
+      "answer": "I'm following up on my email below."
+    },
+    {
+      "id": "q3",
+      "type": "mcq",
+      "prompt": "Best way to decline politely:",
+      "options": [
+        "No way.",
+        "I'm afraid we'll have to pass on this one.",
+        "Nope.",
+        "Hard pass."
+      ],
+      "answer": "I'm afraid we'll have to pass on this one."
+    },
+    {
+      "id": "q4",
+      "type": "mcq",
+      "prompt": "Best way to apologise for a late reply:",
+      "options": [
+        "Sorry I forgot.",
+        "Apologies for the delayed response.",
+        "My bad.",
+        "Whoops."
+      ],
+      "answer": "Apologies for the delayed response."
+    },
+    {
+      "id": "q5",
+      "type": "mcq",
+      "prompt": "Best way to confirm next step:",
+      "options": [
+        "See ya.",
+        "I will send the report by Friday.",
+        "K thx.",
+        "Maybe later."
+      ],
+      "answer": "I will send the report by Friday."
+    }
+  ]
+}

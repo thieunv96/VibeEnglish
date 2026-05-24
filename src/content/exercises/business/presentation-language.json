@@ -1,0 +1,40 @@
+{
+  "slug": "presentation-language",
+  "title": "Presentation Language",
+  "level": "B2",
+  "skill": "business",
+  "type": "fill",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "fill",
+      "prompt": "\"____ everyone, thank you for coming.\"",
+      "answer": "Welcome"
+    },
+    {
+      "id": "q2",
+      "type": "fill",
+      "prompt": "\"Today I'd like to ____ our Q3 results.\"",
+      "answer": "present"
+    },
+    {
+      "id": "q3",
+      "type": "fill",
+      "prompt": "\"As you can ____ from this slide, sales grew 15%.\"",
+      "answer": "see"
+    },
+    {
+      "id": "q4",
+      "type": "fill",
+      "prompt": "\"To ____ up, our priorities for next quarter are…\"",
+      "answer": "sum"
+    },
+    {
+      "id": "q5",
+      "type": "fill",
+      "prompt": "\"Are there any ____?\" (to invite Q&A)",
+      "answer": "questions"
+    }
+  ]
+}

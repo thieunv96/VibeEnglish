@@ -1,0 +1,70 @@
+{
+  "slug": "weather-forecast",
+  "title": "Listening: Weather Forecast",
+  "level": "B1",
+  "skill": "listening",
+  "type": "mcq",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "mcq",
+      "prompt": "Tonight will be cool and ____.",
+      "options": [
+        "rainy",
+        "clear",
+        "windy",
+        "snowy"
+      ],
+      "answer": "clear"
+    },
+    {
+      "id": "q2",
+      "type": "mcq",
+      "prompt": "The low tonight is ____ degrees.",
+      "options": [
+        "12",
+        "21",
+        "5",
+        "0"
+      ],
+      "answer": "12"
+    },
+    {
+      "id": "q3",
+      "type": "mcq",
+      "prompt": "Tomorrow afternoon there will be ____.",
+      "options": [
+        "snow",
+        "fog",
+        "showers",
+        "thunder"
+      ],
+      "answer": "showers"
+    },
+    {
+      "id": "q4",
+      "type": "mcq",
+      "prompt": "The weekend will be sunny and ____.",
+      "options": [
+        "cold",
+        "warm",
+        "windy",
+        "humid"
+      ],
+      "answer": "warm"
+    },
+    {
+      "id": "q5",
+      "type": "mcq",
+      "prompt": "Weekend temperatures will be in the ____.",
+      "options": [
+        "low teens",
+        "high teens",
+        "mid-twenties",
+        "thirties"
+      ],
+      "answer": "mid-twenties"
+    }
+  ]
+}

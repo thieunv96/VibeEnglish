@@ -1,0 +1,70 @@
+{
+  "slug": "letter-of-complaint",
+  "title": "Reading: A Letter of Complaint",
+  "level": "B2",
+  "skill": "reading",
+  "type": "mcq",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "mcq",
+      "prompt": "The writer is mainly:",
+      "options": [
+        "happy",
+        "asking for information",
+        "complaining",
+        "thanking the company"
+      ],
+      "answer": "complaining"
+    },
+    {
+      "id": "q2",
+      "type": "mcq",
+      "prompt": "What outcome do they want?",
+      "options": [
+        "a job",
+        "a refund",
+        "a discount on next purchase",
+        "an apology only"
+      ],
+      "answer": "a refund"
+    },
+    {
+      "id": "q3",
+      "type": "mcq",
+      "prompt": "The tone is best described as:",
+      "options": [
+        "angry and rude",
+        "firm but polite",
+        "joking",
+        "uncertain"
+      ],
+      "answer": "firm but polite"
+    },
+    {
+      "id": "q4",
+      "type": "mcq",
+      "prompt": "They mention attaching:",
+      "options": [
+        "a photo",
+        "a video",
+        "a receipt",
+        "a contract"
+      ],
+      "answer": "a receipt"
+    },
+    {
+      "id": "q5",
+      "type": "mcq",
+      "prompt": "If unresolved, they will:",
+      "options": [
+        "forget about it",
+        "post on social media",
+        "contact a consumer protection agency",
+        "buy another product"
+      ],
+      "answer": "contact a consumer protection agency"
+    }
+  ]
+}

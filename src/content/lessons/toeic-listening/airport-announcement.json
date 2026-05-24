@@ -1,0 +1,25 @@
+{
+  "slug": "airport-announcement",
+  "title": "Airport Announcement",
+  "level": "A2",
+  "category": "toeic-listening",
+  "description": "TOEIC Part 4 — announcement.",
+  "segments": [
+    {
+      "text": "Attention all passengers."
+    },
+    {
+      "text": "Flight DL one zero five to Tokyo will begin boarding shortly at gate fifteen."
+    },
+    {
+      "text": "Passengers travelling with small children or requiring assistance are invited to board first."
+    },
+    {
+      "text": "Please have your boarding pass and identification ready."
+    },
+    {
+      "text": "Thank you for choosing Delta Airlines."
+    }
+  ],
+  "transcript": "Attention all passengers. Flight DL one zero five to Tokyo will begin boarding shortly at gate fifteen. Passengers travelling with small children or requiring assistance are invited to board first. Please have your boarding pass and identification ready. Thank you for choosing Delta Airlines."
+}

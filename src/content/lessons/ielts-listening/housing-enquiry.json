@@ -1,0 +1,43 @@
+{
+  "slug": "housing-enquiry",
+  "title": "Housing Enquiry",
+  "level": "B1",
+  "category": "ielts-listening",
+  "description": "IELTS Section 1 — phone call.",
+  "segments": [
+    {
+      "text": "Hello, I'm calling about the room advertised in the local paper."
+    },
+    {
+      "text": "Of course."
+    },
+    {
+      "text": "Are you a student?"
+    },
+    {
+      "text": "Yes, I'm starting at the university in September."
+    },
+    {
+      "text": "The room is on the first floor, fully furnished, and bills are included."
+    },
+    {
+      "text": "The rent is six hundred pounds per month."
+    },
+    {
+      "text": "Is there a deposit?"
+    },
+    {
+      "text": "Yes, one month's rent in advance."
+    },
+    {
+      "text": "When can I view the room?"
+    },
+    {
+      "text": "Would Saturday at two work for you?"
+    },
+    {
+      "text": "Perfect."
+    }
+  ],
+  "transcript": "Hello, I'm calling about the room advertised in the local paper. Of course. Are you a student? Yes, I'm starting at the university in September. The room is on the first floor, fully furnished, and bills are included. The rent is six hundred pounds per month. Is there a deposit? Yes, one month's rent in advance. When can I view the room? Would Saturday at two work for you? Perfect."
+}

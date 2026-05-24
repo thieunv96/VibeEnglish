@@ -1,0 +1,25 @@
+{
+  "slug": "training-session",
+  "title": "New Employee Training",
+  "level": "B1",
+  "category": "toeic-listening",
+  "description": "TOEIC Part 4 — workplace talk.",
+  "segments": [
+    {
+      "text": "Welcome to your first day at the company."
+    },
+    {
+      "text": "This morning we will cover the basics of our internal software."
+    },
+    {
+      "text": "After lunch, you will meet with your team lead for a one-on-one session."
+    },
+    {
+      "text": "Tomorrow's schedule includes a tour of the building and a meeting with the HR department to complete any remaining paperwork."
+    },
+    {
+      "text": "If you have questions at any point, please don't hesitate to ask."
+    }
+  ],
+  "transcript": "Welcome to your first day at the company. This morning we will cover the basics of our internal software. After lunch, you will meet with your team lead for a one-on-one session. Tomorrow's schedule includes a tour of the building and a meeting with the HR department to complete any remaining paperwork. If you have questions at any point, please don't hesitate to ask."
+}

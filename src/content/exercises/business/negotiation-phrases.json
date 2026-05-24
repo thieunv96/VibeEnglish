@@ -1,0 +1,34 @@
+{
+  "slug": "negotiation-phrases",
+  "title": "Negotiation Phrases",
+  "level": "C1",
+  "skill": "business",
+  "type": "match",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "match",
+      "prompt": "Match each phrase with its purpose.",
+      "pairs": [
+        {
+          "left": "Would you consider…?",
+          "right": "Suggesting an alternative"
+        },
+        {
+          "left": "I'm afraid that won't work for us.",
+          "right": "Polite refusal"
+        },
+        {
+          "left": "Let me get back to you on that.",
+          "right": "Buying time"
+        },
+        {
+          "left": "What if we…?",
+          "right": "Proposing a compromise"
+        }
+      ],
+      "answer": "auto"
+    }
+  ]
+}

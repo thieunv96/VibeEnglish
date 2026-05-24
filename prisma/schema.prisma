@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String            @id @default(cuid())
+  email        String            @unique
+  passwordHash String
+  name         String?
+  locale       String            @default("en")
+  createdAt    DateTime          @default(now())
+  progress     LessonProgress[]
+  attempts     ExerciseAttempt[]
+  vocab        VocabItem[]
+}
+
+model LessonProgress {
+  id                String   @id @default(cuid())
+  userId            String
+  lessonSlug        String
+  category          String
+  title             String
+  segmentsCompleted Int      @default(0)
+  totalSegments     Int
+  accuracy          Float    @default(0)
+  lastOpenedAt      DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonSlug])
+  @@index([userId])
+}
+
+model ExerciseAttempt {
+  id           String   @id @default(cuid())
+  userId       String
+  exerciseSlug String
+  skill        String
+  title        String
+  score        Float
+  completedAt  DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, completedAt])
+}
+
+model VocabItem {
+  id               String   @id @default(cuid())
+  userId           String
+  word             String
+  definition       String?
+  sourceLessonSlug String?
+  addedAt          DateTime @default(now())
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, word])
+  @@index([userId])
+}

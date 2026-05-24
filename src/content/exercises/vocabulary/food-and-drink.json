@@ -1,0 +1,70 @@
+{
+  "slug": "food-and-drink",
+  "title": "Food and Drink",
+  "level": "A1",
+  "skill": "vocabulary",
+  "type": "mcq",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "mcq",
+      "prompt": "Which is a fruit?",
+      "options": [
+        "carrot",
+        "apple",
+        "potato",
+        "onion"
+      ],
+      "answer": "apple"
+    },
+    {
+      "id": "q2",
+      "type": "mcq",
+      "prompt": "Which is a drink?",
+      "options": [
+        "bread",
+        "rice",
+        "tea",
+        "cheese"
+      ],
+      "answer": "tea"
+    },
+    {
+      "id": "q3",
+      "type": "mcq",
+      "prompt": "Which is a vegetable?",
+      "options": [
+        "banana",
+        "milk",
+        "broccoli",
+        "yogurt"
+      ],
+      "answer": "broccoli"
+    },
+    {
+      "id": "q4",
+      "type": "mcq",
+      "prompt": "Which is a meat?",
+      "options": [
+        "lettuce",
+        "chicken",
+        "pasta",
+        "honey"
+      ],
+      "answer": "chicken"
+    },
+    {
+      "id": "q5",
+      "type": "mcq",
+      "prompt": "Which is a dessert?",
+      "options": [
+        "soup",
+        "salad",
+        "ice cream",
+        "sandwich"
+      ],
+      "answer": "ice cream"
+    }
+  ]
+}

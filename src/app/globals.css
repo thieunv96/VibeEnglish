@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --brand: #2563EB;         /* blue-600 — matches the V's body */
+  --brand-strong: #1E40AF;  /* blue-800 — hover/active */
+  --brand-soft: #DBEAFE;    /* blue-100 — chip backgrounds */
+  --accent: #8B5CF6;        /* violet-500 — V's right edge + gradient end */
+  --accent-strong: #6D28D9; /* violet-700 */
+  --muted: #64748b;         /* slate-500 */
+  --surface: #f8fafc;       /* slate-50 */
+  --border: #e2e8f0;        /* slate-200 */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-muted: var(--muted);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --font-sans: var(--font-inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif);
+}
+
+html, body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+
+/* Dictation word-diff helpers used by DictationPlayer */
+.dict-ok    { color: #1D4ED8; font-weight: 600; }
+.dict-miss  { color: #b91c1c; text-decoration: line-through; }
+.dict-extra { color: #b45309; }
+.dict-pending { color: #6b7280; }
+
+/* Respect reduced motion — prevents Playwright "unstable element" timeouts. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* FAQ accordion arrow */
+details > summary { list-style: none; cursor: pointer; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::after {
+  content: "+"; float: right; font-weight: 700; font-size: 1.25rem;
+  color: var(--brand); transition: transform .2s;
+}
+details[open] > summary::after { content: "−"; }

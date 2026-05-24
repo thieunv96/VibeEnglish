@@ -1,0 +1,52 @@
+{
+  "slug": "patient-history-chest-pain",
+  "title": "Taking a History — Chest Pain",
+  "level": "B2",
+  "category": "medical-english-oet",
+  "description": "OET style consultation.",
+  "segments": [
+    {
+      "text": "Good morning, Mr."
+    },
+    {
+      "text": "Carter."
+    },
+    {
+      "text": "I'm Doctor Lee."
+    },
+    {
+      "text": "Can you tell me what brought you in today?"
+    },
+    {
+      "text": "I've been having chest pain for about a week."
+    },
+    {
+      "text": "Can you describe the pain?"
+    },
+    {
+      "text": "It's a tight, squeezing feeling, right in the centre."
+    },
+    {
+      "text": "Does anything make it worse?"
+    },
+    {
+      "text": "Yes, climbing stairs."
+    },
+    {
+      "text": "And does it go anywhere — your arm, your jaw?"
+    },
+    {
+      "text": "Sometimes down my left arm."
+    },
+    {
+      "text": "Any shortness of breath?"
+    },
+    {
+      "text": "A little."
+    },
+    {
+      "text": "Okay, we need to run some tests right away."
+    }
+  ],
+  "transcript": "Good morning, Mr. Carter. I'm Doctor Lee. Can you tell me what brought you in today? I've been having chest pain for about a week. Can you describe the pain? It's a tight, squeezing feeling, right in the centre. Does anything make it worse? Yes, climbing stairs. And does it go anywhere — your arm, your jaw? Sometimes down my left arm. Any shortness of breath? A little. Okay, we need to run some tests right away."
+}

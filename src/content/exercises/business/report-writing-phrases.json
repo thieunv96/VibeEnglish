@@ -1,0 +1,40 @@
+{
+  "slug": "report-writing-phrases",
+  "title": "Report Writing Phrases",
+  "level": "C1",
+  "skill": "business",
+  "type": "fill",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "fill",
+      "prompt": "\"This report ____ to analyze our Q3 performance.\"",
+      "answer": "aims"
+    },
+    {
+      "id": "q2",
+      "type": "fill",
+      "prompt": "\"The data was ____ from three sources.\"",
+      "answer": "gathered"
+    },
+    {
+      "id": "q3",
+      "type": "fill",
+      "prompt": "\"In ____, sales increased by 12%.\"",
+      "answer": "conclusion"
+    },
+    {
+      "id": "q4",
+      "type": "fill",
+      "prompt": "\"We ____ that the company invest in marketing.\"",
+      "answer": "recommend"
+    },
+    {
+      "id": "q5",
+      "type": "fill",
+      "prompt": "\"Further ____ is needed to confirm these results.\"",
+      "answer": "research"
+    }
+  ]
+}

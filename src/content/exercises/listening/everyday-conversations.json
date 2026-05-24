@@ -1,0 +1,70 @@
+{
+  "slug": "everyday-conversations",
+  "title": "Listening: Everyday Conversations",
+  "level": "A2",
+  "skill": "listening",
+  "type": "mcq",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "mcq",
+      "prompt": "In a café: \"I'd like a cappuccino, please.\" — what did the customer order?",
+      "options": [
+        "espresso",
+        "cappuccino",
+        "latte",
+        "tea"
+      ],
+      "answer": "cappuccino"
+    },
+    {
+      "id": "q2",
+      "type": "mcq",
+      "prompt": "\"Turn left at the bank.\" — which direction was given?",
+      "options": [
+        "right",
+        "left",
+        "straight",
+        "back"
+      ],
+      "answer": "left"
+    },
+    {
+      "id": "q3",
+      "type": "mcq",
+      "prompt": "\"The train leaves at 8:45.\" — at what time?",
+      "options": [
+        "8:15",
+        "8:30",
+        "8:45",
+        "9:00"
+      ],
+      "answer": "8:45"
+    },
+    {
+      "id": "q4",
+      "type": "mcq",
+      "prompt": "\"I'll have the chicken salad.\" — what did they order?",
+      "options": [
+        "beef burger",
+        "vegetable soup",
+        "chicken salad",
+        "pasta"
+      ],
+      "answer": "chicken salad"
+    },
+    {
+      "id": "q5",
+      "type": "mcq",
+      "prompt": "\"It's about a ten-minute walk.\" — how long does it take?",
+      "options": [
+        "5 min",
+        "10 min",
+        "15 min",
+        "30 min"
+      ],
+      "answer": "10 min"
+    }
+  ]
+}

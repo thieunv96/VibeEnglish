@@ -1,0 +1,31 @@
+{
+  "slug": "explaining-diagnosis",
+  "title": "Explaining a Diagnosis",
+  "level": "C1",
+  "category": "medical-english-oet",
+  "description": "OET sensitive communication.",
+  "segments": [
+    {
+      "text": "Mr."
+    },
+    {
+      "text": "Singh, I have your test results."
+    },
+    {
+      "text": "The biopsy confirms that the lump is a type of cancer called ductal carcinoma."
+    },
+    {
+      "text": "I know this is difficult to hear."
+    },
+    {
+      "text": "The good news is that we caught it early, which means treatment options are very good."
+    },
+    {
+      "text": "We typically begin with surgery to remove the affected tissue, followed by either radiation or chemotherapy depending on the final pathology."
+    },
+    {
+      "text": "I'd like to refer you to an oncologist this week to discuss the plan in detail."
+    }
+  ],
+  "transcript": "Mr. Singh, I have your test results. The biopsy confirms that the lump is a type of cancer called ductal carcinoma. I know this is difficult to hear. The good news is that we caught it early, which means treatment options are very good. We typically begin with surgery to remove the affected tissue, followed by either radiation or chemotherapy depending on the final pathology. I'd like to refer you to an oncologist this week to discuss the plan in detail."
+}

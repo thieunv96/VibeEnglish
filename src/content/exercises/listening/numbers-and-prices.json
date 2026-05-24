@@ -1,0 +1,40 @@
+{
+  "slug": "numbers-and-prices",
+  "title": "Numbers and Prices",
+  "level": "A1",
+  "skill": "listening",
+  "type": "fill",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "fill",
+      "prompt": "Type the number you hear: \"fifteen\"",
+      "answer": "15"
+    },
+    {
+      "id": "q2",
+      "type": "fill",
+      "prompt": "Type the number you hear: \"forty-two\"",
+      "answer": "42"
+    },
+    {
+      "id": "q3",
+      "type": "fill",
+      "prompt": "Type the price you hear: \"nine dollars fifty\"",
+      "answer": "$9.50"
+    },
+    {
+      "id": "q4",
+      "type": "fill",
+      "prompt": "Type the number you hear: \"one hundred and twenty\"",
+      "answer": "120"
+    },
+    {
+      "id": "q5",
+      "type": "fill",
+      "prompt": "Type the price you hear: \"twelve euros\"",
+      "answer": "€12"
+    }
+  ]
+}

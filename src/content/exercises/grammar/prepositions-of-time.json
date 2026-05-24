@@ -1,0 +1,40 @@
+{
+  "slug": "prepositions-of-time",
+  "title": "Prepositions of Time: in / on / at",
+  "level": "A2",
+  "skill": "grammar",
+  "type": "fill",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "fill",
+      "prompt": "I was born ____ April.",
+      "answer": "in"
+    },
+    {
+      "id": "q2",
+      "type": "fill",
+      "prompt": "The meeting is ____ Monday.",
+      "answer": "on"
+    },
+    {
+      "id": "q3",
+      "type": "fill",
+      "prompt": "We arrived ____ 7 o'clock.",
+      "answer": "at"
+    },
+    {
+      "id": "q4",
+      "type": "fill",
+      "prompt": "She works ____ the morning.",
+      "answer": "in"
+    },
+    {
+      "id": "q5",
+      "type": "fill",
+      "prompt": "He'll call you ____ the weekend.",
+      "answer": "at"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "slug": "asking-for-clarification",
+  "title": "Asking for Clarification",
+  "level": "B1",
+  "skill": "speaking",
+  "type": "match",
+  "description": "",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "match",
+      "prompt": "Match the situation with the right response.",
+      "pairs": [
+        {
+          "left": "You didn't hear them",
+          "right": "Sorry, could you repeat that?"
+        },
+        {
+          "left": "You don't understand a word",
+          "right": "What does that mean?"
+        },
+        {
+          "left": "They spoke too fast",
+          "right": "Could you slow down, please?"
+        },
+        {
+          "left": "You need confirmation",
+          "right": "Just to confirm: did you say…?"
+        }
+      ],
+      "answer": "auto"
+    }
+  ]
+}
