@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Cropper, { type Area } from "react-easy-crop";
 import { toast } from "sonner";
 import { Avatar } from "@/components/Avatar";
+import { renderCroppedJpeg } from "@/lib/avatar-crop";
 
 interface Props {
   name: string;
@@ -243,30 +244,4 @@ export function HeroAvatarMenu({ name, currentUrl, labels }: Props) {
       )}
     </div>
   );
-}
-
-async function renderCroppedJpeg(src: string, area: Area, outSize: number): Promise<Blob> {
-  const img = await loadImage(src);
-  const canvas = document.createElement("canvas");
-  canvas.width = outSize;
-  canvas.height = outSize;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("canvas ctx unavailable");
-  ctx.drawImage(img, area.x, area.y, area.width, area.height, 0, 0, outSize, outSize);
-  return new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob(
-      (b) => (b ? resolve(b) : reject(new Error("toBlob failed"))),
-      "image/jpeg",
-      0.9,
-    );
-  });
-}
-
-function loadImage(src: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = src;
-  });
 }
