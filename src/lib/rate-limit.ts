@@ -29,6 +29,15 @@ export function rateLimit(
   now: number = Date.now(),
 ): RateLimitResult {
   const { limit, windowMs } = opts;
+
+  // Escape hatch for test/CI/local-dev: when RATE_LIMIT_DISABLED=1 the limiter
+  // never throttles, so functional E2E suites (which register many users from a
+  // single localhost IP) aren't tripped by 429s. Production leaves this unset and
+  // enforces the configured limits. The limiter's correctness is covered by unit tests.
+  if (process.env.RATE_LIMIT_DISABLED === "1") {
+    return { allowed: true, remaining: limit, retryAfterMs: 0 };
+  }
+
   const entry = buckets.get(key);
 
   // Start a fresh window when there is no entry or the previous one has expired.

@@ -27,6 +27,11 @@ export default defineConfig({
     timeout: 120_000,
     stdout: "ignore",
     stderr: "pipe",
+    // Disable rate limiting for the functional E2E suite: it registers many users
+    // from a single localhost IP and would otherwise trip the per-IP 429 limits.
+    // Production runs without this flag and enforces limits; the limiter logic itself
+    // is covered by tests/unit/rate-limit.test.ts.
+    env: { RATE_LIMIT_DISABLED: "1" },
   },
   projects: [
     {

@@ -4,7 +4,7 @@ test("/profile shows hero + stats + extended form", async ({ page }) => {
   const email = `pr-${Date.now()}@example.com`;
   await page.goto("/auth/register");
   await page.getByTestId("register-email").fill(email);
-  await page.getByTestId("register-password").fill("supersecret");
+  await page.getByTestId("register-password").fill("supersecret1");
   await page.getByTestId("register-submit").click({ force: true });
   await page.waitForURL(/\/profile/);
 
@@ -24,7 +24,7 @@ test("country dropdown + language multi-picker + new goal persist across reload"
   const email = `pr2-${Date.now()}@example.com`;
   await page.goto("/auth/register");
   await page.getByTestId("register-email").fill(email);
-  await page.getByTestId("register-password").fill("supersecret");
+  await page.getByTestId("register-password").fill("supersecret1");
   await page.getByTestId("register-submit").click({ force: true });
   await page.waitForURL(/\/profile/);
 
@@ -58,7 +58,7 @@ test("toggling learning goals persists across reload", async ({ page }) => {
   const email = `goals-${Date.now()}@example.com`;
   await page.goto("/auth/register");
   await page.getByTestId("register-email").fill(email);
-  await page.getByTestId("register-password").fill("supersecret");
+  await page.getByTestId("register-password").fill("supersecret1");
   await page.getByTestId("register-submit").click({ force: true });
   await page.waitForURL(/\/profile/);
 

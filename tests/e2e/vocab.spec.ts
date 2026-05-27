@@ -5,7 +5,7 @@ test("save a word from lesson → appears on dashboard → delete works", async 
   const email = `vocab-${Date.now()}@example.com`;
   await page.goto("/auth/register");
   await page.getByTestId("register-email").fill(email);
-  await page.getByTestId("register-password").fill("supersecret");
+  await page.getByTestId("register-password").fill("supersecret1");
   await page.getByTestId("register-submit").click({ force: true });
   await page.waitForURL(/\/profile/);
 

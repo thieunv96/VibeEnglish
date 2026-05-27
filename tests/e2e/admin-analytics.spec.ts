@@ -45,7 +45,7 @@ test("non-admin cannot see /admin/analytics", async ({ page }) => {
   const email = `na-${Date.now()}@example.com`;
   await page.goto("/auth/register");
   await page.getByTestId("register-email").fill(email);
-  await page.getByTestId("register-password").fill("supersecret");
+  await page.getByTestId("register-password").fill("supersecret1");
   await page.getByTestId("register-submit").click({ force: true });
   await page.waitForURL(/\/profile/);
 
