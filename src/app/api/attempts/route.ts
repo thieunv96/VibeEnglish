@@ -20,6 +20,15 @@ export async function POST(req: Request) {
   if (!parsed.success) return NextResponse.json({ error: "invalid" }, { status: 400 });
 
   const data = parsed.data;
+
+  // SEC-03: don't record an attempt against an exercise that doesn't exist.
+  // Exercise @@unique([skill, slug]) — the client sends the exercise's own slug + skill.
+  const exercise = await prisma.exercise.findFirst({
+    where: { slug: data.exerciseSlug, skill: data.skill },
+    select: { id: true },
+  });
+  if (!exercise) return NextResponse.json({ error: "exercise not found" }, { status: 404 });
+
   const row = await prisma.exerciseAttempt.create({
     data: {
       userId,

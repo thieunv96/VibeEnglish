@@ -25,13 +25,23 @@ const patchSchema = z.object({
     .transform((v) => (v ? v.toUpperCase() : null))
     .refine((v) => v === null || COUNTRY_SET.has(v), { message: "unknown country" }),
   occupation: z.string().max(120).nullish(),
+  // DATA-01 (CONCERNS LOW-10): nativeLanguages + learningGoals are JSON-in-Text columns,
+  // validated on write so only canonical codes can persist. Unknown codes are REJECTED
+  // (400) rather than silently dropped; a proper relational restructure is deferred to v2.
   nativeLanguages: z
-    .array(z.string().min(2).max(8))
+    .array(
+      z
+        .string()
+        .min(2)
+        .max(8)
+        .transform((c) => c.toLowerCase())
+        .refine((c) => LANG_SET.has(c), { message: "unknown language" }),
+    )
     .max(LANGUAGE_CODES.length)
     .nullish()
     .transform((v) => {
       if (!v || v.length === 0) return null;
-      const clean = Array.from(new Set(v.map((c) => c.toLowerCase()))).filter((c) => LANG_SET.has(c));
+      const clean = Array.from(new Set(v));
       return clean.length > 0 ? JSON.stringify(clean) : null;
     }),
   dailyTimeGoalMin: nullableInt(1, 600),

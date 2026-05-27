@@ -25,6 +25,15 @@ export async function POST(req: Request) {
   }
 
   const data = parsed.data;
+
+  // SEC-03: don't record analytics for a lesson that doesn't exist.
+  // Lesson @@unique([category, slug]) — the client sends the lesson's own slug + category.
+  const lesson = await prisma.lesson.findFirst({
+    where: { slug: data.lessonSlug, category: data.category },
+    select: { id: true },
+  });
+  if (!lesson) return NextResponse.json({ error: "lesson not found" }, { status: 404 });
+
   const row = await prisma.lessonProgress.upsert({
     where: { userId_lessonSlug: { userId, lessonSlug: data.lessonSlug } },
     update: {
