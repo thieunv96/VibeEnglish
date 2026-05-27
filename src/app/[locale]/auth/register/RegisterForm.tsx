@@ -4,6 +4,7 @@ import { useTransition } from "react";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
+import { isStrongPassword } from "@/lib/password-policy";
 
 interface Props {
   labels: {
@@ -30,7 +31,7 @@ export function RegisterForm({ labels }: Props) {
     const birthYearRaw = String(fd.get("birthYear") ?? "").trim();
     const birthYear = birthYearRaw ? Number(birthYearRaw) : undefined;
 
-    if (password.length < 6) {
+    if (!isStrongPassword(password)) {
       toast.error(labels.weak);
       return;
     }
@@ -92,7 +93,7 @@ export function RegisterForm({ labels }: Props) {
           name="password"
           type="password"
           required
-          minLength={6}
+          minLength={8}
           autoComplete="new-password"
           data-testid="register-password"
           className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand"

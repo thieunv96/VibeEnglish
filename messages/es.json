@@ -168,7 +168,7 @@
     "registerLink": "Crear una",
     "invalid": "Correo o contraseña no válidos.",
     "exists": "Ya existe una cuenta con ese correo.",
-    "weak": "La contraseña debe tener al menos 6 caracteres.",
+    "weak": "La contraseña debe tener al menos 8 caracteres e incluir una letra y un número.",
     "birthYear": "Año de nacimiento (opcional)"
   },
   "profile": {

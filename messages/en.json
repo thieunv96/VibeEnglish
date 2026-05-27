@@ -168,7 +168,7 @@
     "registerLink": "Create one",
     "invalid": "Invalid email or password.",
     "exists": "An account with that email already exists.",
-    "weak": "Password must be at least 6 characters.",
+    "weak": "Password must be at least 8 characters and include a letter and a number.",
     "birthYear": "Birth year (optional)"
   },
   "profile": {

@@ -168,7 +168,7 @@
     "registerLink": "En créer un",
     "invalid": "Email ou mot de passe invalide.",
     "exists": "Un compte avec cet email existe déjà.",
-    "weak": "Le mot de passe doit comporter au moins 6 caractères.",
+    "weak": "Le mot de passe doit comporter au moins 8 caractères et inclure une lettre et un chiffre.",
     "birthYear": "Année de naissance (optionnel)"
   },
   "profile": {

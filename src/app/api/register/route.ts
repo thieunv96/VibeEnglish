@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
+import { isStrongPassword, PASSWORD_MIN_LENGTH } from "@/lib/password-policy";
 
 const bodySchema = z.object({
   email: z.string().email(),
-  password: z.string().min(6),
+  password: z.string().min(PASSWORD_MIN_LENGTH),
   name: z.string().optional(),
   birthYear: z.coerce.number().int().min(1900).max(2030).optional(),
 });
@@ -15,6 +16,11 @@ export async function POST(req: Request) {
   const parsed = bodySchema.safeParse(json);
   if (!parsed.success) {
     return NextResponse.json({ error: "invalid" }, { status: 400 });
+  }
+
+  // SEC-02: enforce the stronger password policy (8+ chars, a letter and a digit).
+  if (!isStrongPassword(parsed.data.password)) {
+    return NextResponse.json({ error: "weak" }, { status: 400 });
   }
 
   const email = parsed.data.email.toLowerCase();
