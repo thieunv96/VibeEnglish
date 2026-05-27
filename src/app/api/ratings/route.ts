@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireLearner } from "@/lib/api-auth";
+import { rateLimit, clientKey } from "@/lib/rate-limit";
 
 const bodySchema = z.object({
   lessonId: z.string().min(1),
@@ -12,6 +13,15 @@ export async function POST(req: Request) {
   const gate = await requireLearner();
   if ("error" in gate) return gate.error;
   const userId = gate.userId;
+
+  // SEC-01: throttle write path per user.
+  const rl = rateLimit(clientKey(req, "ratings", userId), { limit: 30, windowMs: 60_000 });
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: "rate_limited" },
+      { status: 429, headers: { "Retry-After": String(Math.ceil(rl.retryAfterMs / 1000)) } },
+    );
+  }
 
   const json = await req.json().catch(() => null);
   const parsed = bodySchema.safeParse(json);

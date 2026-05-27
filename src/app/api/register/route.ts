@@ -3,6 +3,7 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { isStrongPassword, PASSWORD_MIN_LENGTH } from "@/lib/password-policy";
+import { rateLimit, clientKey } from "@/lib/rate-limit";
 
 const bodySchema = z.object({
   email: z.string().email(),
@@ -12,6 +13,15 @@ const bodySchema = z.object({
 });
 
 export async function POST(req: Request) {
+  // SEC-01: throttle by IP (no userId yet) before any body parse / DB work.
+  const rl = rateLimit(clientKey(req, "register"), { limit: 5, windowMs: 60_000 });
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: "rate_limited" },
+      { status: 429, headers: { "Retry-After": String(Math.ceil(rl.retryAfterMs / 1000)) } },
+    );
+  }
+
   const json = await req.json().catch(() => null);
   const parsed = bodySchema.safeParse(json);
   if (!parsed.success) {
