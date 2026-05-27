@@ -19,6 +19,9 @@ test("logged-in learner can rate, aggregate updates", async ({ page }) => {
 
   await page.goto(`/lessons/${SHORT_STORY.category}/${SHORT_STORY.slug}`);
   await expect(page.getByTestId("lesson-rating")).toBeVisible();
+  // Wait for the session to resolve so the rating control is enabled before
+  // clicking — otherwise we race the /api/auth/session fetch (BUG-01/BUG-02).
+  await expect(page.getByTestId("star-5")).toBeEnabled();
   await page.getByTestId("star-5").click({ force: true });
   await expect(page.getByText(/thanks/i).first()).toBeVisible();
 

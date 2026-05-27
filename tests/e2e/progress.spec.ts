@@ -12,6 +12,9 @@ test("logged-in user dictation progress appears on dashboard", async ({ page }) 
   await page.goto(`/lessons/${SHORT_STORY.category}/${SHORT_STORY.slug}`);
   await page.getByTestId("dictation-input").fill(SHORT_STORY.firstSegmentText);
   await page.getByTestId("dictation-submit").click({ force: true });
+  // Wait for the session to resolve so dictation-next is enabled before
+  // advancing — otherwise reportProgress() races the session and never POSTs.
+  await expect(page.getByTestId("dictation-next")).toBeEnabled();
   await page.getByTestId("dictation-next").click({ force: true });
   await page.getByTestId("dictation-show-answer").click({ force: true });
 

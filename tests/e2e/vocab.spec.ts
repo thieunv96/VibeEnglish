@@ -16,6 +16,9 @@ test("save a word from lesson → appears on dashboard → delete works", async 
   const match = wordLabel?.match(/"([^"]+)"|“([^”]+)”/);
   const word = (match?.[1] ?? match?.[2] ?? "").toLowerCase();
   expect(word).not.toBe("");
+  // Wait for the session to resolve so the save control is enabled before
+  // clicking — otherwise we race the /api/auth/session fetch (BUG-01/BUG-02).
+  await expect(firstSave).toBeEnabled();
   await firstSave.click({ force: true });
   await expect(firstSave).toContainText("Saved");
 

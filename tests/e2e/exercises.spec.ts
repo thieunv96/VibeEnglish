@@ -25,6 +25,10 @@ test("logged-in attempt appears on dashboard", async ({ page }) => {
   await page.waitForURL(/\/profile/);
 
   await page.goto(`/practice/${GRAMMAR_MCQ.skill}/${GRAMMAR_MCQ.slug}`);
+  // Wait for the session to resolve so exercise-submit is enabled before
+  // submitting — otherwise submitAll() races the session and skips the
+  // /api/attempts POST (BUG-01/BUG-02).
+  await expect(page.getByTestId("exercise-submit")).toBeEnabled();
   await answerAll(page);
   await expect(page.getByTestId("exercise-score")).toBeVisible();
   await page.waitForTimeout(500);
