@@ -179,10 +179,17 @@
     "name": "Tên",
     "birthYear": "Năm sinh",
     "country": "Quốc gia",
+    "countryNone": "— Chọn quốc gia —",
     "occupation": "Nghề nghiệp",
-    "nativeLanguage": "Ngôn ngữ mẹ đẻ (mã ISO)",
+    "nativeLanguages": "Ngôn ngữ mẹ đẻ",
+    "nativeLanguagesPlaceholder": "Chọn ngôn ngữ…",
+    "nativeLanguagesSummary": "{n, plural, other {Đã chọn # ngôn ngữ}}",
+    "nativeLanguagesSearch": "Tìm ngôn ngữ…",
+    "nativeLanguagesNone": "Không có kết quả",
     "dailyTimeGoalMin": "Mục tiêu mỗi ngày (phút)",
     "learningGoals": "Mục tiêu học",
+    "learningGoalsTestPrep": "Luyện thi",
+    "learningGoalsGeneral": "Mục tiêu chung & kỹ năng",
     "save": "Lưu thay đổi",
     "saved": "Đã lưu",
     "goalNames": {
@@ -194,18 +201,29 @@
       "business": "Tiếng Anh thương mại",
       "travel": "Du lịch",
       "movies-tv": "Phim & TV",
-      "academic": "Học thuật"
+      "academic": "Học thuật",
+      "listening": "Nghe",
+      "speaking": "Nói",
+      "reading": "Đọc",
+      "writing": "Viết",
+      "pronunciation": "Phát âm",
+      "grammar-mastery": "Thành thạo ngữ pháp",
+      "vocabulary-building": "Tăng vốn từ vựng",
+      "kids-family": "Trẻ em & gia đình"
     },
     "avatar": {
-      "upload": "Tải lên",
-      "remove": "Xoá",
+      "menuLabel": "Chỉnh sửa ảnh",
+      "upload": "Tải ảnh lên",
+      "remove": "Xoá ảnh",
       "cropTitle": "Cắt ảnh đại diện",
       "save": "Lưu ảnh",
       "cancel": "Huỷ",
       "zoom": "Phóng",
       "saved": "Đã cập nhật ảnh",
       "removed": "Đã xoá ảnh",
-      "tooLarge": "Ảnh quá lớn (tối đa 5 MB)"
+      "tooLarge": "Ảnh quá lớn (tối đa 5 MB)",
+      "uploadFailed": "Tải lên thất bại",
+      "removeFailed": "Xoá thất bại"
     }
   },
   "rating": {

@@ -3,12 +3,12 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { Container } from "@/components/Container";
-import { Avatar } from "@/components/Avatar";
 import { userStats, userRecentActivity } from "@/lib/user-analytics";
 import { ProfileForm } from "./ProfileForm";
-import { AvatarUploader } from "./AvatarUploader";
+import { HeroAvatarMenu } from "./HeroAvatarMenu";
 import { StatsCard, ActivityFeedCard } from "./Stats";
 import { GOAL_OPTIONS, parseGoals, type GoalSlug } from "@/lib/learning-goals";
+import { parseLanguages } from "@/lib/languages";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -32,7 +32,7 @@ export default async function ProfilePage({ params }: PageProps) {
         birthYear: true,
         country: true,
         occupation: true,
-        nativeLanguage: true,
+        nativeLanguages: true,
         dailyTimeGoalMin: true,
         learningGoals: true,
         avatarUrl: true,
@@ -58,11 +58,23 @@ export default async function ProfilePage({ params }: PageProps) {
       <section className="bg-gradient-to-b from-brand-soft via-surface to-white border-b border-border">
         <Container size="wide" className="py-10">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-            <Avatar
+            <HeroAvatarMenu
               name={displayName}
-              src={user.avatarUrl ?? undefined}
-              size={96}
-              className="shadow-sm"
+              currentUrl={user.avatarUrl ?? null}
+              labels={{
+                menuLabel: t("avatar.menuLabel"),
+                upload: t("avatar.upload"),
+                remove: t("avatar.remove"),
+                cropTitle: t("avatar.cropTitle"),
+                save: t("avatar.save"),
+                cancel: t("avatar.cancel"),
+                zoom: t("avatar.zoom"),
+                saved: t("avatar.saved"),
+                removed: t("avatar.removed"),
+                tooLarge: t("avatar.tooLarge"),
+                uploadFailed: t("avatar.uploadFailed"),
+                removeFailed: t("avatar.removeFailed"),
+              }}
             />
             <div className="flex-1 text-center sm:text-left">
               <h1
@@ -96,22 +108,6 @@ export default async function ProfilePage({ params }: PageProps) {
             <p className="text-sm text-muted mt-1">{t("sub")}</p>
           </header>
 
-          <AvatarUploader
-            name={displayName}
-            currentUrl={user.avatarUrl ?? null}
-            labels={{
-              upload: t("avatar.upload"),
-              remove: t("avatar.remove"),
-              cropTitle: t("avatar.cropTitle"),
-              save: t("avatar.save"),
-              cancel: t("avatar.cancel"),
-              zoom: t("avatar.zoom"),
-              saved: t("avatar.saved"),
-              removed: t("avatar.removed"),
-              tooLarge: t("avatar.tooLarge"),
-            }}
-          />
-
           <ProfileForm
             email={user.email}
             initial={{
@@ -119,7 +115,7 @@ export default async function ProfilePage({ params }: PageProps) {
               birthYear: user.birthYear,
               country: user.country,
               occupation: user.occupation,
-              nativeLanguage: user.nativeLanguage,
+              nativeLanguages: parseLanguages(user.nativeLanguages),
               dailyTimeGoalMin: user.dailyTimeGoalMin,
               learningGoals: parseGoals(user.learningGoals),
             }}
@@ -128,10 +124,16 @@ export default async function ProfilePage({ params }: PageProps) {
               name: t("name"),
               birthYear: t("birthYear"),
               country: t("country"),
+              countryNone: t("countryNone"),
               occupation: t("occupation"),
-              nativeLanguage: t("nativeLanguage"),
+              nativeLanguages: t("nativeLanguages"),
+              nativeLanguagesPlaceholder: t("nativeLanguagesPlaceholder"),
+              nativeLanguagesSearch: t("nativeLanguagesSearch"),
+              nativeLanguagesNone: t("nativeLanguagesNone"),
               dailyTimeGoalMin: t("dailyTimeGoalMin"),
               learningGoals: t("learningGoals"),
+              learningGoalsTestPrep: t("learningGoalsTestPrep"),
+              learningGoalsGeneral: t("learningGoalsGeneral"),
               save: t("save"),
               saved: t("saved"),
               goalNames,

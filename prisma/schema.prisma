@@ -20,7 +20,7 @@ model User {
   occupation       String?
   learningGoals    String?           @db.Text   // JSON array of slugs
   dailyTimeGoalMin Int?
-  nativeLanguage   String?
+  nativeLanguages  String?           @db.Text   // JSON array of ISO-639-1 codes
   createdAt        DateTime          @default(now())
   progress         LessonProgress[]
   attempts         ExerciseAttempt[]

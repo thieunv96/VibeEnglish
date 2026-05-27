@@ -179,10 +179,17 @@
     "name": "Nombre",
     "birthYear": "Año de nacimiento",
     "country": "País",
+    "countryNone": "— Selecciona país —",
     "occupation": "Ocupación",
-    "nativeLanguage": "Lengua materna (código ISO)",
+    "nativeLanguages": "Lenguas maternas",
+    "nativeLanguagesPlaceholder": "Elige idiomas…",
+    "nativeLanguagesSummary": "{n, plural, =1 {1 idioma seleccionado} other {# idiomas seleccionados}}",
+    "nativeLanguagesSearch": "Buscar idioma…",
+    "nativeLanguagesNone": "Sin resultados",
     "dailyTimeGoalMin": "Meta diaria (min)",
     "learningGoals": "Objetivos de aprendizaje",
+    "learningGoalsTestPrep": "Preparación de exámenes",
+    "learningGoalsGeneral": "Generales y por habilidad",
     "save": "Guardar cambios",
     "saved": "Guardado",
     "goalNames": {
@@ -194,18 +201,29 @@
       "business": "Inglés de negocios",
       "travel": "Viajes",
       "movies-tv": "Películas y TV",
-      "academic": "Académico"
+      "academic": "Académico",
+      "listening": "Escucha",
+      "speaking": "Habla",
+      "reading": "Lectura",
+      "writing": "Escritura",
+      "pronunciation": "Pronunciación",
+      "grammar-mastery": "Dominio de gramática",
+      "vocabulary-building": "Vocabulario",
+      "kids-family": "Niños y familia"
     },
     "avatar": {
-      "upload": "Subir",
-      "remove": "Eliminar",
+      "menuLabel": "Editar avatar",
+      "upload": "Subir avatar",
+      "remove": "Eliminar avatar",
       "cropTitle": "Recorta tu avatar",
       "save": "Guardar avatar",
       "cancel": "Cancelar",
       "zoom": "Zoom",
       "saved": "Avatar actualizado",
       "removed": "Avatar eliminado",
-      "tooLarge": "La imagen es demasiado grande (máx 5 MB)"
+      "tooLarge": "La imagen es demasiado grande (máx 5 MB)",
+      "uploadFailed": "Error al subir",
+      "removeFailed": "Error al eliminar"
     }
   },
   "rating": {

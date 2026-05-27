@@ -10,7 +10,13 @@ interface Props {
 }
 
 export function Avatar({ name, src, size = 36, className, alt }: Props) {
-  const dim = { width: size, height: size, minWidth: size, minHeight: size };
+  const dim = {
+    width: size,
+    height: size,
+    minWidth: size,
+    minHeight: size,
+    display: "block",
+  };
   if (src) {
     // eslint-disable-next-line @next/next/no-img-element
     return (
@@ -18,7 +24,7 @@ export function Avatar({ name, src, size = 36, className, alt }: Props) {
         src={src}
         alt={alt ?? name}
         style={dim}
-        className={cn("rounded-full object-cover bg-surface border border-border", className)}
+        className={cn("block rounded-full object-cover bg-surface border border-border", className)}
         data-testid="avatar-img"
       />
     );

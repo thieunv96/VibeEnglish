@@ -179,10 +179,17 @@
     "name": "Nom",
     "birthYear": "Année de naissance",
     "country": "Pays",
+    "countryNone": "— Sélectionnez un pays —",
     "occupation": "Profession",
-    "nativeLanguage": "Langue maternelle (code ISO)",
+    "nativeLanguages": "Langues maternelles",
+    "nativeLanguagesPlaceholder": "Choisissez des langues…",
+    "nativeLanguagesSummary": "{n, plural, =1 {1 langue sélectionnée} other {# langues sélectionnées}}",
+    "nativeLanguagesSearch": "Rechercher une langue…",
+    "nativeLanguagesNone": "Aucun résultat",
     "dailyTimeGoalMin": "Objectif quotidien (min)",
     "learningGoals": "Objectifs d'apprentissage",
+    "learningGoalsTestPrep": "Préparation aux examens",
+    "learningGoalsGeneral": "Objectifs généraux & compétences",
     "save": "Enregistrer",
     "saved": "Enregistré",
     "goalNames": {
@@ -194,18 +201,29 @@
       "business": "Anglais des affaires",
       "travel": "Voyages",
       "movies-tv": "Films & TV",
-      "academic": "Académique"
+      "academic": "Académique",
+      "listening": "Écoute",
+      "speaking": "Expression orale",
+      "reading": "Lecture",
+      "writing": "Écriture",
+      "pronunciation": "Prononciation",
+      "grammar-mastery": "Maîtrise de la grammaire",
+      "vocabulary-building": "Vocabulaire",
+      "kids-family": "Enfants & famille"
     },
     "avatar": {
-      "upload": "Téléverser",
-      "remove": "Supprimer",
+      "menuLabel": "Modifier l'avatar",
+      "upload": "Téléverser l'avatar",
+      "remove": "Supprimer l'avatar",
       "cropTitle": "Recadrez votre avatar",
       "save": "Enregistrer l'avatar",
       "cancel": "Annuler",
       "zoom": "Zoom",
       "saved": "Avatar mis à jour",
       "removed": "Avatar supprimé",
-      "tooLarge": "Image trop grande (max 5 Mo)"
+      "tooLarge": "Image trop grande (max 5 Mo)",
+      "uploadFailed": "Échec du téléversement",
+      "removeFailed": "Échec de la suppression"
     }
   },
   "rating": {

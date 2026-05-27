@@ -179,10 +179,17 @@
     "name": "Name",
     "birthYear": "Birth year",
     "country": "Country",
+    "countryNone": "— Select country —",
     "occupation": "Occupation",
-    "nativeLanguage": "Native language (ISO code)",
+    "nativeLanguages": "Native languages",
+    "nativeLanguagesPlaceholder": "Pick languages…",
+    "nativeLanguagesSummary": "{n, plural, =1 {1 language selected} other {# languages selected}}",
+    "nativeLanguagesSearch": "Search languages…",
+    "nativeLanguagesNone": "No matches",
     "dailyTimeGoalMin": "Daily study goal (min)",
     "learningGoals": "Learning goals",
+    "learningGoalsTestPrep": "Test preparation",
+    "learningGoalsGeneral": "General & skill goals",
     "save": "Save changes",
     "saved": "Saved",
     "goalNames": {
@@ -194,18 +201,29 @@
       "business": "Business English",
       "travel": "Travel",
       "movies-tv": "Movies & TV",
-      "academic": "Academic"
+      "academic": "Academic",
+      "listening": "Listening",
+      "speaking": "Speaking",
+      "reading": "Reading",
+      "writing": "Writing",
+      "pronunciation": "Pronunciation",
+      "grammar-mastery": "Grammar mastery",
+      "vocabulary-building": "Vocabulary building",
+      "kids-family": "Kids & family"
     },
     "avatar": {
-      "upload": "Upload",
-      "remove": "Remove",
+      "menuLabel": "Edit avatar",
+      "upload": "Upload avatar",
+      "remove": "Remove avatar",
       "cropTitle": "Crop your avatar",
       "save": "Save avatar",
       "cancel": "Cancel",
       "zoom": "Zoom",
       "saved": "Avatar updated",
       "removed": "Avatar removed",
-      "tooLarge": "Image is too large (max 5 MB before crop)"
+      "tooLarge": "Image is too large (max 5 MB before crop)",
+      "uploadFailed": "Upload failed",
+      "removeFailed": "Remove failed"
     }
   },
   "rating": {

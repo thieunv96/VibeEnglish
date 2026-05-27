@@ -17,7 +17,7 @@ test("learner can set birth year on /profile and it persists", async ({ page }) 
 
   await page.getByTestId("profile-birth-year").fill("1990");
   await page.getByTestId("profile-name").fill("Test Learner");
-  await page.getByTestId("profile-country").fill("VN");
+  await page.getByTestId("profile-country").selectOption("VN");
   await page.getByTestId("profile-submit").click({ force: true });
   // Sonner toast: live region announces success.
   await expect(page.getByText("Saved", { exact: false })).toBeVisible();

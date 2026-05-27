@@ -2,18 +2,9 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireLearner } from "@/lib/api-auth";
-
-const GOAL_OPTIONS = [
-  "toeic",
-  "toefl",
-  "ielts",
-  "oet",
-  "conversation",
-  "business",
-  "travel",
-  "movies-tv",
-  "academic",
-] as const;
+import { GOAL_OPTIONS } from "@/lib/learning-goals";
+import { LANGUAGE_CODES } from "@/lib/languages";
+import { COUNTRY_CODES } from "@/lib/countries";
 
 const nullableInt = (min: number, max: number) =>
   z
@@ -21,12 +12,28 @@ const nullableInt = (min: number, max: number) =>
     .nullish()
     .transform((v) => (v === "" || v == null ? null : v));
 
+const COUNTRY_SET = new Set(COUNTRY_CODES);
+const LANG_SET = new Set(LANGUAGE_CODES);
+
 const patchSchema = z.object({
   name: z.string().max(120).nullish(),
   birthYear: nullableInt(1900, 2030),
-  country: z.string().max(80).nullish(),
+  country: z
+    .string()
+    .max(8)
+    .nullish()
+    .transform((v) => (v ? v.toUpperCase() : null))
+    .refine((v) => v === null || COUNTRY_SET.has(v), { message: "unknown country" }),
   occupation: z.string().max(120).nullish(),
-  nativeLanguage: z.string().max(40).nullish(),
+  nativeLanguages: z
+    .array(z.string().min(2).max(8))
+    .max(LANGUAGE_CODES.length)
+    .nullish()
+    .transform((v) => {
+      if (!v || v.length === 0) return null;
+      const clean = Array.from(new Set(v.map((c) => c.toLowerCase()))).filter((c) => LANG_SET.has(c));
+      return clean.length > 0 ? JSON.stringify(clean) : null;
+    }),
   dailyTimeGoalMin: nullableInt(1, 600),
   learningGoals: z
     .array(z.enum(GOAL_OPTIONS))
@@ -54,7 +61,7 @@ export async function PATCH(req: Request) {
       birthYear: data.birthYear ?? null,
       country: data.country ?? null,
       occupation: data.occupation ?? null,
-      nativeLanguage: data.nativeLanguage ?? null,
+      nativeLanguages: data.nativeLanguages ?? null,
       dailyTimeGoalMin: data.dailyTimeGoalMin ?? null,
       learningGoals: data.learningGoals ?? null,
     },
@@ -65,7 +72,7 @@ export async function PATCH(req: Request) {
       birthYear: true,
       country: true,
       occupation: true,
-      nativeLanguage: true,
+      nativeLanguages: true,
       dailyTimeGoalMin: true,
       learningGoals: true,
     },
