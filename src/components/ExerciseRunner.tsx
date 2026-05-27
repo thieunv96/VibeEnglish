@@ -36,6 +36,7 @@ function checkAnswer(q: ExerciseQuestion, given: string | Record<string, string>
 
 export function ExerciseRunner({ exercise, labels }: Props) {
   const { status } = useSession();
+  const loading = status === "loading";
   const [answers, setAnswers] = useState<AnswerMap>({});
   const [feedback, setFeedback] = useState<FeedbackMap>({});
   const [showAll, setShowAll] = useState(false);
@@ -218,8 +219,9 @@ export function ExerciseRunner({ exercise, labels }: Props) {
         <button
           type="button"
           onClick={submitAll}
+          disabled={loading}
           data-testid="exercise-submit"
-          className="rounded-md bg-brand hover:bg-brand-strong text-white font-semibold px-5 py-2.5"
+          className="rounded-md bg-brand hover:bg-brand-strong text-white font-semibold px-5 py-2.5 disabled:opacity-50"
         >
           {labels.submit}
         </button>

@@ -7,6 +7,7 @@ interface Props {
   value: number;          // 0..5 (can be fractional for display)
   size?: number;          // px
   interactive?: boolean;
+  disabled?: boolean;      // when interactive, force-disable the buttons (e.g. session loading)
   onChange?: (stars: number) => void;
   className?: string;
   testId?: string;
@@ -15,7 +16,7 @@ interface Props {
 const FILLED = "#F59E0B";       // amber-500
 const EMPTY  = "#D1D5DB";       // gray-300
 
-export function Stars({ value, size = 20, interactive = false, onChange, className, testId }: Props) {
+export function Stars({ value, size = 20, interactive = false, disabled = false, onChange, className, testId }: Props) {
   const [hover, setHover] = useState<number | null>(null);
   const shown = hover ?? value;
 
@@ -34,7 +35,7 @@ export function Stars({ value, size = 20, interactive = false, onChange, classNa
             key={i}
             type="button"
             tabIndex={interactive ? 0 : -1}
-            disabled={!interactive}
+            disabled={!interactive || disabled}
             onMouseEnter={interactive ? () => setHover(i) : undefined}
             onClick={interactive && onChange ? () => onChange(i) : undefined}
             aria-label={`${i} star${i > 1 ? "s" : ""}`}

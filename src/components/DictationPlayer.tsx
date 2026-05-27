@@ -28,6 +28,7 @@ interface Props {
 
 export function DictationPlayer({ lesson, labels }: Props) {
   const { status } = useSession();
+  const loading = status === "loading";
   const [idx, setIdx] = useState(0);
   const [input, setInput] = useState("");
   const [diff, setDiff] = useState<DiffWord[] | null>(null);
@@ -220,8 +221,9 @@ export function DictationPlayer({ lesson, labels }: Props) {
             <button
               type="button"
               onClick={next}
+              disabled={loading}
               data-testid="dictation-next"
-              className="rounded-md border-2 border-brand text-brand hover:bg-brand-soft px-4 py-2 font-semibold ml-auto"
+              className="rounded-md border-2 border-brand text-brand hover:bg-brand-soft px-4 py-2 font-semibold ml-auto disabled:opacity-50"
             >
               {labels.nextSegment} →
             </button>

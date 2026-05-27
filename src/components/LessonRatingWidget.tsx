@@ -20,13 +20,15 @@ export function LessonRatingWidget({
   initialYou,
 }: Props) {
   const { status } = useSession();
+  const loading = status === "loading";
   const t = useTranslations("rating");
   const [avg, setAvg] = useState(initialAvg);
   const [count, setCount] = useState(initialCount);
   const [you, setYou] = useState<number | null>(initialYou);
 
   async function rate(stars: number) {
-    if (status !== "authenticated") {
+    if (status === "loading") return;
+    if (status === "unauthenticated") {
       toast.info(t("signInToRate"));
       return;
     }
@@ -68,6 +70,7 @@ export function LessonRatingWidget({
           size={28}
           interactive
           onChange={rate}
+          disabled={loading}
           testId="lesson-rating-you"
         />
         {you !== null && (
