@@ -24,24 +24,25 @@ The app builds, runs, and demonstrably works end-to-end — every documented con
 - ✓ Activity heartbeats feeding streak/active-minute analytics — existing
 - ✓ Admin dashboard: content CRUD + analytics + role lockout — existing
 - ✓ Vitest unit suite (pure domain logic) + Playwright E2E suite (Chromium, production server on :1998) — existing
+- ✓ In-progress profile/avatar/multi-native-language work committed as a clean baseline (STAB-01/02) — Phase 1 (`642c81c`)
+- ✓ `useSession()` "loading" race fixed across 4 session-gated components; the 4 formerly-flaky specs reliable (BUG-01/02, HIGH-1) — Phase 1
+- ✓ Per-IP/per-user rate limiting (429) on all 8 user-driven write endpoints (SEC-01, MED-5) — Phase 2
+- ✓ Strengthened + surfaced password policy: min 8 + letter + digit, all 4 locales (SEC-02, MED-7) — Phase 2
+- ✓ Lesson/exercise existence validation before tracking writes (SEC-03, MED-6) — Phase 2
+- ✓ `nativeLanguages` rejected on unknown ISO codes; `learningGoals` enum-validated (DATA-01, LOW-10) — Phase 2
+- ✓ `.nvmrc` (Node 24) + README setup docs, no session-specific paths (ENV-01/02, HIGH-2) — Phase 3
+- ✓ Screenshot scripts hard-timeout instead of hanging silently (ENV-03, MED-4) — Phase 3
+- ✓ Empty `src/generated/` removed (ENV-04, LOW-11) — Phase 3
+- ✓ Avatar cropper logic extracted to `src/lib/avatar-crop.ts` (reusable + unit-tested), behavior unchanged (REF-01, LOW-8) — Phase 3
+- ✓ Deep locale key-parity test across en/es/fr/vi (REF-02, LOW-9) — Phase 3
+- ✓ Runtime avatar serving verified + local-disk limitation documented (REF-03, MED-3) — Phase 3
+- ✓ Full Playwright E2E suite green (64/64) vs production build + home route `/` demonstrably working (QA-01/02) — Phase 4
 
 ### Active
 
-<!-- This milestone's scope: resolve every concern in docs/.dev/codebase/CONCERNS.md + stabilize WIP + prove it works. -->
+<!-- All v1 audit-milestone requirements shipped and validated (2026-05-27). -->
 
-- [ ] Stabilize and commit the in-progress profile/avatar/multi-native-language work as a clean baseline
-- [ ] Fix the `useSession()` "loading" race that silently no-ops mutations and breaks 4 E2E specs (HIGH-1)
-- [ ] Resolve dev-environment Node version mismatch: commit `.nvmrc`, document setup, drop the session-specific envrc path dependency (HIGH-2)
-- [ ] Harden runtime avatar serving / document its local-disk persistence limitation (MED-3)
-- [ ] Restore screenshot capture or document/route around the headless-Chromium hang (MED-4)
-- [ ] Add lightweight rate limiting to user-driven endpoints (MED-5)
-- [ ] Validate lesson/exercise existence & ownership in tracking endpoints (MED-6)
-- [ ] Strengthen the password policy (MED-7)
-- [ ] Refactor large multi-concern client components (MED/LOW-8)
-- [ ] Add a translation key-parity check across the four locale catalogs (LOW-9)
-- [ ] Address JSON-in-Text columns (`learningGoals`, `nativeLanguages`) — validate or restructure (LOW-10)
-- [ ] Remove or document the empty/reserved `src/generated/` directory (LOW-11)
-- [ ] Demo the finish line: full Playwright E2E suite green against a production build, with at least one feature verified working on `/`
+(None — the audit & hardening milestone is complete; all 17 requirements validated.)
 
 ### Out of Scope
 
@@ -74,10 +75,12 @@ The app builds, runs, and demonstrably works end-to-end — every documented con
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Audit scope = all 11 concerns (HIGH+MEDIUM+LOW) | User chose full coverage, not just critical | — Pending |
-| Stabilize & commit the 28 WIP changes | Establish a clean, verifiable baseline before/within hardening | — Pending |
-| Finish line = full green Playwright E2E suite vs production build | "Demo at least 1 feature on /" → automated end-to-end proof | — Pending |
-| Avatar object-storage migration explicitly deferred | Single self-hosted instance; document limitation instead of over-engineering | — Pending |
+| Audit scope = all 11 concerns (HIGH+MEDIUM+LOW) | User chose full coverage, not just critical | ✓ Good — all 11 resolved across 4 phases |
+| Stabilize & commit the 28 WIP changes | Establish a clean, verifiable baseline before/within hardening | ✓ Good — `642c81c`, typecheck+build clean |
+| Finish line = full green Playwright E2E suite vs production build | "Demo at least 1 feature on /" → automated end-to-end proof | ✓ Good — 64/64 green, `/` verified live |
+| Avatar object-storage migration explicitly deferred | Single self-hosted instance; document limitation instead of over-engineering | ✓ Good — documented as INFRA-01 (v2) |
+| Rate limiting in-memory + `RATE_LIMIT_DISABLED` test hatch | Single self-hosted instance; deterministic functional E2E (limiter unit-tested) | ✓ Good — prod strict, tests green |
+| ExerciseRunner added to BUG-01 scope | Same `useSession` race; required for BUG-02's exercises spec | ✓ Good — caught by plan-checker |
 
 ## Evolution
 
@@ -97,4 +100,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-27 after initialization*
+*Last updated: 2026-05-27 after milestone completion (all 4 phases verified; 17/17 requirements validated)*

@@ -56,3 +56,11 @@ next-env.d.ts
 /public/avatars/*
 !/public/avatars/.gitkeep
 
+# Vibe planning docs (local-only per project config; codebase map stays tracked)
+/docs/.dev/config.json
+/docs/.dev/REQUIREMENTS.md
+/docs/.dev/ROADMAP.md
+/docs/.dev/STATE.md
+/docs/.dev/research/
+
+/docs/.dev/phases/
