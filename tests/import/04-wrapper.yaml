@@ -1,0 +1,47 @@
+lessons:
+  - slug: small-talk-weather
+    title: Small Talk — Weather
+    level: A1
+    category: conversations
+    description: Light conversation about the weather.
+    segments:
+      - text: "Nice day today, isn't it?"
+      - text: "Yes, lovely. A bit windy though."
+      - text: "I heard it might rain tonight."
+      - text: "Really? I'd better take an umbrella."
+    transcript: "Nice day today, isn't it? Yes, lovely. A bit windy though. I heard it might rain tonight. Really? I'd better take an umbrella."
+
+  - slug: bedtime-story-the-fox
+    title: Bedtime Story — The Clever Fox
+    level: A1
+    category: stories-for-kids
+    description: A short tale for young learners.
+    segments:
+      - text: "Once upon a time, a clever fox lived in the woods."
+      - text: "Every day, the fox looked for food."
+      - text: "One morning, the fox saw a piece of cheese on a rock."
+      - text: "The fox jumped, but the cheese fell into the river."
+      - text: "The fox was sad, but went home and slept."
+    transcript: "Once upon a time, a clever fox lived in the woods. Every day, the fox looked for food. One morning, the fox saw a piece of cheese on a rock. The fox jumped, but the cheese fell into the river. The fox was sad, but went home and slept."
+
+exercises:
+  - slug: countries-and-capitals-match
+    title: Countries and Capitals
+    level: A2
+    skill: vocabulary
+    type: match
+    description: Match each country with its capital.
+    questions:
+      - id: q1
+        type: match
+        prompt: Match each country to its capital city.
+        answer:
+          - France=Paris
+          - Japan=Tokyo
+          - Egypt=Cairo
+          - Brazil=Brasilia
+        pairs:
+          - { left: France, right: Paris }
+          - { left: Japan, right: Tokyo }
+          - { left: Egypt, right: Cairo }
+          - { left: Brazil, right: Brasilia }

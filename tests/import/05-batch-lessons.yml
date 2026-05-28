@@ -1,0 +1,38 @@
+- slug: doctor-visit-symptoms
+  title: At the Doctor — Describing Symptoms
+  level: A2
+  category: medical-english-oet
+  description: Talking to a doctor about how you feel.
+  segments:
+    - text: "Good morning. What seems to be the problem?"
+    - text: "I've had a sore throat for three days."
+    - text: "Any fever or cough?"
+    - text: "A mild fever last night."
+    - text: "Let me take a look. Open your mouth, please."
+  transcript: "Good morning. What seems to be the problem? I've had a sore throat for three days. Any fever or cough? A mild fever last night. Let me take a look. Open your mouth, please."
+
+- slug: ielts-listening-airport-announcement
+  title: Listening Practice — Airport Announcement
+  level: B1
+  category: ielts-listening
+  description: Practice catching key details in announcements.
+  segments:
+    - text: "Attention passengers on Flight 217 to London."
+    - text: "Boarding will begin at gate 14 in ten minutes."
+    - text: "Please have your boarding pass and passport ready."
+    - text: "Priority passengers may board first."
+    - text: "Thank you for flying with us."
+  transcript: "Attention passengers on Flight 217 to London. Boarding will begin at gate 14 in ten minutes. Please have your boarding pass and passport ready. Priority passengers may board first. Thank you for flying with us."
+
+- slug: ted-ed-why-we-yawn
+  title: TED-Ed — Why Do We Yawn?
+  level: B2
+  category: ted-ed
+  description: A short explainer about the science of yawning.
+  segments:
+    - text: "Have you ever wondered why we yawn?"
+    - text: "Scientists used to think it was about oxygen."
+    - text: "But newer research points to brain temperature regulation."
+    - text: "Yawning may help cool the brain when it overheats."
+    - text: "And yes — yawns really are contagious."
+  transcript: "Have you ever wondered why we yawn? Scientists used to think it was about oxygen. But newer research points to brain temperature regulation. Yawning may help cool the brain when it overheats. And yes — yawns really are contagious."

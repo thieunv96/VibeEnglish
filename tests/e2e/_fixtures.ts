@@ -1,6 +1,6 @@
 // Stable seed-data fixtures used across specs. These slugs exist in the DB
-// because they were imported from src/content/lessons/... before that folder
-// was deleted (see scripts/import-content.mjs + scripts/seed-content.mjs).
+// because they were imported from tests/import/seed-content/lessons/...
+// (see scripts/import-content.mjs + scripts/seed-content.mjs).
 
 export const SHORT_STORY = {
   category: "short-stories" as const,

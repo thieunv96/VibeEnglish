@@ -1,13 +1,14 @@
 #!/usr/bin/env node
-// One-shot import: walks src/content/{lessons,exercises}/*/*.json and upserts
-// into Prisma `lesson` / `exercise` tables. Idempotent.
+// One-shot import: walks tests/import/seed-content/{lessons,exercises}/*/*.json
+// and upserts into Prisma `lesson` / `exercise` tables. Idempotent.
+import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { PrismaClient } from "@prisma/client";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.join(__dirname, "..", "src", "content");
+const ROOT = path.join(__dirname, "..", "tests", "import", "seed-content");
 const prisma = new PrismaClient();
 
 async function importLessons() {

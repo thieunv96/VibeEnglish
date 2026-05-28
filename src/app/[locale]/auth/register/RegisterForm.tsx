@@ -59,13 +59,13 @@ export function RegisterForm({ labels }: Props) {
         toast.error("Account created but login failed. Please try again.");
         return;
       }
-      router.push("/profile");
+      router.push("/");
       router.refresh();
     });
   }
 
   return (
-    <form onSubmit={onSubmit} className="mt-6 space-y-4" data-testid="register-form">
+    <form method="post" onSubmit={onSubmit} className="mt-6 space-y-4" data-testid="register-form">
       <label className="block">
         <span className="text-sm font-medium">{labels.name}</span>
         <input

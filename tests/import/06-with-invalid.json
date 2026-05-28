@@ -1,0 +1,53 @@
+{
+  "lessons": [
+    {
+      "slug": "phone-call-booking",
+      "title": "Booking by Phone",
+      "level": "A2",
+      "category": "conversations",
+      "description": "Making a reservation over the phone.",
+      "segments": [
+        { "text": "Hello, I'd like to book a table for two." },
+        { "text": "Certainly — for what time?" },
+        { "text": "Seven thirty this evening, please." },
+        { "text": "Could I have a name for the booking?" },
+        { "text": "Yes, it's Lopez. L-O-P-E-Z." }
+      ],
+      "transcript": "Hello, I'd like to book a table for two. Certainly — for what time? Seven thirty this evening, please. Could I have a name for the booking? Yes, it's Lopez. L-O-P-E-Z."
+    },
+    {
+      "slug": "Bad Slug With Spaces",
+      "title": "This lesson should fail validation",
+      "level": "Z9",
+      "category": "conversations",
+      "transcript": "x",
+      "segments": []
+    }
+  ],
+  "exercises": [
+    {
+      "slug": "synonyms-easy-mcq",
+      "title": "Synonyms — Easy",
+      "level": "A2",
+      "skill": "word-skills",
+      "type": "mcq",
+      "description": "Pick the closest synonym.",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "mcq",
+          "prompt": "Choose the word closest in meaning to \"happy\".",
+          "options": ["sad", "joyful", "angry", "tired"],
+          "answer": "joyful"
+        },
+        {
+          "id": "q2",
+          "type": "mcq",
+          "prompt": "Choose the word closest in meaning to \"big\".",
+          "options": ["large", "tiny", "fast", "slow"],
+          "answer": "large"
+        }
+      ]
+    }
+  ]
+}

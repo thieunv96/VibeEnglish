@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Generates lesson + exercise JSON files under src/content/
+// Generates lesson + exercise JSON files under tests/import/seed-content/
 // from compact source data below. Idempotent — overwrites files.
 
 import fs from "node:fs";
@@ -7,7 +7,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.join(__dirname, "..", "src", "content");
+const ROOT = path.join(__dirname, "..", "tests", "import", "seed-content");
 
 function ensureDir(dir) {
   fs.mkdirSync(dir, { recursive: true });

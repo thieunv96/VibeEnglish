@@ -1,0 +1,15 @@
+{
+  "slug": "ordering-coffee",
+  "title": "Ordering Coffee",
+  "level": "A1",
+  "category": "conversations",
+  "description": "Buying coffee at a café.",
+  "segments": [
+    { "text": "Hi, what can I get you?" },
+    { "text": "A small latte, please." },
+    { "text": "For here or to go?" },
+    { "text": "To go, thanks." },
+    { "text": "That'll be three dollars and fifty cents." }
+  ],
+  "transcript": "Hi, what can I get you? A small latte, please. For here or to go? To go, thanks. That'll be three dollars and fifty cents."
+}

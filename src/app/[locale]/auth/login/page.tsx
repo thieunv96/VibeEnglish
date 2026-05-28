@@ -5,11 +5,14 @@ import { LoginForm } from "./LoginForm";
 
 export default async function LoginPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const { error } = await searchParams;
   const t = await getTranslations("auth");
   const tBrand = await getTranslations("brand");
 
@@ -35,6 +38,7 @@ export default async function LoginPage({
             submit: t("loginBtn"),
             invalid: t("invalid"),
           }}
+          errorParam={error}
         />
 
         <p className="mt-6 text-sm text-muted">

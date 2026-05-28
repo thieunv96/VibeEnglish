@@ -1,0 +1,45 @@
+[
+  {
+    "slug": "checking-into-hotel",
+    "title": "Checking into a Hotel",
+    "level": "A2",
+    "category": "conversations",
+    "description": "At the front desk.",
+    "segments": [
+      { "text": "Hello, I have a reservation under Smith." },
+      { "text": "Welcome. Could I see some ID, please?" },
+      { "text": "Here's my passport." },
+      { "text": "Thank you. You're in room 412." },
+      { "text": "Breakfast is served from seven to ten." }
+    ],
+    "transcript": "Hello, I have a reservation under Smith. Welcome. Could I see some ID, please? Here's my passport. Thank you. You're in room 412. Breakfast is served from seven to ten."
+  },
+  {
+    "slug": "irregular-past-tense-fill",
+    "title": "Irregular Past Tense — Fill in the blank",
+    "level": "A2",
+    "skill": "grammar",
+    "type": "fill",
+    "description": "Type the past tense form.",
+    "questions": [
+      {
+        "id": "q1",
+        "type": "fill",
+        "prompt": "Yesterday I ____ (go) to the market.",
+        "answer": "went"
+      },
+      {
+        "id": "q2",
+        "type": "fill",
+        "prompt": "She ____ (eat) breakfast at seven.",
+        "answer": "ate"
+      },
+      {
+        "id": "q3",
+        "type": "fill",
+        "prompt": "They ____ (see) the new movie last night.",
+        "answer": "saw"
+      }
+    ]
+  }
+]

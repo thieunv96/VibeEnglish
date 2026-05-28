@@ -1,9 +1,9 @@
 "use client";
 
-import { useTransition } from "react";
-import { signIn } from "next-auth/react";
+import { useEffect } from "react";
+import { useFormStatus } from "react-dom";
 import { toast } from "sonner";
-import { useRouter } from "@/i18n/navigation";
+import { loginAction } from "./actions";
 
 interface Props {
   labels: {
@@ -12,35 +12,30 @@ interface Props {
     submit: string;
     invalid: string;
   };
+  errorParam?: string;
 }
 
-export function LoginForm({ labels }: Props) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+function SubmitButton({ label }: { label: string }) {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      data-testid="login-submit"
+      className="w-full rounded-md bg-brand hover:bg-brand-strong text-white font-semibold py-2.5 disabled:opacity-50"
+    >
+      {label}
+    </button>
+  );
+}
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const email = String(fd.get("email") ?? "");
-    const password = String(fd.get("password") ?? "");
-
-    startTransition(async () => {
-      const res = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
-      if (res?.error) {
-        toast.error(labels.invalid);
-        return;
-      }
-      router.push("/profile");
-      router.refresh();
-    });
-  }
+export function LoginForm({ labels, errorParam }: Props) {
+  useEffect(() => {
+    if (errorParam === "invalid") toast.error(labels.invalid);
+  }, [errorParam, labels.invalid]);
 
   return (
-    <form onSubmit={onSubmit} className="mt-6 space-y-4" data-testid="login-form">
+    <form action={loginAction} className="mt-6 space-y-4" data-testid="login-form">
       <label className="block">
         <span className="text-sm font-medium">{labels.email}</span>
         <input
@@ -63,14 +58,7 @@ export function LoginForm({ labels }: Props) {
           className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand"
         />
       </label>
-      <button
-        type="submit"
-        disabled={isPending}
-        data-testid="login-submit"
-        className="w-full rounded-md bg-brand hover:bg-brand-strong text-white font-semibold py-2.5 disabled:opacity-50"
-      >
-        {labels.submit}
-      </button>
+      <SubmitButton label={labels.submit} />
     </form>
   );
 }

@@ -1,0 +1,31 @@
+{
+  "slug": "common-greetings-mcq",
+  "title": "Common Greetings",
+  "level": "A1",
+  "skill": "vocabulary",
+  "type": "mcq",
+  "description": "Pick the most natural greeting.",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "mcq",
+      "prompt": "Meeting a friend in the morning, you say…",
+      "options": ["Good night", "Good morning", "Good bye", "See you"],
+      "answer": "Good morning"
+    },
+    {
+      "id": "q2",
+      "type": "mcq",
+      "prompt": "Someone says \"Thank you.\" The natural reply is…",
+      "options": ["You're welcome", "Goodbye", "Sorry", "Please"],
+      "answer": "You're welcome"
+    },
+    {
+      "id": "q3",
+      "type": "mcq",
+      "prompt": "Leaving the office at the end of the day, you say…",
+      "options": ["Good morning", "Hello", "Have a good evening", "How are you"],
+      "answer": "Have a good evening"
+    }
+  ]
+}
