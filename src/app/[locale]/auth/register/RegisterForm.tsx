@@ -15,6 +15,8 @@ interface Props {
     submit: string;
     exists: string;
     weak: string;
+    /** Toast shown when the post-signup claim call fails unexpectedly. */
+    claimFailed: string;
   };
 }
 
@@ -59,7 +61,33 @@ export function RegisterForm({ labels }: Props) {
         toast.error("Account created but login failed. Please try again.");
         return;
       }
-      router.push("/");
+
+      // Post-signup claim: attempt to persist any pending sample-test / CEFR-test
+      // result stored in the HttpOnly cookie. The registration already succeeded at
+      // this point — claim failure MUST NOT block the redirect.
+      try {
+        const claimRes = await fetch("/api/sample-test/claim", { method: "POST" });
+        if (claimRes.ok) {
+          const { testType } = (await claimRes.json()) as { testType?: string };
+          if (testType === "cefr") {
+            router.push("/sample-test/cefr/results");
+          } else {
+            // testType === "sample" or any future test type falls back to sample results
+            router.push("/sample-test/results");
+          }
+        } else if (claimRes.status === 400) {
+          // no_session | session_expired | invalid_session → silent redirect to dashboard
+          // (registration succeeded; only the claim was a no-op)
+          router.push("/dashboard");
+        } else {
+          toast.error(labels.claimFailed);
+          router.push("/");
+        }
+      } catch {
+        // Network failure — registration is still a success; redirect to home.
+        router.push("/");
+      }
+
       router.refresh();
     });
   }

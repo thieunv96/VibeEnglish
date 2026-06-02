@@ -3,7 +3,19 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import type { Exercise, ExerciseQuestion } from "@/lib/content";
+import { checkAnswer } from "@/lib/exercise-scoring";
 import { cn } from "@/lib/cn";
+
+type AnswerMap = Record<string, string | Record<string, string>>;
+type FeedbackMap = Record<string, "correct" | "incorrect">;
+
+/** Payload shape passed to the optional onSubmit override. */
+export interface ExerciseSubmitPayload {
+  answers: AnswerMap;
+  feedback: FeedbackMap;
+  correctCount: number;
+  score: number;
+}
 
 interface Props {
   exercise: Exercise;
@@ -16,25 +28,14 @@ interface Props {
     correct: string;
     incorrect: string;
   };
+  /**
+   * When provided, suppresses the default `/api/attempts` write so callers can
+   * route submissions elsewhere (e.g. sample-test, CEFR test).
+   */
+  onSubmit?: (payload: ExerciseSubmitPayload) => Promise<void> | void;
 }
 
-type AnswerMap = Record<string, string | Record<string, string>>;
-type FeedbackMap = Record<string, "correct" | "incorrect">;
-
-function normalize(s: string): string {
-  return s.toLowerCase().trim().replace(/[^\p{L}\p{N}'$€.]/gu, "");
-}
-
-function checkAnswer(q: ExerciseQuestion, given: string | Record<string, string>): boolean {
-  if (q.type === "match" && q.pairs) {
-    if (typeof given !== "object") return false;
-    return q.pairs.every((p) => normalize(given[p.left] ?? "") === normalize(p.right));
-  }
-  const want = Array.isArray(q.answer) ? q.answer : [q.answer];
-  return want.some((w) => normalize(String(w)) === normalize(String(given)));
-}
-
-export function ExerciseRunner({ exercise, labels }: Props) {
+export function ExerciseRunner({ exercise, labels, onSubmit }: Props) {
   const { status } = useSession();
   const loading = status === "loading";
   const [answers, setAnswers] = useState<AnswerMap>({});
@@ -62,6 +63,14 @@ export function ExerciseRunner({ exercise, labels }: Props) {
 
     const correctCount = Object.values(fb).filter((v) => v === "correct").length;
     const score = correctCount / exercise.questions.length;
+
+    if (onSubmit) {
+      // onSubmit override: bypass the default /api/attempts write entirely.
+      // The caller (e.g. SampleTestRunner, CefrTestRunner) handles persistence.
+      await onSubmit({ answers, feedback: fb, correctCount, score });
+      setScoreReported(true);
+      return;
+    }
 
     if (status === "authenticated" && !scoreReported) {
       try {
@@ -166,26 +175,35 @@ export function ExerciseRunner({ exercise, labels }: Props) {
 
               {q.type === "match" && q.pairs && (
                 <div className="grid gap-3 sm:grid-cols-2" data-testid={`q${idx}-match`}>
-                  {q.pairs.map((p) => (
-                    <div key={p.left} className="flex items-center gap-2">
-                      <span className="font-medium min-w-40">{p.left}</span>
-                      <select
-                        value={(answers[q.id] as Record<string, string> | undefined)?.[p.left] ?? ""}
-                        onChange={(e) => {
-                          const current = (answers[q.id] as Record<string, string>) ?? {};
-                          setAnswer(q.id, { ...current, [p.left]: e.target.value });
-                        }}
-                        className="flex-1 rounded-md border border-border bg-white px-2 py-1.5"
-                      >
-                        <option value="">— choose —</option>
-                        {q.pairs!.map((pp) => (
-                          <option key={pp.right} value={pp.right}>
-                            {pp.right}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  ))}
+                  {q.pairs.map((p) => {
+                    // For sanitised questions (sample/CEFR tests), right values are
+                    // stripped from pairs and exposed as a shuffled `options` array.
+                    // Fall back to pairs[].right for regular practice exercises.
+                    const matchOptions: string[] =
+                      q.options && q.options.length > 0
+                        ? q.options
+                        : q.pairs!.map((pp) => pp.right).filter(Boolean);
+                    return (
+                      <div key={p.left} className="flex items-center gap-2">
+                        <span className="font-medium min-w-40">{p.left}</span>
+                        <select
+                          value={(answers[q.id] as Record<string, string> | undefined)?.[p.left] ?? ""}
+                          onChange={(e) => {
+                            const current = (answers[q.id] as Record<string, string>) ?? {};
+                            setAnswer(q.id, { ...current, [p.left]: e.target.value });
+                          }}
+                          className="flex-1 rounded-md border border-border bg-white px-2 py-1.5"
+                        >
+                          <option value="">— choose —</option>
+                          {matchOptions.map((opt) => (
+                            <option key={opt} value={opt}>
+                              {opt}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
 
