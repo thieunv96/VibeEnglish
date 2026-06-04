@@ -1,16 +1,14 @@
 /**
  * sample-test-jwt.ts
  *
- * HS256 JWT helpers for the sample-test / CEFR-test cookie flow.
+ * HS256 session-JWT helpers for the sample-test / CEFR-test flow.
  * Uses `jose` (available as a transitive dep of next-auth v5) with AUTH_SECRET.
  *
- * Two pairs of helpers:
- *   signSessionJWT / verifySessionJWT   — session JWTs sent to the client browser
- *   signResultCookie / verifyResultCookie — result JWTs stored in the HttpOnly cookie
+ * The session JWT binds /start to /submit: /start signs it with the sampled
+ * question list, /submit verifies the user's answers correspond to that exact
+ * list, preventing forged-question submissions.
  *
- * Both pairs use the same key and algorithm; they differ only in semantics/TTL.
- *
- * Throws at module-load time in production when AUTH_SECRET is not set.
+ * Throws at first use if AUTH_SECRET is missing outside NODE_ENV=test.
  */
 
 import { SignJWT, jwtVerify } from "jose";
@@ -72,34 +70,3 @@ export async function verifySessionJWT<T extends Record<string, unknown>>(
   return payload as unknown as T;
 }
 
-// ---------------------------------------------------------------------------
-// Result cookie JWT — contains guest answers and per-exercise scores.
-// Used in: /api/sample-test/submit, /api/sample-test/cefr/submit, /api/sample-test/claim
-// ---------------------------------------------------------------------------
-
-/**
- * Sign a result cookie JWT.
- * @param payload  Any JSON-serialisable object to embed.
- * @param ttlSec   TTL in seconds (spec: 1800 = 30 min).
- */
-export async function signResultCookie(
-  payload: Record<string, unknown>,
-  ttlSec: number,
-): Promise<string> {
-  return new SignJWT(payload)
-    .setProtectedHeader({ alg: ALG })
-    .setIssuedAt()
-    .setExpirationTime(Math.floor(Date.now() / 1000) + ttlSec)
-    .sign(getSecret());
-}
-
-/**
- * Verify a result cookie JWT and return the typed payload.
- * Throws on invalid signature, expiry, or malformed token.
- */
-export async function verifyResultCookie<T extends Record<string, unknown>>(
-  token: string,
-): Promise<T> {
-  const { payload } = await jwtVerify(token, getSecret(), { algorithms: [ALG] });
-  return payload as unknown as T;
-}

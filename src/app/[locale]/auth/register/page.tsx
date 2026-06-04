@@ -12,7 +12,6 @@ export default async function RegisterPage({
   setRequestLocale(locale);
   const t = await getTranslations("auth");
   const tBrand = await getTranslations("brand");
-  const tSampleTest = await getTranslations("sampleTest");
 
   return (
     <Container size="narrow" className="py-16">
@@ -38,7 +37,6 @@ export default async function RegisterPage({
             submit: t("registerBtn"),
             exists: t("exists"),
             weak: t("weak"),
-            claimFailed: tSampleTest("claimFailed"),
           }}
         />
 

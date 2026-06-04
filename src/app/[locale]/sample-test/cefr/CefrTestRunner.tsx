@@ -4,8 +4,7 @@
  * CefrTestRunner — thin wrapper around ExerciseRunner for the 25-Q CEFR test.
  *
  * Accepts the 25 sanitised questions and builds a synthetic Exercise for
- * ExerciseRunner. Does NOT call useSession() — mode is a prop from CefrTestClient.
- * Does NOT duplicate MCQ/fill/match rendering logic (ExerciseRunner owns that).
+ * ExerciseRunner. Does NOT duplicate MCQ/fill/match rendering logic.
  */
 
 import { ExerciseRunner } from "@/components/ExerciseRunner";
@@ -15,8 +14,6 @@ import type { Exercise, ExerciseQuestion } from "@/lib/content";
 
 interface Props {
   questions: SanitisedQuestion[];
-  /** Derived from useSession() in CefrTestClient — never read here. */
-  mode: "guest" | "loggedin";
   /** i18n labels sourced from CefrTestClient (which gets them from cefr/page.tsx). */
   labels: {
     check: string;
@@ -39,8 +36,11 @@ interface Props {
  * The shuffled right values are preserved in options for dropdown rendering.
  */
 function toExerciseQuestion(sq: SanitisedQuestion): ExerciseQuestion {
+  // Use composite "${slug}:${id}" as the synthetic question id so the
+  // ExerciseRunner answers map remains unique even when two source exercises
+  // both have a "q1".
   const base: ExerciseQuestion = {
-    id: sq.id,
+    id: `${sq.sourceExerciseSlug}:${sq.id}`,
     type: sq.type,
     prompt: sq.prompt,
     answer: "",

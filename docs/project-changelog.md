@@ -4,6 +4,61 @@ All notable changes to VibeEnglish are documented here. Date format: YYYY-MM-DD.
 
 ---
 
+## 2026-06-04 — Sample Test + CEFR: auth-gated single-page rewrite
+
+The 10-Q sample test and 25-Q CEFR placement are no longer guest-accessible. The
+guest conversion-hook design from 2026-06-03 has been replaced with an auth gate
+on both landings and both API routes.
+
+**Behaviour change:**
+- Anonymous visitors to `/[locale]/sample-test` or `/[locale]/sample-test/cefr`
+  are now redirected to `/auth/login`.
+- `POST /api/sample-test/start`, `/api/sample-test/cefr/start`, and both submit
+  endpoints now require a logged-in session (401 otherwise).
+- Landing → test → results is now a single client state machine on the original
+  URL. The separate `/results` pages are deleted.
+- After submit the client renders score, skill breakdown, per-question review,
+  recommendations (10-Q) or CEFR estimate + level breakdown (CEFR) inline.
+- The CEFR disclaimer renders server-side on the landing page (visible *before*
+  the user starts) instead of on a results page.
+- Retake button on the inline results resets state back to the landing.
+
+**Removed:**
+- `/api/sample-test/claim` and `/api/sample-test/recommendations` endpoints.
+- `/[locale]/sample-test/results` and `/[locale]/sample-test/cefr/results`
+  routes (including all child components: `ResultsClient`, `FullResults`,
+  `CefrResultsClient`, `CefrEstimate` wrapper page).
+- `signResultCookie` / `verifyResultCookie` helpers from
+  `src/lib/sample-test-jwt.ts` (the session JWT helpers stay — they bind
+  `/start` to `/submit` so users can't forge question lists).
+- `RegisterForm`'s post-signin claim hook and the `claimFailed` label / i18n key.
+- Guest-only i18n keys in both namespaces: `teaserHeading`, `teaserSub`,
+  `teaserSignUpBtn`, `teaserLoginPrompt`, `teaserLoginLink`, `noResultsHeading`,
+  `noResultsBody`, `noResultsLink`, `expiredBody`, `redirecting`, `claimFailed`.
+- All guest E2E scenarios (teaser, signup-claim, no-cookie/expired-cookie,
+  forged result cookie) — auth-gate replaces them.
+
+**Implementation note worth keeping:** the client→server answers payload is now
+keyed by composite `${slug}:${questionId}` IDs (the synthetic ExerciseRunner
+question ids are also composite). This fixes a pre-existing collision class
+where two source exercises both contributing a question with bare id `"q1"`
+would lose one of the user's answers in the runner's answers map.
+
+**Submit response shape (inline results):**
+- 10-Q: `{ correct, total, exerciseScores, reviewQuestions, weakestSkill, recommendations }`
+- CEFR: `{ correct, total, exerciseScores, reviewQuestions, levelScores, cefrEstimate }`
+
+No schema changes. No new environment variables. The `sampleTest` and `cefrTest`
+i18n namespaces shrink to 19 keys + 21 keys respectively. Coverage stays at
+124 unit tests; E2E drops from 29 (mostly guest scenarios) to 15 (auth-gated +
+forged-session + redirect + happy paths).
+
+The previous guest-flow specs at `plans/specs/sample-test-spec.md` and
+`plans/specs/cefr-test-spec.md` are superseded by this change; the
+authentication-required behaviour is the current source of truth.
+
+---
+
 ## 2026-06-03 — Sample Test (10-Question Guest Conversion Hook)
 
 **Routes:** `GET/POST /[locale]/sample-test`, `GET /[locale]/sample-test/results`

@@ -10,12 +10,7 @@ afterEach(() => {
   process.env.NODE_ENV = "test";
 });
 
-import {
-  signSessionJWT,
-  verifySessionJWT,
-  signResultCookie,
-  verifyResultCookie,
-} from "../../src/lib/sample-test-jwt";
+import { signSessionJWT, verifySessionJWT } from "../../src/lib/sample-test-jwt";
 
 /**
  * Reliably corrupt a JWT signature by mutating a character at index 20 (middle
@@ -71,36 +66,6 @@ describe("signSessionJWT / verifySessionJWT", () => {
     // ttlSec = -1 creates a token already past expiry.
     const token = await signSessionJWT({ data: "test" }, -1);
     await expect(verifySessionJWT(token)).rejects.toThrow();
-  });
-});
-
-// ---------------------------------------------------------------------------
-// signResultCookie / verifyResultCookie
-// ---------------------------------------------------------------------------
-describe("signResultCookie / verifyResultCookie", () => {
-  it("round-trips a result payload", async () => {
-    const payload = {
-      testType: "sample",
-      sessionId: "sess-1",
-      exerciseScores: [{ slug: "ex-1", skill: "grammar", correct: 3, total: 4 }],
-      submittedAt: 1748822400,
-    };
-    const token = await signResultCookie(payload, 1800);
-    const decoded = await verifyResultCookie<typeof payload>(token);
-    expect(decoded.testType).toBe("sample");
-    expect(decoded.exerciseScores).toHaveLength(1);
-    expect(decoded.submittedAt).toBe(1748822400);
-  });
-
-  it("throws on tampered result cookie", async () => {
-    const token = await signResultCookie({ score: 10 }, 1800);
-    const tampered = tamperSignature(token);
-    await expect(verifyResultCookie(tampered)).rejects.toThrow();
-  });
-
-  it("throws on expired result cookie", async () => {
-    const token = await signResultCookie({ score: 5 }, -1);
-    await expect(verifyResultCookie(token)).rejects.toThrow();
   });
 });
 

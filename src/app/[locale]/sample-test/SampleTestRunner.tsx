@@ -6,8 +6,6 @@
  * Accepts the 10 sanitised questions, builds a synthetic Exercise object,
  * and passes it to ExerciseRunner with onSubmit override to prevent the
  * default /api/attempts write.
- *
- * Does NOT call useSession() — mode is received as a prop from SampleTestClient.
  */
 
 import { ExerciseRunner } from "@/components/ExerciseRunner";
@@ -17,8 +15,6 @@ import type { Exercise, ExerciseQuestion } from "@/lib/content";
 
 interface Props {
   questions: SanitisedQuestion[];
-  /** Derived from useSession() in SampleTestClient — never read here. */
-  mode: "guest" | "loggedin";
   labels: {
     check: string;
     showAll: string;
@@ -43,8 +39,11 @@ interface Props {
  * The correct right values are NEVER sent to the client (AC-2).
  */
 function toExerciseQuestion(sq: SanitisedQuestion): ExerciseQuestion {
+  // Use composite "${slug}:${id}" as the synthetic question id so the
+  // ExerciseRunner answers map remains unique even when two source exercises
+  // both have a "q1" (per-exercise ids are not globally unique).
   const base: ExerciseQuestion = {
-    id: sq.id,
+    id: `${sq.sourceExerciseSlug}:${sq.id}`,
     type: sq.type,
     prompt: sq.prompt,
     answer: "", // server-side scoring only; not used by ExerciseRunner when onSubmit is set

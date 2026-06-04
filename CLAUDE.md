@@ -81,7 +81,7 @@ Prisma 6 with MariaDB 11. Schema lives in `prisma/schema.prisma`. Key models: `U
 | `countries.ts` | ISO 3166-1 alpha-2 countries with flag emoji; `countryByCode()`, `flagOf()` |
 | `cn.ts` | classnames shorthand |
 | `exercise-scoring.ts` | Pure `checkAnswer()`, `normalize()`, `sanitiseQuestion()` — extracted for reuse by sample & CEFR tests |
-| `sample-test-jwt.ts` | JWT sign/verify helpers using `jose`; `signResultCookie()`, `verifyResultCookie()` for stateless guest sessions |
+| `sample-test-jwt.ts` | `signSessionJWT()` / `verifySessionJWT()` — binds `/start` to `/submit` for the auth-gated sample & CEFR tests |
 | `cefr-estimation.ts` | `computeCefrEstimate(levelScores): CefrEstimate` — returns `CefrLevel \| "C1+"` based on 60% pass threshold |
 | `cefr-sampling.ts` | Stratified sampler for CEFR test; `sampleCefrQuestions()` with composite-key dedup |
 | `recommendation.ts` | `buildSkillBreakdown()`, `pickWeakestSkill()` — derives skill breakdown and identifies weakest skill for recommendations |

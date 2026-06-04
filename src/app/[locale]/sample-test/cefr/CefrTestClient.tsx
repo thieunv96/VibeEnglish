@@ -1,30 +1,63 @@
 "use client";
 
-// CefrTestClient — state machine for the 25-Q CEFR placement test.
-// State flow: idle → loading → started → submitting → teaser | claimed.
+// CefrTestClient — single-page state machine: idle → running → results.
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "@/i18n/navigation";
-import { Link } from "@/i18n/navigation";
 import { CefrTestRunner } from "./CefrTestRunner";
+import { SkillBreakdown } from "@/components/SkillBreakdown";
+import { QuestionReview } from "@/components/QuestionReview";
+import { LevelBreakdown } from "@/components/LevelBreakdown";
+import { CefrEstimateBadge } from "@/components/CefrEstimateBadge";
+import { buildSkillBreakdown } from "@/lib/recommendation";
 import type { SanitisedQuestion } from "@/lib/exercise-scoring";
+import type { CefrEstimate, LevelScores } from "@/lib/cefr-estimation";
 
-type TestState = "idle" | "loading" | "started" | "submitting" | "teaser" | "claimed";
+type TestState = "idle" | "loading" | "running" | "submitting" | "results";
+
+interface ExerciseScore {
+  slug: string;
+  skill: string;
+  title: string;
+  level: string;
+  correct: number;
+  total: number;
+}
+
+interface ReviewQuestion {
+  id: string;
+  prompt: string;
+  userAnswer: string | Record<string, string>;
+  correctAnswer: string | Record<string, string>;
+  isCorrect: boolean;
+}
+
+interface Results {
+  correct: number;
+  total: number;
+  exerciseScores: ExerciseScore[];
+  reviewQuestions: ReviewQuestion[];
+  levelScores: LevelScores;
+  cefrEstimate: CefrEstimate;
+}
 
 interface Labels {
   startBtn: string;
-  /** Template with {correct}/{total} placeholders — interpolated client-side */
-  teaserHeading: string;
-  teaserSub: string;
-  teaserSignUpBtn: string;
-  teaserLoginPrompt: string;
-  teaserLoginLink: string;
+  fullResultsHeading: string;
+  scoreLabel: string;
+  estimatedLevelLabel: string;
+  c1PlusExplanation: string;
+  levelBreakdownHeading: string;
+  levelBreakdownItem: string;
+  skillBreakdownHeading: string;
+  skillBreakdownItem: string;
+  reviewHeading: string;
+  reviewCorrect: string;
+  reviewIncorrect: string;
+  reviewCorrectAnswer: string;
   retakeBtn: string;
   errorStart: string;
   errorSubmit: string;
   errorNetwork: string;
-  redirecting: string;
   exercise: {
     check: string;
     showAll: string;
@@ -36,27 +69,12 @@ interface Labels {
   };
 }
 
-interface Props {
-  labels: Labels;
-}
-
-function interpolateScore(t: string, c: number, n: number) {
-  return t.replace("{correct}", String(c)).replace("{total}", String(n));
-}
-
-export function CefrTestClient({ labels }: Props) {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-
+export function CefrTestClient({ labels }: { labels: Labels }) {
   const [state, setState] = useState<TestState>("idle");
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [questions, setQuestions] = useState<SanitisedQuestion[]>([]);
-  const [score, setScore] = useState<{ correct: number; total: number } | null>(null);
+  const [results, setResults] = useState<Results | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  // Derive mode once from session — never passed to runner as mutable state.
-  const mode: "guest" | "loggedin" =
-    status === "authenticated" && session?.user ? "loggedin" : "guest";
 
   async function handleStart() {
     setState("loading");
@@ -68,13 +86,10 @@ export function CefrTestClient({ labels }: Props) {
         setState("idle");
         return;
       }
-      const data = (await res.json()) as {
-        sessionId: string;
-        questions: SanitisedQuestion[];
-      };
+      const data = (await res.json()) as { sessionId: string; questions: SanitisedQuestion[] };
       setSessionId(data.sessionId);
       setQuestions(data.questions);
-      setState("started");
+      setState("running");
     } catch {
       setError(labels.errorNetwork);
       setState("idle");
@@ -92,34 +107,33 @@ export function CefrTestClient({ labels }: Props) {
       });
       if (!res.ok) {
         setError(labels.errorSubmit);
-        setState("started");
+        setState("running");
         return;
       }
-      const data = (await res.json()) as {
-        correct: number;
-        total: number;
-        claimed?: boolean;
-      };
-      setScore({ correct: data.correct, total: data.total });
-
-      if (data.claimed) {
-        // Authenticated path: attempt already written; go straight to results.
-        setState("claimed");
-        router.push("/sample-test/cefr/results");
-      } else {
-        setState("teaser");
-      }
+      setResults((await res.json()) as Results);
+      setState("results");
     } catch {
       setError(labels.errorNetwork);
-      setState("started");
+      setState("running");
     }
   }
 
-  // ---- idle / loading ----
+  function handleRetake() {
+    setSessionId(null);
+    setQuestions([]);
+    setResults(null);
+    setError(null);
+    setState("idle");
+  }
+
+  function interp(t: string, vars: Record<string, string | number>): string {
+    return Object.entries(vars).reduce((s, [k, v]) => s.replace(`{${k}}`, String(v)), t);
+  }
+
   if (state === "idle" || state === "loading") {
     return (
-      <div className="text-center">
-        {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
+      <div className="text-center space-y-6">
+        {error && <p className="text-red-600 text-sm">{error}</p>}
         <button
           type="button"
           onClick={handleStart}
@@ -133,14 +147,12 @@ export function CefrTestClient({ labels }: Props) {
     );
   }
 
-  // ---- questions ----
-  if (state === "started" || state === "submitting") {
+  if (state === "running" || state === "submitting") {
     return (
       <div className="space-y-4">
         {error && <p className="text-red-600 text-sm">{error}</p>}
         <CefrTestRunner
           questions={questions}
-          mode={mode}
           labels={labels.exercise}
           onSubmit={handleSubmit}
           disabled={state === "submitting"}
@@ -149,49 +161,56 @@ export function CefrTestClient({ labels }: Props) {
     );
   }
 
-  // ---- teaser (guest submitted) ----
-  if (state === "teaser" && score) {
+  if (state === "results" && results) {
     return (
-      <div className="rounded-2xl border border-border bg-white p-8 text-center space-y-6 shadow-sm">
-        <h2
-          className="text-4xl font-extrabold text-brand-strong"
-          data-testid="cefr-teaser-score"
-        >
-          {interpolateScore(labels.teaserHeading, score.correct, score.total)}
-        </h2>
-        <p className="text-muted max-w-md mx-auto">{labels.teaserSub}</p>
-        <div className="space-y-3">
-          {/* AC-8 / Security Note 8: NO returnTo query param */}
-          <Link
-            href="/auth/register"
-            className="block w-full rounded-md bg-brand hover:bg-brand-strong text-white font-semibold py-3 text-center"
-            data-testid="cefr-teaser-signup-btn"
-          >
-            {labels.teaserSignUpBtn}
-          </Link>
-          <p className="text-sm text-muted">
-            {labels.teaserLoginPrompt}{" "}
-            <Link href="/auth/login" className="font-semibold text-brand hover:underline">
-              {labels.teaserLoginLink}
-            </Link>
-          </p>
+      <div className="space-y-8" data-testid="cefr-results">
+        <div className="rounded-2xl border border-border bg-white p-8 text-center shadow-sm">
+          <h2 className="text-4xl font-extrabold text-brand-strong" data-testid="cefr-results-score">
+            {interp(labels.scoreLabel, { correct: results.correct, total: results.total })}
+          </h2>
+          <h3 className="mt-2 text-lg font-semibold text-muted">{labels.fullResultsHeading}</h3>
+          <div className="mt-6 flex flex-col items-center gap-2">
+            <p className="text-sm text-muted">{labels.estimatedLevelLabel}</p>
+            <CefrEstimateBadge estimate={results.cefrEstimate} className="text-2xl" />
+            {results.cefrEstimate === "C1+" && (
+              <p className="text-xs text-muted max-w-md mt-2">{labels.c1PlusExplanation}</p>
+            )}
+          </div>
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            setScore(null);
-            setSessionId(null);
-            setQuestions([]);
-            setState("idle");
-          }}
-          className="text-sm text-muted hover:text-brand underline"
-        >
-          {labels.retakeBtn}
-        </button>
+
+        <LevelBreakdown
+          levelScores={results.levelScores}
+          heading={labels.levelBreakdownHeading}
+          itemTemplate={labels.levelBreakdownItem}
+        />
+
+        <SkillBreakdown
+          breakdown={buildSkillBreakdown(results.exerciseScores)}
+          headingLabel={labels.skillBreakdownHeading}
+          itemLabel={labels.skillBreakdownItem}
+        />
+
+        <QuestionReview
+          questions={results.reviewQuestions}
+          headingLabel={labels.reviewHeading}
+          correctLabel={labels.reviewCorrect}
+          incorrectLabel={labels.reviewIncorrect}
+          correctAnswerLabel={labels.reviewCorrectAnswer}
+        />
+
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={handleRetake}
+            data-testid="cefr-retake-btn"
+            className="rounded-md border border-border px-6 py-2 font-semibold hover:bg-surface"
+          >
+            {labels.retakeBtn}
+          </button>
+        </div>
       </div>
     );
   }
 
-  // ---- claimed / redirecting ----
-  return <div className="text-center py-10 text-muted">{labels.redirecting}</div>;
+  return null;
 }

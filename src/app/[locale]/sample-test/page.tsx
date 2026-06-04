@@ -1,5 +1,7 @@
+import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Container } from "@/components/Container";
+import { auth } from "@/auth";
 import { SampleTestClient } from "./SampleTestClient";
 
 interface PageProps {
@@ -9,6 +11,11 @@ interface PageProps {
 export default async function SampleTestPage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
+
+  // Auth gate — anonymous visitors are bounced to login.
+  const session = await auth();
+  const u = session?.user as { id?: string } | undefined;
+  if (!u?.id) redirect("/auth/login");
 
   const t = await getTranslations("sampleTest");
   const tEx = await getTranslations("exercise");
@@ -30,19 +37,20 @@ export default async function SampleTestPage({ params }: PageProps) {
           startBtn: t("startBtn"),
           questionCount: t("questionCount"),
           submitBtn: t("submitBtn"),
-          // Pass template string — client interpolates {correct}/{total} at runtime.
-          // Deferred-interpolation trick: passing placeholder as its own value so
-          // next-intl returns the raw template; client fills in actual numbers.
-          teaserHeading: t("teaserHeading", { correct: "{correct}", total: "{total}" }),
-          teaserSub: t("teaserSub"),
-          teaserSignUpBtn: t("teaserSignUpBtn"),
-          teaserLoginPrompt: t("teaserLoginPrompt"),
-          teaserLoginLink: t("teaserLoginLink"),
+          fullResultsHeading: t("fullResultsHeading"),
+          scoreLabel: t("scoreLabel", { correct: "{correct}", total: "{total}" }),
+          skillBreakdownHeading: t("skillBreakdownHeading"),
+          skillBreakdownItem: t("skillBreakdownItem", { correct: "{correct}", total: "{total}" }),
+          recommendationsHeading: t("recommendationsHeading"),
+          recommendationsEmpty: t("recommendationsEmpty"),
+          reviewHeading: t("reviewHeading"),
+          reviewCorrect: t("reviewCorrect"),
+          reviewIncorrect: t("reviewIncorrect"),
+          reviewCorrectAnswer: t("reviewCorrectAnswer", { answer: "{answer}" }),
           retakeBtn: t("retakeBtn"),
           errorStart: t("errorStart"),
           errorSubmit: t("errorSubmit"),
           errorNetwork: t("errorNetwork"),
-          redirecting: t("redirecting"),
           exercise: {
             check: tEx("check"),
             showAll: tEx("showAll"),

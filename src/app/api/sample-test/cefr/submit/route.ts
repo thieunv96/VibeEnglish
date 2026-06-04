@@ -1,26 +1,33 @@
 /**
  * POST /api/sample-test/cefr/submit
- * 4-step: (no auth gate) → rateLimit → Zod → verifyJWT + score + cookie|DB write
+ *
+ * Score the 25-Q CEFR placement, persist attempts, compute the CEFR estimate,
+ * and return the full result blob inline. No cookie — the client renders
+ * results from the response body.
+ *
+ * 4-step pattern:
+ *   1. requireLearner()
+ *   2. rateLimit(IP, 10/60s)
+ *   3. Zod-validate body
+ *   4. verifySessionJWT → score → levelScores → ExerciseAttempt rows → CEFR estimate
  */
 
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
+import { requireLearner } from "@/lib/api-auth";
 import { rateLimit, clientKey } from "@/lib/rate-limit";
-import { verifySessionJWT, signResultCookie } from "@/lib/sample-test-jwt";
+import { verifySessionJWT } from "@/lib/sample-test-jwt";
 import { checkAnswer } from "@/lib/exercise-scoring";
 import { computeCefrEstimate } from "@/lib/cefr-estimation";
 import type { CefrLevel } from "@/lib/content";
 import type { LevelScores } from "@/lib/cefr-estimation";
 import type { ExerciseQuestion } from "@/lib/content";
 
-const COOKIE_NAME = "sample_test_result";
-const RESULT_TTL_SEC = 1800;
+const ALL_LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
 const bodySchema = z.object({
   sessionId: z.string().min(1),
-  // Zod v4: z.record requires (keySchema, valueSchema)
   answers: z.record(z.string(), z.union([z.string(), z.record(z.string(), z.string())])),
 });
 
@@ -33,21 +40,19 @@ interface SessionPayload {
   grouping: Record<string, { skill: string; title: string; level: string; questionIds: string[] }>;
 }
 
-const ALL_LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
-
-function cookieHeader(token: string): string {
-  const s = process.env.NODE_ENV === "production" ? "; Secure" : "";
-  return `${COOKIE_NAME}=${token}; Max-Age=${RESULT_TTL_SEC}; Path=/; HttpOnly; SameSite=Lax${s}`;
-}
-
 export async function POST(req: Request) {
+  // Step 1 — Auth gate.
+  const gate = await requireLearner();
+  if ("error" in gate) return gate.error;
+  const { userId } = gate;
+
   // Step 2 — Rate limit.
   const rl = rateLimit(clientKey(req, "sample-test-cefr:submit"), { limit: 10, windowMs: 60_000 });
   if (!rl.allowed) {
-    return NextResponse.json({ error: "rate_limited" }, {
-      status: 429,
-      headers: { "Retry-After": String(Math.ceil(rl.retryAfterMs / 1000)) },
-    });
+    return NextResponse.json(
+      { error: "rate_limited" },
+      { status: 429, headers: { "Retry-After": String(Math.ceil(rl.retryAfterMs / 1000)) } },
+    );
   }
 
   // Step 3 — Validate body.
@@ -55,7 +60,7 @@ export async function POST(req: Request) {
   if (!parsed.success) return NextResponse.json({ error: "invalid" }, { status: 400 });
   const { sessionId: sessionToken, answers } = parsed.data;
 
-  // Step 4a — Verify session JWT; assert testType "cefr" (AC-X4).
+  // Step 4a — Verify session JWT; assert testType "cefr".
   let session: SessionPayload;
   try {
     const raw = await verifySessionJWT<Record<string, unknown>>(sessionToken);
@@ -72,8 +77,6 @@ export async function POST(req: Request) {
     where: { slug: { in: Object.keys(session.grouping) } },
     select: { slug: true, questions: true },
   });
-  // Composite key "${slug}:${q.id}" avoids collisions when multiple exercises share
-  // the same per-exercise question id (e.g. "q1"–"q5" in every exercise).
   const questionMap = new Map<string, ExerciseQuestion>();
   for (const ex of exercises) {
     for (const q of ex.questions as unknown as ExerciseQuestion[]) {
@@ -81,7 +84,7 @@ export async function POST(req: Request) {
     }
   }
 
-  // Step 4c — Score; accumulate per exercise and per CEFR level.
+  // Step 4c — Score; build per-question review; accumulate per exercise and per CEFR level.
   const exMap = new Map<string, { skill: string; title: string; level: string; correct: number; total: number }>();
   for (const [slug, info] of Object.entries(session.grouping)) {
     exMap.set(slug, { skill: info.skill, title: info.title, level: info.level, correct: 0, total: info.questionIds.length });
@@ -89,72 +92,82 @@ export async function POST(req: Request) {
   const levelScores: LevelScores = Object.fromEntries(
     ALL_LEVELS.map((l) => [l, { correct: 0, total: 0 }]),
   ) as LevelScores;
+
+  const reviewQuestions: {
+    id: string;
+    prompt: string;
+    userAnswer: string | Record<string, string>;
+    correctAnswer: string | Record<string, string>;
+    isCorrect: boolean;
+  }[] = [];
   let totalCorrect = 0;
   let totalQuestions = 0;
 
-  for (const [slug, info] of Object.entries(session.grouping)) {
-    const entry = exMap.get(slug)!;
-    for (const qId of info.questionIds) {
-      // Composite lookup matches the key written by the start route.
-      const q = questionMap.get(`${slug}:${qId}`);
-      if (!q) continue;
-      totalQuestions++;
-      // levelMap is also keyed by composite "${slug}:${questionId}"; fall back to exercise level.
-      const lvl = (session.levelMap[`${slug}:${qId}`] ?? info.level) as CefrLevel;
-      if (ALL_LEVELS.includes(lvl)) levelScores[lvl].total++;
-      const ok = checkAnswer(q, (answers[qId] ?? "") as string | Record<string, string>);
-      if (ok) {
-        totalCorrect++;
-        entry.correct++;
-        if (ALL_LEVELS.includes(lvl)) levelScores[lvl].correct++;
-      }
+  for (const compositeId of session.questionCompositeIds) {
+    const [slug, qId] = compositeId.split(":");
+    const q = questionMap.get(compositeId);
+    if (!q) continue;
+    totalQuestions++;
+    const lvl = (session.levelMap[compositeId] ?? exMap.get(slug)?.level ?? "") as CefrLevel;
+    if (ALL_LEVELS.includes(lvl)) levelScores[lvl].total++;
+    // Client keys answers by composite id (see CefrTestRunner.toExerciseQuestion)
+    // — fall back to bare qId for forward-compat.
+    const given = answers[compositeId] ?? answers[qId] ?? "";
+    const isCorrect = checkAnswer(q, given as string | Record<string, string>);
+    if (isCorrect) {
+      totalCorrect++;
+      const entry = exMap.get(slug);
+      if (entry) entry.correct++;
+      if (ALL_LEVELS.includes(lvl)) levelScores[lvl].correct++;
     }
+    const correctAnswer = Array.isArray(q.answer)
+      ? q.answer.join(", ")
+      : q.pairs
+        ? Object.fromEntries(q.pairs.map((p) => [p.left, p.right]))
+        : String(q.answer);
+    reviewQuestions.push({
+      id: qId,
+      prompt: q.prompt,
+      userAnswer: given as string | Record<string, string>,
+      correctAnswer,
+      isCorrect,
+    });
   }
 
-  const cefrEstimate = computeCefrEstimate(levelScores);
   const exerciseScores = Array.from(exMap.entries()).map(([slug, s]) => ({
-    slug, skill: s.skill, title: s.title, level: s.level, correct: s.correct, total: s.total,
+    slug,
+    skill: s.skill,
+    title: s.title,
+    level: s.level,
+    correct: s.correct,
+    total: s.total,
   }));
-  const submittedAt = Math.floor(Date.now() / 1000);
+  const cefrEstimate = computeCefrEstimate(levelScores);
 
-  // Step 4d — Branch on auth.
-  const as = await auth();
-  const su = as?.user as { id?: string; isAdmin?: boolean } | undefined;
-  const userId = su?.id && !su.isAdmin ? su.id : null;
-
-  if (userId) {
-    for (const es of exerciseScores) {
-      const ex = await prisma.exercise.findFirst({ where: { slug: es.slug, skill: es.skill }, select: { id: true } });
-      if (!ex) continue; // SEC-03
-      await prisma.exerciseAttempt.create({
-        data: { userId, exerciseSlug: es.slug, skill: es.skill, title: es.title, score: es.total > 0 ? es.correct / es.total : 0 },
-      });
-    }
-    return NextResponse.json({ correct: totalCorrect, total: totalQuestions, cefrEstimate, claimed: true });
+  // Step 4d — Persist ExerciseAttempt rows (SEC-03: existence check per slug).
+  for (const es of exerciseScores) {
+    const ex = await prisma.exercise.findFirst({
+      where: { slug: es.slug, skill: es.skill },
+      select: { id: true },
+    });
+    if (!ex) continue;
+    await prisma.exerciseAttempt.create({
+      data: {
+        userId,
+        exerciseSlug: es.slug,
+        skill: es.skill,
+        title: es.title,
+        score: es.total > 0 ? es.correct / es.total : 0,
+      },
+    });
   }
 
-  // Composite ids come from the session JWT (built in start route) so collisions on bare
-  // qIds (e.g. multiple exercises with "q1") don't corrupt the results-page review lookup.
-  const questionCompositeIds = session.questionCompositeIds;
-  // Parallel-ordered guest-answer array (positional by composite-id index).
-  const answersByIndex = questionCompositeIds.map((composite) => {
-    const qId = composite.split(":")[1] ?? composite;
-    return answers[qId] ?? "";
+  return NextResponse.json({
+    correct: totalCorrect,
+    total: totalQuestions,
+    exerciseScores,
+    reviewQuestions,
+    levelScores,
+    cefrEstimate,
   });
-  // Slug-only exercise score list (title/skill/level derivable from DB) keeps the cookie
-  // under the browser's 4 KB per-cookie limit. Earlier attempts with full {slug, skill,
-  // title, level, correct, total} per row pushed the encoded JWT past 4 KB and the browser
-  // silently dropped the Set-Cookie header — making every guest claim look like 400 no_session.
-  const slimScores = exerciseScores.map((s) => [s.slug, s.correct, s.total] as [string, number, number]);
-
-  // Guest: cefrEstimate goes into the signed cookie ONLY — never in response body.
-  const token = await signResultCookie(
-    { testType: "cefr", sessionId: session.sessionId,
-      questionCompositeIds, answersByIndex, slimScores, levelScores, cefrEstimate, submittedAt },
-    RESULT_TTL_SEC,
-  );
-  return NextResponse.json(
-    { correct: totalCorrect, total: totalQuestions },
-    { headers: { "Set-Cookie": cookieHeader(token) } },
-  );
 }

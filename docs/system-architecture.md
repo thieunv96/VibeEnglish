@@ -120,7 +120,106 @@ requireLearner() → verify JWT signature → check submittedAt ≤ 30 min
 
 ---
 
-## Guest Conversion Features (NEW in June 2026)
+## Sample Test & CEFR Placement (auth-gated, single-page)
+
+Both surfaces require a logged-in session. Anonymous visitors are redirected to
+`/auth/login` by the page server components; `/api/sample-test/*` routes return
+401 without a session. The 2026-06-03 guest conversion-hook design (teasers,
+result cookie, claim endpoint, post-signin claim hook) has been removed —
+results render inline on the test page after submit.
+
+### Shared infrastructure
+
+| Module | Purpose |
+|---|---|
+| `src/lib/exercise-scoring.ts` | `checkAnswer()`, `normalize()`, `sanitiseQuestion()` (strips answers + `pairs[].right` before sending to client) |
+| `src/lib/sample-test-jwt.ts` | `signSessionJWT` / `verifySessionJWT` only — HS256, AUTH_SECRET, 30-min TTL. The session JWT binds `/start` → `/submit`. |
+| `src/lib/cefr-sampling.ts` | Stratified sampler + composite-key dedup |
+| `src/lib/cefr-estimation.ts` | `computeCefrEstimate(levelScores)` returns `CefrLevel \| "C1+"` |
+| `src/lib/recommendation.ts` | `buildSkillBreakdown()`, `pickWeakestSkill()` |
+
+### Routes
+
+| Route | Method | Purpose |
+|---|---|---|
+| `/[locale]/sample-test` | GET | Landing page (auth-required); hosts client state machine |
+| `/[locale]/sample-test/cefr` | GET | Landing page (auth-required); renders disclaimer in SSR HTML |
+| `/api/sample-test/start` | POST | Returns 10 sanitised questions + session JWT; rate-limit 5/min/IP |
+| `/api/sample-test/submit` | POST | Scores, persists ExerciseAttempt rows, returns full results blob; rate-limit 10/min/IP |
+| `/api/sample-test/cefr/start` | POST | Stratified 25-question sampler; rate-limit 3/min/IP |
+| `/api/sample-test/cefr/submit` | POST | Scores, persists, computes CEFR estimate, returns results blob; rate-limit 10/min/IP |
+
+### Submit response shapes
+
+The client renders the results inline from the response — no cookie, no
+follow-up DB query needed.
+
+**10-Q:**
+```ts
+{
+  correct: number;
+  total: number;
+  exerciseScores: { slug, skill, title, correct, total }[];
+  reviewQuestions: { id, prompt, userAnswer, correctAnswer, isCorrect }[];
+  weakestSkill: string | null;
+  recommendations: { slug, skill, title, level }[];
+}
+```
+
+**CEFR:**
+```ts
+{
+  correct: number;
+  total: number;
+  exerciseScores: { slug, skill, title, level, correct, total }[];
+  reviewQuestions: { id, prompt, userAnswer, correctAnswer, isCorrect }[];
+  levelScores: Record<CefrLevel, { correct, total }>;
+  cefrEstimate: CefrLevel | "C1+";
+}
+```
+
+### Composite question-id keys
+
+`Exercise.questions[].id` values are only unique *within* one exercise (literally
+`"q1"`–`"q5"` per exercise). Every cross-exercise operation uses composite
+`${exerciseSlug}:${questionId}` keys:
+
+- `pickedIds` set in `sampleCefrQuestions` (dedup across levels)
+- `questionMap` server-side scoring lookup
+- `questionCompositeIds: string[]` in the session JWT (positional, ordered)
+- **Synthetic ExerciseRunner question ids** in `SampleTestRunner` /
+  `CefrTestRunner` — so the runner's answers map is unique per question even
+  when two source exercises both contribute a `"q1"`. The submit routes accept
+  composite-keyed answers (with bare-key fallback for forward-compat).
+
+### Stratified CEFR sampling (`CEFR_TARGET_COUNTS`)
+
+| Level | Target | DB count (as of 2026-06-03 audit) |
+|---|---|---|
+| A1 | 4 | 12 |
+| A2 | 4 | 23 |
+| B1 | 5 | 30 |
+| B2 | 8 | 33 — over-samples by 2 to absorb missing C2 slots |
+| C1 | 4 | 4 — hard cap |
+| C2 | 0 | 0 — no content; followups are tracked separately |
+
+When a level has fewer exercises than its target, the sampler falls back to an
+adjacent level (C1 → B2, A1 → A2, etc.). When `levelScores.C2.total === 0` and
+the user passes C1, `computeCefrEstimate` returns the special `"C1+"` label —
+the spec mandates honesty about untested levels.
+
+### Disclaimer rendering
+
+The CEFR landing page server-renders the disclaimer ("Please note: this is not
+an official exam…") *before* hydration. A user sees the disclaimer the moment
+the page loads, even if they never start the test. (The previous design rendered
+it only on a separate `/results` page after submit.)
+
+---
+
+<!-- legacy guest-flow section retained below for historical reference; behaviour described here is superseded by the auth-gated rewrite above. -->
+
+## Guest Conversion Features (legacy, superseded 2026-06-04)
 
 ### Sample Test (10-Question Guest Hook)
 
