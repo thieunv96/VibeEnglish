@@ -106,6 +106,13 @@ export default async function HomePage({
             >
               {t("ctaPractice")}
             </Link>
+            <Link
+              href="/sample-test/cefr"
+              data-testid="hero-cta-test"
+              className="inline-flex items-center justify-center rounded-md border-2 border-border text-foreground hover:border-brand hover:text-brand font-semibold px-6 py-3 text-base transition-colors"
+            >
+              {t("ctaTest")}
+            </Link>
           </div>
           <div className="mt-6 inline-flex items-center gap-2 text-sm text-muted">
             <span className="inline-block h-2 w-2 rounded-full bg-emerald-600 animate-pulse"></span>

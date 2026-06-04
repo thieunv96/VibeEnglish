@@ -23,7 +23,8 @@
       "close": "Cerrar menú",
       "menu": "Menú",
       "search": "Buscar"
-    }
+    },
+    "sampleTest": "Prueba rápida"
   },
   "search": {
     "title": "Buscar",
@@ -95,7 +96,8 @@
     "faqTitle": "Preguntas, respondidas",
     "ctaStripTitle": "¿Listo para entender el inglés de verdad?",
     "ctaStripSub": "Empieza tu primera lección en menos de 30 segundos. Sin tarjeta, sin email.",
-    "ctaStripBtn": "Empieza tu primera lección"
+    "ctaStripBtn": "Empieza tu primera lección",
+    "ctaTest": "Descubre tu nivel MCER"
   },
   "lessons": {
     "title": "Domina lecciones de inglés en 9 categorías",

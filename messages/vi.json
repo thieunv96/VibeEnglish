@@ -23,7 +23,8 @@
       "close": "Đóng menu",
       "menu": "Menu",
       "search": "Tìm kiếm"
-    }
+    },
+    "sampleTest": "Bài kiểm tra mẫu"
   },
   "search": {
     "title": "Tìm kiếm",
@@ -95,7 +96,8 @@
     "faqTitle": "Câu hỏi, câu trả lời",
     "ctaStripTitle": "Sẵn sàng thật sự hiểu tiếng Anh chưa?",
     "ctaStripSub": "Bắt đầu bài đầu tiên trong chưa đến 30 giây. Không thẻ, không email.",
-    "ctaStripBtn": "Bắt đầu bài đầu tiên"
+    "ctaStripBtn": "Bắt đầu bài đầu tiên",
+    "ctaTest": "Khám phá trình độ CEFR"
   },
   "lessons": {
     "title": "Làm chủ bài học tiếng Anh qua 9 danh mục",

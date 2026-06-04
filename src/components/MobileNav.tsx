@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 
 interface Item {
-  href: "/lessons" | "/practice" | "/learn-from-youtube" | "/admin" | "/admin/lessons" | "/admin/exercises" | "/admin/analytics";
+  href: "/lessons" | "/practice" | "/sample-test" | "/learn-from-youtube" | "/admin" | "/admin/lessons" | "/admin/exercises" | "/admin/analytics";
   label: string;
 }
 

@@ -34,6 +34,7 @@ export async function Header() {
   const learnerLinks = [
     { href: "/lessons" as const, label: t("lessons") },
     { href: "/practice" as const, label: t("practice") },
+    { href: "/sample-test" as const, label: t("sampleTest") },
     { href: "/learn-from-youtube" as const, label: t("youtube") },
   ];
   const adminLinks = [

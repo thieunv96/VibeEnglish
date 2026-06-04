@@ -23,7 +23,8 @@
       "close": "Fermer le menu",
       "menu": "Menu",
       "search": "Recherche"
-    }
+    },
+    "sampleTest": "Test rapide"
   },
   "search": {
     "title": "Recherche",
@@ -95,7 +96,8 @@
     "faqTitle": "Vos questions, nos réponses",
     "ctaStripTitle": "Prêt à vraiment comprendre l'anglais ?",
     "ctaStripSub": "Première leçon en moins de 30 secondes. Sans carte ni email.",
-    "ctaStripBtn": "Commencer votre première leçon"
+    "ctaStripBtn": "Commencer votre première leçon",
+    "ctaTest": "Découvrez votre niveau CECR"
   },
   "lessons": {
     "title": "Maîtrisez l'anglais à travers 9 catégories",

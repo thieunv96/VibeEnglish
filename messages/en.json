@@ -23,7 +23,8 @@
       "close": "Close menu",
       "menu": "Menu",
       "search": "Search"
-    }
+    },
+    "sampleTest": "Sample Test"
   },
   "search": {
     "title": "Search",
@@ -95,7 +96,8 @@
     "faqTitle": "Questions, answered",
     "ctaStripTitle": "Ready to actually understand English?",
     "ctaStripSub": "Start your first lesson in under 30 seconds. No card, no email, no catch.",
-    "ctaStripBtn": "Start Your First Lesson"
+    "ctaStripBtn": "Start Your First Lesson",
+    "ctaTest": "Find your CEFR level"
   },
   "lessons": {
     "title": "Master English Lessons Across 9 Categories",
