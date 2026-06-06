@@ -4,6 +4,7 @@ import { Container } from "@/components/Container";
 import { CefrBadge } from "@/components/CefrBadge";
 import { DictationPlayer } from "@/components/DictationPlayer";
 import { SaveWordButton } from "@/components/SaveWordButton";
+import { AddVocabForm } from "@/components/AddVocabForm";
 import { LessonRatingWidget } from "@/components/LessonRatingWidget";
 import { Link } from "@/i18n/navigation";
 import { getLesson, isCategory } from "@/lib/content";
@@ -90,6 +91,7 @@ export default async function LessonDetailPage({ params }: PageProps) {
           yourInput: tL("yourInput"),
           accuracy: tL("accuracy"),
           loginToSave: tL("loginToSave"),
+          answerForSegment: tL("answerForSegment", { n: "{n}" }),
         }}
       />
 
@@ -109,16 +111,17 @@ export default async function LessonDetailPage({ params }: PageProps) {
         </div>
       </section>
 
-      {interestingWords.length > 0 && (
-        <section className="mt-6">
-          <h3 className="text-base font-semibold mb-3">Vocabulary from this lesson</h3>
+      <section className="mt-6">
+        <h3 className="text-base font-semibold mb-3">Vocabulary from this lesson</h3>
+        {interestingWords.length > 0 && (
           <div className="flex flex-wrap gap-2" data-testid="vocab-suggestions">
             {interestingWords.map((w) => (
               <SaveWordButton key={w} word={w.toLowerCase()} sourceLessonSlug={lesson.slug} />
             ))}
           </div>
-        </section>
-      )}
+        )}
+        <AddVocabForm sourceLessonSlug={lesson.slug} />
+      </section>
     </Container>
   );
 }

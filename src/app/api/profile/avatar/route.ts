@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { requireLearner } from "@/lib/api-auth";
+import { requireUser } from "@/lib/api-auth";
 import { rateLimit, clientKey } from "@/lib/rate-limit";
 import { AVATAR_DIR, avatarPath, avatarUrl } from "@/lib/avatar-server";
 
@@ -9,7 +9,7 @@ const MAX_BYTES = 500 * 1024; // 500 KB
 const ACCEPTED = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 export async function POST(req: Request) {
-  const gate = await requireLearner();
+  const gate = await requireUser();
   if ("error" in gate) return gate.error;
   const userId = gate.userId;
 
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const gate = await requireLearner();
+  const gate = await requireUser();
   if ("error" in gate) return gate.error;
   const userId = gate.userId;
 

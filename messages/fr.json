@@ -139,7 +139,8 @@
     "yourInput": "Tapez ce que vous entendez...",
     "accuracy": "Précision",
     "yourScore": "Votre précision",
-    "loginToSave": "Connectez-vous pour sauvegarder votre progression."
+    "loginToSave": "Connectez-vous pour sauvegarder votre progression.",
+    "answerForSegment": "Votre réponse pour le segment {n}"
   },
   "practice": {
     "title": "8 domaines de pratique",

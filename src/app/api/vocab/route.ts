@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
-import { requireLearner } from "@/lib/api-auth";
+import { requireUser } from "@/lib/api-auth";
 import { rateLimit, clientKey } from "@/lib/rate-limit";
 
 const postSchema = z.object({
@@ -12,7 +12,7 @@ const postSchema = z.object({
 });
 
 export async function POST(req: Request) {
-  const gate = await requireLearner();
+  const gate = await requireUser();
   if ("error" in gate) return gate.error;
   const userId = gate.userId;
 

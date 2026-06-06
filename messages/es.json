@@ -139,7 +139,8 @@
     "yourInput": "Escribe lo que oyes...",
     "accuracy": "Precisión",
     "yourScore": "Tu precisión",
-    "loginToSave": "Inicia sesión para guardar tu progreso y vocabulario."
+    "loginToSave": "Inicia sesión para guardar tu progreso y vocabulario.",
+    "answerForSegment": "Tu respuesta para el segmento {n}"
   },
   "practice": {
     "title": "8 áreas de práctica",

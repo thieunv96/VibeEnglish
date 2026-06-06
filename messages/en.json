@@ -139,7 +139,8 @@
     "yourInput": "Type what you hear...",
     "accuracy": "Accuracy",
     "yourScore": "Your accuracy",
-    "loginToSave": "Sign in to save your progress and vocabulary."
+    "loginToSave": "Sign in to save your progress and vocabulary.",
+    "answerForSegment": "Your answer for segment {n}"
   },
   "practice": {
     "title": "8 Practice Skill Areas",

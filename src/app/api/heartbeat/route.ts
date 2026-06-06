@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { requireLearner } from "@/lib/api-auth";
+import { requireUser } from "@/lib/api-auth";
 import { rateLimit, clientKey } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
-  const gate = await requireLearner();
+  const gate = await requireUser();
   if ("error" in gate) return gate.error;
   const userId = gate.userId;
 

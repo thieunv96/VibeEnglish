@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import type { Exercise, ExerciseQuestion } from "@/lib/content";
-import { checkAnswer } from "@/lib/exercise-scoring";
+import { checkAnswer, normalize } from "@/lib/exercise-scoring";
 import { cn } from "@/lib/cn";
 
 type AnswerMap = Record<string, string | Record<string, string>>;
@@ -53,6 +53,15 @@ export function ExerciseRunner({ exercise, labels, onSubmit }: Props) {
     setFeedback((f) => ({ ...f, [q.id]: checkAnswer(q, given) ? "correct" : "incorrect" }));
   }
 
+  /** Per-pair check for match questions, keyed by `${q.id}__${left}`. Only
+   * usable when the pair's `right` value is present (regular practice). For
+   * sanitised sample/CEFR tests the correct value is stripped server-side. */
+  function checkPair(q: ExerciseQuestion, left: string, correctRight: string) {
+    const current = (answers[q.id] as Record<string, string> | undefined)?.[left] ?? "";
+    const ok = normalize(current) === normalize(correctRight);
+    setFeedback((f) => ({ ...f, [`${q.id}__${left}`]: ok ? "correct" : "incorrect" }));
+  }
+
   async function submitAll() {
     const fb: FeedbackMap = {};
     exercise.questions.forEach((q) => {
@@ -93,17 +102,45 @@ export function ExerciseRunner({ exercise, labels, onSubmit }: Props) {
 
   const correctCount = Object.values(feedback).filter((v) => v === "correct").length;
   const score = submitted ? correctCount / exercise.questions.length : null;
+  const reveal = showAll || submitted;
+
+  // Flatten match questions so each pair renders as its own numbered card.
+  // Regular mcq/fill questions render as themselves.
+  type RenderItem =
+    | { kind: "q"; q: ExerciseQuestion }
+    | { kind: "pair"; q: ExerciseQuestion; left: string; correctRight: string; options: string[] };
+  const renderItems: RenderItem[] = [];
+  for (const q of exercise.questions) {
+    if (q.type === "match" && q.pairs) {
+      // For sanitised sample/CEFR tests, pairs[].right is stripped and the
+      // shuffled choices live on q.options. For regular practice the pairs
+      // carry their own right value and we just collect them.
+      const options =
+        q.options && q.options.length > 0
+          ? q.options
+          : q.pairs.map((pp) => pp.right).filter(Boolean);
+      for (const p of q.pairs) {
+        renderItems.push({ kind: "pair", q, left: p.left, correctRight: p.right ?? "", options });
+      }
+    } else {
+      renderItems.push({ kind: "q", q });
+    }
+  }
 
   return (
     <div className="space-y-6" data-testid="exercise-runner">
       <ol className="space-y-5">
-        {exercise.questions.map((q, idx) => {
-          const fb = feedback[q.id];
-          const reveal = showAll || submitted;
+        {renderItems.map((item, idx) => {
+          const { q } = item;
+          const fbKey = item.kind === "pair" ? `${q.id}__${item.left}` : q.id;
+          const fb = feedback[fbKey];
+
+          // Per-pair: prompt = left; main: prompt = q.prompt.
+          const promptText = item.kind === "pair" ? item.left : q.prompt;
 
           return (
             <li
-              key={q.id}
+              key={fbKey}
               data-testid={`question-${idx}`}
               className={cn(
                 "rounded-xl border bg-white p-5",
@@ -115,7 +152,7 @@ export function ExerciseRunner({ exercise, labels, onSubmit }: Props) {
               <div className="flex justify-between items-start gap-4 mb-3">
                 <p className="font-medium">
                   <span className="text-muted mr-2">{idx + 1}.</span>
-                  {q.prompt}
+                  {promptText}
                 </p>
                 {fb && (
                   <span
@@ -130,13 +167,14 @@ export function ExerciseRunner({ exercise, labels, onSubmit }: Props) {
                 )}
               </div>
 
-              {q.type === "mcq" && q.options && (
+              {item.kind === "q" && q.type === "mcq" && q.options && (
                 <div className="space-y-2" role="radiogroup">
                   {q.options.map((opt) => {
                     const selected = answers[q.id] === opt;
                     const isAnswer = Array.isArray(q.answer)
                       ? q.answer.includes(opt)
                       : q.answer === opt;
+                    const wrongPick = reveal && selected && !isAnswer;
                     return (
                       <label
                         key={opt}
@@ -144,6 +182,7 @@ export function ExerciseRunner({ exercise, labels, onSubmit }: Props) {
                           "flex items-center gap-2 rounded-md border px-3 py-2 cursor-pointer",
                           selected ? "border-brand bg-brand-soft/40" : "border-border hover:bg-surface",
                           reveal && isAnswer && "border-emerald-400 bg-emerald-50",
+                          wrongPick && "border-red-400 bg-red-50",
                         )}
                       >
                         <input
@@ -162,7 +201,7 @@ export function ExerciseRunner({ exercise, labels, onSubmit }: Props) {
                 </div>
               )}
 
-              {q.type === "fill" && (
+              {item.kind === "q" && q.type === "fill" && (
                 <input
                   type="text"
                   value={(answers[q.id] as string) ?? ""}
@@ -173,46 +212,46 @@ export function ExerciseRunner({ exercise, labels, onSubmit }: Props) {
                 />
               )}
 
-              {q.type === "match" && q.pairs && (
-                <div className="grid gap-3 sm:grid-cols-2" data-testid={`q${idx}-match`}>
-                  {q.pairs.map((p) => {
-                    // For sanitised questions (sample/CEFR tests), right values are
-                    // stripped from pairs and exposed as a shuffled `options` array.
-                    // Fall back to pairs[].right for regular practice exercises.
-                    const matchOptions: string[] =
-                      q.options && q.options.length > 0
-                        ? q.options
-                        : q.pairs!.map((pp) => pp.right).filter(Boolean);
-                    return (
-                      <div key={p.left} className="flex items-center gap-2">
-                        <span className="font-medium min-w-40">{p.left}</span>
-                        <select
-                          value={(answers[q.id] as Record<string, string> | undefined)?.[p.left] ?? ""}
-                          onChange={(e) => {
-                            const current = (answers[q.id] as Record<string, string>) ?? {};
-                            setAnswer(q.id, { ...current, [p.left]: e.target.value });
-                          }}
-                          className="flex-1 rounded-md border border-border bg-white px-2 py-1.5"
-                        >
-                          <option value="">— choose —</option>
-                          {matchOptions.map((opt) => (
-                            <option key={opt} value={opt}>
-                              {opt}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+              {item.kind === "pair" && (() => {
+                const current = (answers[q.id] as Record<string, string> | undefined)?.[item.left] ?? "";
+                const wrongPick =
+                  reveal && current !== "" && item.correctRight !== "" &&
+                  normalize(current) !== normalize(item.correctRight);
+                return (
+                  <div data-testid={`q${idx}-match`} className="flex items-center gap-2">
+                    <select
+                      value={current}
+                      onChange={(e) => {
+                        const cur = (answers[q.id] as Record<string, string>) ?? {};
+                        setAnswer(q.id, { ...cur, [item.left]: e.target.value });
+                      }}
+                      className={cn(
+                        "flex-1 rounded-md border bg-white px-3 py-2",
+                        wrongPick ? "border-red-400 bg-red-50" : "border-border",
+                      )}
+                    >
+                      <option value="">— choose —</option>
+                      {item.options.map((opt) => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                );
+              })()}
 
               {(reveal || fb) && q.explanation && (
                 <p className="mt-3 text-sm text-muted">💡 {q.explanation}</p>
               )}
-              {reveal && !fb && (
+              {reveal && !fb && item.kind === "q" && (
                 <p className="mt-3 text-sm text-emerald-700">
                   Answer: <strong>{Array.isArray(q.answer) ? q.answer.join(", ") : q.answer}</strong>
+                </p>
+              )}
+              {reveal && !fb && item.kind === "pair" && item.correctRight && (
+                <p className="mt-3 text-sm text-emerald-700">
+                  Answer: <strong>{item.correctRight}</strong>
                 </p>
               )}
 
@@ -220,9 +259,17 @@ export function ExerciseRunner({ exercise, labels, onSubmit }: Props) {
                 <div className="mt-3">
                   <button
                     type="button"
-                    onClick={() => checkOne(q)}
+                    onClick={() =>
+                      item.kind === "pair"
+                        ? checkPair(q, item.left, item.correctRight)
+                        : checkOne(q)
+                    }
+                    // Hide the per-pair check button when correct answer is
+                    // stripped (sanitised sample/CEFR tests have no right value
+                    // to compare against client-side).
+                    disabled={item.kind === "pair" && !item.correctRight}
                     data-testid={`q${idx}-check`}
-                    className="text-xs font-semibold text-brand hover:text-brand-strong"
+                    className="text-xs font-semibold text-brand hover:text-brand-strong disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     {labels.check}
                   </button>
@@ -246,8 +293,9 @@ export function ExerciseRunner({ exercise, labels, onSubmit }: Props) {
         <button
           type="button"
           onClick={() => setShowAll((v) => !v)}
+          disabled={submitted}
           data-testid="exercise-show-all"
-          className="rounded-md border border-border bg-white hover:bg-surface px-5 py-2.5 font-semibold"
+          className="rounded-md border border-border bg-white hover:bg-surface px-5 py-2.5 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {labels.showAll}
         </button>

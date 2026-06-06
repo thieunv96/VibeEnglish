@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { requireLearner } from "@/lib/api-auth";
+import { requireUser } from "@/lib/api-auth";
 import { rateLimit, clientKey } from "@/lib/rate-limit";
 import { GOAL_OPTIONS } from "@/lib/learning-goals";
 import { LANGUAGE_CODES } from "@/lib/languages";
@@ -54,7 +54,7 @@ const patchSchema = z.object({
 });
 
 export async function PATCH(req: Request) {
-  const gate = await requireLearner();
+  const gate = await requireUser();
   if ("error" in gate) return gate.error;
   const userId = gate.userId;
 

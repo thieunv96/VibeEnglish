@@ -139,7 +139,8 @@
     "yourInput": "Gõ những gì bạn nghe được...",
     "accuracy": "Độ chính xác",
     "yourScore": "Độ chính xác của bạn",
-    "loginToSave": "Đăng nhập để lưu tiến độ và từ vựng."
+    "loginToSave": "Đăng nhập để lưu tiến độ và từ vựng.",
+    "answerForSegment": "Câu trả lời của bạn cho đoạn {n}"
   },
   "practice": {
     "title": "8 lĩnh vực luyện tập",

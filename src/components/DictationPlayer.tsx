@@ -23,6 +23,8 @@ interface Props {
     yourInput: string;
     accuracy: string;
     loginToSave: string;
+    /** Template with {n} placeholder for the current segment number. */
+    answerForSegment: string;
   };
 }
 
@@ -186,6 +188,9 @@ export function DictationPlayer({ lesson, labels }: Props) {
 
       {/* Input */}
       <div className="rounded-xl border border-border bg-white p-5 space-y-3">
+        <h3 className="text-sm font-semibold text-foreground" data-testid="dictation-input-label">
+          {labels.answerForSegment.replace("{n}", String(idx + 1))}
+        </h3>
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
