@@ -79,6 +79,9 @@ export async function Header() {
                         { href: "/admin", label: t("adminHome"), testId: "avatar-menu-admin" },
                         { href: "/admin/lessons", label: t("lessons"), testId: "avatar-menu-admin-lessons" },
                         { href: "/admin/analytics", label: t("analytics"), testId: "avatar-menu-admin-analytics" },
+                        { href: "/profile", label: t("menu.profile"), testId: "avatar-menu-profile" },
+                        { href: "/vocab", label: t("menu.vocab"), testId: "avatar-menu-vocab" },
+                        { href: "/history", label: t("menu.history"), testId: "avatar-menu-history" },
                       ]
                     : [
                         { href: "/profile", label: t("menu.profile"), testId: "avatar-menu-profile" },

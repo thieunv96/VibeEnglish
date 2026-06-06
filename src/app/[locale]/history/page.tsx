@@ -16,7 +16,6 @@ export default async function HistoryPage({ params }: PageProps) {
   const session = await auth();
   const u = session?.user as { id?: string; isAdmin?: boolean } | undefined;
   if (!u?.id) redirect("/auth/login");
-  if (u.isAdmin) redirect("/admin");
 
   const [progress, attempts] = await Promise.all([
     prisma.lessonProgress.findMany({

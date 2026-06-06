@@ -21,7 +21,6 @@ export default async function ProfilePage({ params }: PageProps) {
   const session = await auth();
   const u = session?.user as { id?: string; isAdmin?: boolean } | undefined;
   if (!u?.id) redirect("/auth/login");
-  if (u.isAdmin) redirect("/admin");
 
   const [user, stats, activity] = await Promise.all([
     prisma.user.findUnique({
