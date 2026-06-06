@@ -74,16 +74,11 @@ export function VocabList({ initialItems, labels }: Props) {
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-white" data-testid="vocab-list">
       <table className="w-full text-sm table-fixed">
-        <colgroup>
-          <col className="w-1/4" />
-          <col />
-          <col className="w-36" />
-        </colgroup>
         <thead className="bg-surface text-xs uppercase tracking-wide text-muted">
           <tr>
-            <th className="px-4 py-2 text-left font-semibold">{labels.word}</th>
+            <th className="px-4 py-2 text-left font-semibold w-1/4">{labels.word}</th>
             <th className="px-4 py-2 text-left font-semibold">{labels.definition}</th>
-            <th className="px-4 py-2 text-right font-semibold"></th>
+            <th className="px-4 py-2 text-right font-semibold w-40"></th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
@@ -115,44 +110,46 @@ export function VocabList({ initialItems, labels }: Props) {
                   )}
                 </td>
                 <td className="px-4 py-3 text-right">
-                  {isEditing ? (
-                    <div className="flex justify-end gap-2">
-                      <button
-                        type="button"
-                        onClick={() => saveEdit(item)}
-                        data-testid={`save-vocab-${item.word}`}
-                        className="text-xs font-semibold text-brand hover:text-brand-strong"
-                      >
-                        {labels.save}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={cancelEdit}
-                        className="text-xs font-semibold text-muted hover:text-foreground"
-                      >
-                        {labels.cancel}
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex justify-end gap-3">
-                      <button
-                        type="button"
-                        onClick={() => startEdit(item)}
-                        data-testid={`edit-vocab-${item.word}`}
-                        className="text-xs font-semibold text-brand hover:text-brand-strong"
-                      >
-                        {labels.edit}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => remove(item.id)}
-                        data-testid={`delete-vocab-${item.word}`}
-                        className="text-xs font-semibold text-red-600 hover:text-red-800"
-                      >
-                        {labels.delete}
-                      </button>
-                    </div>
-                  )}
+                  <div className="flex justify-end gap-3">
+                    {isEditing ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => saveEdit(item)}
+                          data-testid={`save-vocab-${item.word}`}
+                          className="text-xs font-semibold text-brand hover:text-brand-strong"
+                        >
+                          {labels.save}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={cancelEdit}
+                          className="text-xs font-semibold text-muted hover:text-foreground"
+                        >
+                          {labels.cancel}
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => startEdit(item)}
+                          data-testid={`edit-vocab-${item.word}`}
+                          className="text-xs font-semibold text-brand hover:text-brand-strong"
+                        >
+                          {labels.edit}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => remove(item.id)}
+                          data-testid={`delete-vocab-${item.word}`}
+                          className="text-xs font-semibold text-red-600 hover:text-red-800"
+                        >
+                          {labels.delete}
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </td>
               </tr>
             );
