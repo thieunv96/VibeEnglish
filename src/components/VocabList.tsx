@@ -73,12 +73,17 @@ export function VocabList({ initialItems, labels }: Props) {
 
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-white" data-testid="vocab-list">
-      <table className="w-full text-sm">
+      <table className="w-full text-sm table-fixed">
+        <colgroup>
+          <col className="w-1/4" />
+          <col />
+          <col className="w-36" />
+        </colgroup>
         <thead className="bg-surface text-xs uppercase tracking-wide text-muted">
           <tr>
             <th className="px-4 py-2 text-left font-semibold">{labels.word}</th>
             <th className="px-4 py-2 text-left font-semibold">{labels.definition}</th>
-            <th className="px-4 py-2 text-right font-semibold w-32"></th>
+            <th className="px-4 py-2 text-right font-semibold"></th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
