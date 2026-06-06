@@ -5,7 +5,7 @@
  * Returns a signed session JWT + sanitised questions (no answers).
  *
  * 4-step pattern:
- *   1. requireLearner() — CEFR test is a logged-in-only feature
+ *   1. requireUser() — CEFR test is a logged-in-only feature
  *   2. rateLimit(IP, 3/60s) — lower than 10-Q because 25 questions per call.
  *   3. No body — no Zod needed.
  *   4. DB: one findMany per CEFR level → stratified sample → sign JWT → return.
@@ -15,7 +15,7 @@ import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { requireLearner } from "@/lib/api-auth";
+import { requireUser } from "@/lib/api-auth";
 import { rateLimit, clientKey } from "@/lib/rate-limit";
 import { signSessionJWT } from "@/lib/sample-test-jwt";
 import { sanitiseQuestion } from "@/lib/exercise-scoring";
@@ -43,7 +43,7 @@ type ParsedQuestion = z.infer<typeof questionSchema>;
 
 export async function POST(req: Request) {
   // Step 1 — Auth gate.
-  const gate = await requireLearner();
+  const gate = await requireUser();
   if ("error" in gate) return gate.error;
 
   // Step 2 — Rate limit (IP, 3/60s).

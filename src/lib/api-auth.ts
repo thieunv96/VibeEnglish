@@ -46,3 +46,13 @@ export async function requireLearner(): Promise<
   }
   return { userId: user.id, user };
 }
+
+/** Require any signed-in user (admin OR learner). Used by surfaces that
+ * admins should be able to demo — e.g. the sample test and CEFR placement. */
+export async function requireUser(): Promise<
+  { userId: string; user: SessionUserInfo } | { error: NextResponse }
+> {
+  const user = await currentUser();
+  if (!user) return { error: NextResponse.json({ error: "unauthorized" }, { status: 401 }) };
+  return { userId: user.id, user };
+}

@@ -4,7 +4,7 @@
  * Authenticated random question sampler for the 10-Q sample test.
  *
  * 4-step pattern:
- *   1. requireLearner() — sample test is a logged-in-only feature
+ *   1. requireUser() — sample test is a logged-in-only feature
  *   2. rateLimit(IP, 5/60s)
  *   3. No body — no Zod needed
  *   4. prisma.exercise.findMany → Fisher-Yates → take 10 → sign session JWT
@@ -13,7 +13,7 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { prisma } from "@/lib/db";
-import { requireLearner } from "@/lib/api-auth";
+import { requireUser } from "@/lib/api-auth";
 import { rateLimit, clientKey } from "@/lib/rate-limit";
 import { signSessionJWT } from "@/lib/sample-test-jwt";
 import { sanitiseQuestion } from "@/lib/exercise-scoring";
@@ -42,7 +42,7 @@ function shuffle<T>(arr: T[]): T[] {
 
 export async function POST(req: Request) {
   // Step 1 — Auth gate.
-  const gate = await requireLearner();
+  const gate = await requireUser();
   if ("error" in gate) return gate.error;
 
   // Step 2 — Rate limit (IP, 5/60s).

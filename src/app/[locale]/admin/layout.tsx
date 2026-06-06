@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Container } from "@/components/Container";
 import { Link } from "@/i18n/navigation";
+import { AdminNav } from "@/components/AdminNav";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -25,15 +26,16 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="bg-surface min-h-screen">
       <Container size="wide" className="py-8">
-        <nav className="mb-6 flex flex-wrap items-center gap-4 border-b border-border pb-4" aria-label="Admin">
-          <span className="text-xs font-bold uppercase tracking-widest text-brand">Admin</span>
-          <Link href="/admin" className="text-sm font-medium hover:text-brand">Dashboard</Link>
-          <Link href="/admin/lessons" className="text-sm font-medium hover:text-brand">Lessons</Link>
-          <Link href="/admin/exercises" className="text-sm font-medium hover:text-brand">Exercises</Link>
-          <Link href="/admin/import" className="text-sm font-medium hover:text-brand">Import</Link>
-          <Link href="/admin/analytics" className="text-sm font-medium hover:text-brand">Analytics</Link>
-          <span className="ml-auto text-xs text-muted">Signed in as {user.email}</span>
-        </nav>
+        <AdminNav
+          email={user.email}
+          items={[
+            { href: "/admin", label: "Dashboard" },
+            { href: "/admin/lessons", label: "Lessons" },
+            { href: "/admin/exercises", label: "Exercises" },
+            { href: "/admin/import", label: "Import" },
+            { href: "/admin/analytics", label: "Analytics" },
+          ]}
+        />
         {children}
       </Container>
     </div>

@@ -5,7 +5,7 @@
  * blob inline. No cookie — the client renders results from the response body.
  *
  * 4-step pattern:
- *   1. requireLearner()
+ *   1. requireUser()
  *   2. rateLimit(IP, 10/60s)
  *   3. Zod-validate body
  *   4. verifySessionJWT → score → ExerciseAttempt rows → fetch recommendations
@@ -14,7 +14,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { requireLearner } from "@/lib/api-auth";
+import { requireUser } from "@/lib/api-auth";
 import { rateLimit, clientKey } from "@/lib/rate-limit";
 import { verifySessionJWT } from "@/lib/sample-test-jwt";
 import { checkAnswer } from "@/lib/exercise-scoring";
@@ -36,7 +36,7 @@ interface SessionPayload {
 
 export async function POST(req: Request) {
   // Step 1 — Auth gate.
-  const gate = await requireLearner();
+  const gate = await requireUser();
   if ("error" in gate) return gate.error;
   const { userId } = gate;
 

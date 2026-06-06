@@ -7,6 +7,7 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { SearchBar } from "./SearchBar";
 import { MobileNav } from "./MobileNav";
 import { AvatarMenu } from "./AvatarMenu";
+import { PrimaryNav } from "./PrimaryNav";
 import { Link } from "@/i18n/navigation";
 
 export async function Header() {
@@ -58,20 +59,7 @@ export async function Header() {
           {/* Left cluster: logo + (desktop) primary nav */}
           <div className="flex items-center gap-6">
             <Logo />
-            <nav
-              className="hidden md:flex items-center gap-5 text-sm font-medium"
-              aria-label="Primary"
-            >
-              {links.map((l) => (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  className="text-foreground hover:text-brand transition-colors"
-                >
-                  {l.label}
-                </Link>
-              ))}
-            </nav>
+            <PrimaryNav items={links} />
           </div>
 
           {/* Center: search */}
