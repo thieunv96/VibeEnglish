@@ -12,7 +12,7 @@ All user-facing pages live under `src/app/[locale]/`, making every route locale-
 
 **Route groups (organized by domain):**
 - `auth/` — Login, register, password reset
-- `admin/` — Content import, bulk management, analytics
+- `admin/` — Content import, bulk management, analytics, test-prep analytics
 - `lessons/` — Lesson view & progress
 - `practice/` — Exercise practice by skill
 - `vocab/` — Vocabulary list & spaced-repetition review
@@ -20,7 +20,9 @@ All user-facing pages live under `src/app/[locale]/`, making every route locale-
 - `dashboard/` — User home, progress overview
 - `history/` — Attempt history, performance insights
 - `search/` — Content search & discovery
-- `test-prep/` — IELTS/TOEFL prep lessons
+- `test-prep/[exam]/mock/` — Listening-only mock tests (TOEIC/TOEFL/IELTS/OET)
+- `test-prep/[exam]/practice/[skill]` — Skill-focused practice for exam prep
+- `admin/test-prep/` — Test-prep analytics dashboard
 - `sample-test/` — 10-question guest sample test (conversion hook)
 - `sample-test/cefr/` — 25-question CEFR placement test (stratified, conversion hook)
 
@@ -117,6 +119,150 @@ requireLearner() → verify JWT signature → check submittedAt ≤ 30 min
 | `languages.ts` | 73 ISO 639-1 language codes with autonyms; `languageByCode()`, `parseLanguages()` |
 | `countries.ts` | ISO 3166-1 alpha-2 country codes with flag emoji; `countryByCode()`, `flagOf()` |
 | `cn.ts` | classnames shorthand (`cn(…)`) for conditional class assembly |
+
+---
+
+## Exam-Prep Listening Mocks (V1, June 2026)
+
+**Status:** Listening-only; all four exams (TOEIC, TOEFL, IELTS, OET). Reading mock and v2 enhancements tracked separately (NQ-3, NQ-5).
+
+### Schema
+
+**New table: `MockTestAttempt`**
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | String | Primary key |
+| `userId` | String | FK → User (cascade) |
+| `exam` | String | Exam slug (TOEIC, TOEFL, IELTS, OET) |
+| `bandEstimate` | String? | Nullable; rounded-down single value: "Band 5.5", "600", "B", "28" (see below) |
+| `correctAnswers` | Int | Number of correct answers |
+| `totalQuestions` | Int | Total questions answered |
+| `score` | Float | Ratio 0.0–1.0 (`correctAnswers / totalQuestions`) |
+| `completedAt` | DateTime | ISO timestamp |
+
+**Indices:**
+- `(userId, exam, completedAt)` — Ordered history per user+exam
+- `(exam, completedAt)` — For admin analytics
+
+**Schema additions (existing models):**
+- `Exercise.exam String?` — Nullable; indexed. Exam slug if exercise is exam-prep. Null for general exercises.
+- `ExerciseAttempt.attemptType String @default("practice")` — Tracks source: "practice", "sample", "cefr", "mock". Enables `/history` filtering by test type.
+- `ExerciseAttempt` composite index: `(userId, attemptType)` — Query mock attempts separately from practice.
+
+### Atomic Transaction Design
+
+Mock-submit endpoint (`POST /api/test-prep/[exam]/mock/submit`) writes in a **single Prisma transaction**:
+
+1. Create one `MockTestAttempt` parent record (band pre-calculated)
+2. Create N `ExerciseAttempt` child records, each with `attemptType: "mock"`, linked to the same `updatedAt` (transaction timestamp)
+
+**Rationale:**
+- Session-level aggregation is cheap (one row per mock test) → fast admin analytics
+- Per-exercise rows (`ExerciseAttempt`) keep history queryable (learner can drill into past attempts from `/history`)
+- Atomicity prevents partial writes (all-or-nothing)
+
+**Code reference:** `prisma.$transaction([mockAttempt, ...exerciseAttempts])` in submit route.
+
+### Endpoints
+
+**Learner Routes:**
+- `POST /api/test-prep/[exam]/mock/start` — Auth + rate-limit (2/min/IP). Samples 25 listening questions where `Exercise.skill = "listening"` AND `Exercise.exam = [exam]`. Returns sanitized questions + session JWT (HS256, 1hr TTL, `testType: "mock-{exam}"`).
+- `POST /api/test-prep/[exam]/mock/submit` — Auth + rate-limit (10/min/IP). Verifies JWT signature + asserts `testType` matches URL exam (rejects cross-exam replay). Scores via `checkAnswer()`. Computes band via `estimateBand()`. Persists transaction. Returns inline results blob + band.
+
+**Admin Routes:**
+- `GET /api/admin/test-prep/analytics` — requireAdmin + rate-limit (30/min/userId). Returns per-exam aggregates: unique-user count, attempts count, average band, band distribution (histogram).
+- `GET /[locale]/admin/test-prep` — Page. 4 exam cards + band distribution table + summary stats.
+
+### Band Estimation
+
+`src/lib/test-prep-bands.ts` exports `estimateBand(exam, correct, total): BandResult`:
+
+```ts
+interface BandResult {
+  band: string; // "Band 5.5", "600", "B", "28" (exam-specific)
+  rangeLow?: number;
+  rangeHigh?: number;
+}
+```
+
+- **Band format:** Single rounded-DOWN value (never a range, never a midpoint). E.g. if raw score = 76–85%, return "Band 5.5", not "5.5–6.0" or "5.75".
+- **Thresholds:** **Placeholders pending SME sign-off (NQ-1)**. Current values are hardcoded per exam; do not rely on them for grading. Mark clearly in code comments.
+
+**Exam-specific steps:**
+- TOEIC: 5-point bands (495, 605, 720, 785, 860, …)
+- TOEFL: 10-point bands (60, 70, 80, 90, …)
+- IELTS: 0.5-point bands (4.0, 4.5, 5.0, …)
+- OET: Letter bands (A, B, C, D)
+
+### Admin Analytics Surface
+
+**Page:** `/admin/test-prep` (new nav entry "Test Prep" between Exercises and Import)
+
+**Components:**
+- 4 exam cards (TOEIC, TOEFL, IELTS, OET) showing:
+  - Unique learners who took the mock
+  - Total attempts
+  - Average band (display format: "Band 5.5" or "600", etc.)
+- Band distribution histogram (x-axis = band step, y-axis = count)
+- Summary stats (total tests taken, trend)
+
+**Data source:** `/api/admin/test-prep/analytics` endpoint aggregates `MockTestAttempt` table.
+
+### Test-Type Tagging (`attemptType`)
+
+All exercise attempts now carry `attemptType: String`:
+
+| Type | Source | Notes |
+|---|---|---|
+| `"practice"` | `/practice/[skill]` (existing) | General learner practice |
+| `"sample"` | `/api/sample-test/submit` | 10-question sampler |
+| `"cefr"` | `/api/sample-test/cefr/submit` | 25-question CEFR test |
+| `"mock"` | `/api/test-prep/[exam]/mock/submit` | Exam-prep listening mock |
+
+**Use case:** Learner history (`/history`) can filter by test type; exam-prep mocks separate from general practice. Future: skill-based analytics can isolate mock performance.
+
+### Composite Question IDs (Pattern Extension)
+
+Question uniqueness rule applies across three systems (sample, CEFR, test-prep):
+
+- Exercise questions have local ids: `"q1"` – `"q5"` within the exercise
+- Cross-exercise ops use `${exerciseSlug}:${questionId}` composite keys
+- This convention prevents answer collisions when two exercises both contribute a `"q1"`
+- Applied in: session JWT, answer validation, results rendering
+
+**Documented at:** This section (to signal pattern reuse) + original `Sample Test & CEFR Placement` section.
+
+### V1 Scope
+
+- **Listening-only** (reading, writing, speaking deferred to V2 / NQ-3)
+- **All four exams:** TOEIC, TOEFL, IELTS, OET
+- **Single-page state machine:** idle → running → results inline (no separate `/results` route; mirrors sample-test design)
+- **Server-rendered disclaimer** on landing AND in results panel (no client popup)
+
+### Reuse & Inheritance
+
+Reuses from sample-test / CEFR:
+
+| Component | Reused From | Notes |
+|---|---|---|
+| `checkAnswer()` | `exercise-scoring.ts` | Answer validation (shared across all test types) |
+| `sanitiseQuestion()` | `exercise-scoring.ts` | Strips answers before sending to client |
+| JWT signing/verify | `sample-test-jwt.ts` | HS256 via AUTH_SECRET; 1hr TTL for mock (longer than 30min guest default) |
+| State machine pattern | `SampleTestRunner` | Single-page: question display, answer collection, submit, inline results |
+| Composite key convention | CEFR sampler | `${slug}:${questionId}` keys throughout |
+| Fisher-Yates shuffle | `shuffle.ts` (extracted utility) | Question sampling without replacement |
+
+### Known Follow-Ups & Placeholders
+
+| Ticket | Scope | Status | Notes |
+|---|---|---|---|
+| NQ-1 | Band threshold SME sign-off | Open | Current thresholds are placeholders; must be validated against official exam score mappings before production release |
+| NQ-3 | Reading mock + full test | Planned | V2: extend mocks to reading section for TOEFL, IELTS, TOEIC |
+| NQ-5 | IELTS Academic vs General Training split | Planned | V2: content authoring + separate progress tracking per variant |
+| PQ-3 | `/api/test-prep/[exam]/progress` route | Deferred | Server Component reads `MockTestAttempt` directly today; route only needed if client component requires it |
+| Admin nav i18n | Migrate admin nav to `nav.*` namespace | Planned | The `nav.adminTestPrep` i18n key shipped in V1 as a seed; full admin nav migration (hardcoded labels → i18n keys) is a future refactor |
+| i18n translation | es/fr/vi for `testPrep` namespace | Planned | Currently shipping English placeholders; translation pending |
 
 ---
 

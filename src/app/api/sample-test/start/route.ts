@@ -17,6 +17,7 @@ import { requireUser } from "@/lib/api-auth";
 import { rateLimit, clientKey } from "@/lib/rate-limit";
 import { signSessionJWT } from "@/lib/sample-test-jwt";
 import { sanitiseQuestion } from "@/lib/exercise-scoring";
+import { shuffle } from "@/lib/shuffle";
 import type { ExerciseQuestion } from "@/lib/content";
 
 const SAMPLE_SIZE = 10;
@@ -29,15 +30,6 @@ interface QuestionTuple {
   exerciseTitle: string;
   exerciseLevel: string;
   question: ExerciseQuestion;
-}
-
-/** Fisher-Yates in-place shuffle — mutates and returns the array. */
-function shuffle<T>(arr: T[]): T[] {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
 }
 
 export async function POST(req: Request) {

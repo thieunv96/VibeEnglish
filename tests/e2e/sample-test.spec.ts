@@ -38,7 +38,7 @@ test.describe("10-Q Sample Test", () => {
       expect(q.sourceExerciseSkill).toBeTruthy();
       expect((q as Record<string, unknown>).answer).toBeUndefined();
       if (q.pairs) {
-        for (const p of q.pairs) expect(p.right).toBe("");
+        for (const p of q.pairs) expect(p.right).toBeUndefined();
       }
     }
   });

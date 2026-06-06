@@ -24,7 +24,8 @@
       "menu": "Menu",
       "search": "Search"
     },
-    "sampleTest": "Sample Test"
+    "sampleTest": "Sample Test",
+    "adminTestPrep": "Test Prep"
   },
   "search": {
     "title": "Search",
@@ -370,5 +371,67 @@
     "errorStart": "Could not start the placement test. Please try again.",
     "errorSubmit": "Could not submit your answers. Please try again.",
     "errorNetwork": "Network error. Please try again."
+  },
+  "testPrep": {
+    "hubTitle": "Exam Preparation",
+    "hubSubtitle": "Structured practice tracks for the world's top English proficiency exams.",
+    "examCard": {
+      "mockCta": "Start Listening Mock",
+      "practiceCta": "Practice by Skill",
+      "attemptsLabel": "{count} attempt(s)",
+      "bestScoreLabel": "Best: {score}%",
+      "noAttemptsLabel": "No attempts yet",
+      "lastAttemptLabel": "Last: {date}"
+    },
+    "mockTest": {
+      "pageTitle": "{exam} Listening Mock",
+      "pageSubtitle": "A {count}-question listening practice session modelled on the real {exam} exam.",
+      "listeningOnlyNote": "V1 covers listening only. Reading and writing mocks are coming soon.",
+      "disclaimer": "VibeEnglish estimates are for practice and self-assessment only. They are not official scores and do not predict real-exam results.",
+      "startBtn": "Start Listening Mock",
+      "submitBtn": "Submit Answers",
+      "retakeBtn": "Take Mock Test Again",
+      "sessionExpiredError": "Your session expired. Please start a new mock test.",
+      "noContentError": "No practice content is available for this exam yet. Check back soon.",
+      "rateLimitError": "Too many attempts. Please wait a moment and try again.",
+      "errorStart": "Could not start the mock test. Please try again.",
+      "errorSubmit": "Could not submit your answers. Please try again.",
+      "errorNetwork": "Network error. Please try again.",
+      "resultsHeading": "Your Listening Mock Results",
+      "scoreLabel": "{correct} / {total}",
+      "bandEstimateLabel": "Estimated {exam} ≈ {band}",
+      "bandDisclaimerLabel": "VibeEnglish estimates are for practice and self-assessment only. They are not official scores and do not predict real-exam results.",
+      "skillBreakdownHeading": "Skills Breakdown",
+      "skillBreakdownItem": "{correct} / {total} correct",
+      "reviewHeading": "Question Review",
+      "reviewCorrect": "Correct",
+      "reviewIncorrect": "Incorrect",
+      "reviewCorrectAnswer": "Correct answer: {answer}"
+    },
+    "practice": {
+      "pageTitle": "{exam} {skill} Practice",
+      "pageSubtitle": "Targeted exercises for {exam} {skill}.",
+      "noExercisesLabel": "No exercises available for this skill yet.",
+      "lastScoreLabel": "Last score: {score}%",
+      "startExerciseBtn": "Start",
+      "exerciseLevel": "Level: {level}"
+    },
+    "progress": {
+      "sectionHeading": "Your Progress",
+      "attemptsLabel": "{count} listening mock(s) completed",
+      "bestScoreLabel": "Best score: {score}%",
+      "lastAttemptLabel": "Last attempt: {date}",
+      "noAttemptsLabel": "You have not taken a listening mock for this exam yet."
+    },
+    "examDescriptions": {
+      "toeic": "Business communication — emails, meetings, conversations, and presentations. Used by employers in 160+ countries.",
+      "toefl": "Academic English for university admissions — lectures, campus conversations, and integrated tasks.",
+      "ielts": "Academic and general English for study, work, and migration — four skills, internationally recognised.",
+      "oet": "Healthcare English for medical professionals — doctors, nurses, pharmacists and allied health."
+    },
+    "examSkills": {
+      "listening": "Listening",
+      "reading": "Reading"
+    }
   }
 }

@@ -27,6 +27,7 @@ model User {
   vocab            VocabItem[]
   activity         UserActivity[]
   ratings          LessonRating[]
+  mockTests        MockTestAttempt[]
 }
 
 model UserActivity {
@@ -81,9 +82,11 @@ model Exercise {
   questions   Json     // ExerciseQuestion[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  exam        String?  // "toeic" | "toefl" | "ielts" | "oet" | null — nullable, validated at app layer
 
   @@unique([skill, slug])
   @@index([skill, level])
+  @@index([exam])
 }
 
 model LessonProgress {
@@ -110,9 +113,13 @@ model ExerciseAttempt {
   title        String
   score        Float
   completedAt  DateTime @default(now())
+  // attemptType is a String column (not a native ENUM) to avoid MariaDB full-table rebuilds
+  // on ENUM alterations. Application-layer Zod enum validates: "practice"|"sample"|"cefr"|"mock".
+  attemptType  String   @default("practice")
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, completedAt])
+  @@index([userId, attemptType])
 }
 
 model VocabItem {
@@ -126,4 +133,19 @@ model VocabItem {
 
   @@unique([userId, word])
   @@index([userId])
+}
+
+model MockTestAttempt {
+  id             String   @id @default(cuid())
+  userId         String
+  exam           String   // toeic | toefl | ielts | oet
+  totalQuestions Int
+  correctAnswers Int
+  score          Float    // correctAnswers / totalQuestions (0.0–1.0)
+  bandEstimate   String?  // rounded-down single-value label, e.g. "600", "Band 5.5", "B"
+  completedAt    DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, exam, completedAt])
+  @@index([exam, completedAt])
 }

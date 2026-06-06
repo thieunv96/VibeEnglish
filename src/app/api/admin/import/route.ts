@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
+import { examSlugSchema } from "@/lib/test-prep-constants";
 
 const lessonSchema = z.object({
   slug: z.string().regex(/^[a-z0-9-]+$/, "lowercase alphanumeric and dashes only"),
@@ -32,6 +33,7 @@ const exerciseSchema = z.object({
   level: z.enum(["A1", "A2", "B1", "B2", "C1", "C2"]),
   type: z.enum(["mcq", "fill", "match"]),
   description: z.string().nullish(),
+  exam: examSlugSchema.nullish(),
   questions: z.array(questionSchema).min(1),
 });
 
@@ -227,9 +229,10 @@ export async function POST(req: Request) {
           level: data.level,
           type: data.type,
           description: data.description ?? null,
+          exam: data.exam ?? null,
           questions: data.questions,
         },
-        create: data,
+        create: { ...data, exam: data.exam ?? null },
       });
       exerciseResults.push({
         index,

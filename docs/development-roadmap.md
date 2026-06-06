@@ -23,7 +23,7 @@ VibeEnglish is a full-stack English learning platform with adaptive lessons, voc
 
 ---
 
-## Phase 2: Conversion & Guest Features (In Progress)
+## Phase 2: Conversion & Guest Features + Exam-Prep Mocks (In Progress)
 
 **Status:** Complete (June 2026)
 
@@ -57,6 +57,32 @@ VibeEnglish is a full-stack English learning platform with adaptive lessons, voc
   - Result cookie extended with `testType`, `levelScores`, `cefrEstimate`
   - `/api/sample-test/cefr/{start,submit}` endpoints
 - **Content Gap (Non-Blocking Follow-Up):** C2 exercises = 0. B2 over-samples to fill. C1+ label signals gap. Content team to deliver C2 + additional C1 in parallel workstream.
+- **Completed:** June 2026
+
+### 2c. Exam-Prep Listening Mocks V1 (TOEIC / TOEFL / IELTS / OET)
+- **Route:** `GET/POST /[locale]/test-prep/[exam]/mock`
+- **Features:**
+  - Listening-only mock tests (25 questions each) for 4 exams
+  - Single-page state machine (idle → running → results inline)
+  - Band estimation per exam (placeholder thresholds, pending SME sign-off NQ-1)
+  - Atomic persistence: one `MockTestAttempt` parent + N `ExerciseAttempt` children in single transaction
+  - Admin analytics page (`/admin/test-prep`) with per-exam stats + band distribution histogram
+  - JWT session binding prevents cross-exam replay attacks
+- **Infrastructure:**
+  - New `MockTestAttempt` model with `(userId, exam, completedAt)` + `(exam, completedAt)` indices
+  - `Exercise.exam String?` column + `ExerciseAttempt.attemptType` enum (tracks "practice", "sample", "cefr", "mock")
+  - `src/lib/test-prep-bands.ts` — Per-exam band estimation (currently placeholder values)
+  - `src/lib/test-prep-content.ts` — Listening-only question sampler by exam
+  - `src/lib/test-prep-progress.ts` — Exam progress aggregator
+  - `src/lib/test-prep-admin-analytics.ts` — Admin dashboard aggregates
+  - `src/lib/shuffle.ts` — Extracted Fisher-Yates utility (reused by sample-test + test-prep)
+  - `/api/test-prep/[exam]/mock/{start,submit}` endpoints + `/api/admin/test-prep/analytics`
+  - `testPrep` i18n namespace added to all 4 locales (es/fr/vi = English placeholders pending translation)
+- **Non-Blocking Follow-Ups:**
+  - **NQ-1:** Band threshold SME sign-off (current values placeholders)
+  - **NQ-3, NQ-5:** Reading mock + IELTS Academic/General Training split (V2)
+  - **PQ-3:** `/api/test-prep/[exam]/progress` route if needed by client
+  - **Translation:** es/fr/vi for `testPrep` namespace
 - **Completed:** June 2026
 
 ---
@@ -104,6 +130,7 @@ VibeEnglish is a full-stack English learning platform with adaptive lessons, voc
 | MVP Launch (Phase 1) | May 2026 | ✓ Complete |
 | Sample Test (10-Q) | June 2026 | ✓ Complete |
 | CEFR Test (25-Q) | June 2026 | ✓ Complete |
+| Exam-Prep Listening Mocks V1 (Phase 2c) | June 2026 | ✓ Complete |
 | Adaptive Lessons (Phase 3a) | TBD | Planned |
 | Vocabulary Mastery (Phase 3b) | TBD | Planned |
 | Leaderboards & Gamification (Phase 3c) | TBD | Planned |

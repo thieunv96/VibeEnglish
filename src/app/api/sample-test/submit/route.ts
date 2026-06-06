@@ -144,6 +144,7 @@ export async function POST(req: Request) {
     if (!ex) continue;
     await prisma.exerciseAttempt.create({
       data: {
+        attemptType: "sample",
         userId,
         exerciseSlug: es.slug,
         skill: es.skill,

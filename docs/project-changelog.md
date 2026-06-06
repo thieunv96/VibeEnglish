@@ -4,6 +4,79 @@ All notable changes to VibeEnglish are documented here. Date format: YYYY-MM-DD.
 
 ---
 
+## 2026-06-06 — Exam-Prep Listening Mocks V1 (TOEIC/TOEFL/IELTS/OET)
+
+### Schema Delta — MockTestAttempt Table
+
+A new `MockTestAttempt` model persists listening mock test sessions:
+- `(userId, exam, completedAt)` — ordered history per exam
+- `(exam, completedAt)` — admin analytics index
+- FK: `userId` → `User` (cascade delete)
+- Fields: `bandEstimate` (rounded-down single value, placeholder thresholds pending SME sign-off NQ-1), `correctAnswers`, `totalQuestions`, `score` (ratio 0.0–1.0)
+
+Companion additions to existing models:
+- `Exercise.exam String?` — nullable; indexed. Tags exercises by exam slug.
+- `ExerciseAttempt.attemptType String @default("practice")` — enum values: "practice", "sample", "cefr", "mock". Enables history filtering by test type.
+
+### Feature — Listening Mocks (V1)
+
+**Routes:**
+- `GET/POST /[locale]/test-prep/[exam]/mock` — Single-page state machine (idle → running → results inline). Landing page & test host on same URL.
+- `GET /[locale]/admin/test-prep` — Admin analytics: 4 exam cards, band distribution table, summary stats.
+- `POST /api/test-prep/[exam]/mock/start` — Auth-required; rate-limit 2/min/IP. Samples 25 listening questions. Returns sanitized questions + session JWT (`testType: "mock-{exam}"` prevents cross-exam replay).
+- `POST /api/test-prep/[exam]/mock/submit` — Auth-required; rate-limit 10/min/IP. Scores answers. Computes band. **Atomically writes 1 `MockTestAttempt` + N `ExerciseAttempt` rows (attemptType="mock") in a single transaction.** Returns inline results blob with band.
+- `GET /api/admin/test-prep/analytics` — requireAdmin; rate-limit 30/min/userId. Per-exam aggregates: unique users, attempt count, average band, band distribution.
+
+**Scope:** Listening-only (reading deferred to V2 / NQ-3). All four exams (TOEIC, TOEFL, IELTS, OET).
+
+**Disclaimer:** Server-rendered on landing page AND results panel (AC-10 requirement).
+
+**Band Format:** Single rounded-down value per exam (e.g. "Band 5.5", "600", "B", "28"). **Thresholds are placeholders pending SME sign-off (NQ-1).**
+
+### Admin Nav & Analytics
+
+- New `/admin/test-prep` page (4 exam cards, band histogram).
+- Admin nav gains "Test Prep" entry (between Exercises and Import).
+- `nav.adminTestPrep` i18n key added (forward-looking; admin nav still hardcoded, consolidation deferred to later refactor).
+
+### Shared Infrastructure
+
+**New utilities extracted/added:**
+- `src/lib/shuffle.ts` — Fisher-Yates shuffle (extracted from inline sampling; reused by sample-test + test-prep).
+- `src/lib/test-prep-constants.ts` — Exam slug enum, `attemptType` enum, `MOCK_TEST_QUESTION_COUNT = 25`.
+- `src/lib/test-prep-bands.ts` — `estimateBand(exam, correct, total)` returning `{ band, rangeLow?, rangeHigh? }`. Band value is single rounded-down step (never range, never midpoint).
+- `src/lib/test-prep-content.ts` — `sampleListeningQuestions(exam, count)` — server-side sampler for listening-only questions by exam.
+- `src/lib/test-prep-progress.ts` — `getExamProgress(userId, exam)` — aggregates `MockTestAttempt` records.
+- `src/lib/test-prep-admin-analytics.ts` — `getTestPrepAnalytics()` — per-exam stats for admin API + page.
+
+**Existing utilities extended:**
+- `ExerciseAttempt` table: all sample-test, CEFR, and practice attempts now write `attemptType: "sample"` / `"cefr"` / `"practice"` / `"mock"` respectively (previously untagged).
+
+### i18n
+
+New `testPrep` namespace added to all four locales (en, es, fr, vi). es/fr/vi ship **English placeholders** pending translation (parallel workstream). New `nav.adminTestPrep` key in all four files.
+
+### Test Coverage
+
+E2E + unit tests:
+- 31/31 Playwright E2E pass (12 test-prep mock + 4 admin analytics + 15 regression sample/CEFR)
+- 185/185 unit tests pass (including new band estimation, constants, content sampler tests)
+- JWT forgery rejection confirmed (cross-exam replay rejects on testType mismatch)
+- Pre-existing E2E bug fixed: `sample-test.spec.ts` and `cefr-test.spec.ts` asserted `pairs[].right === ""` post-sanitisation; corrected to `expect(p.right).toBeUndefined()` (sanitiseQuestion strips the key entirely)
+
+### Composite Question-ID Convention (Documented Pattern)
+
+Extended documentation: the `${exerciseSlug}:${questionId}` convention now spans three systems (sample-test, CEFR placement, test-prep mocks). Documented in `system-architecture.md` as a project-wide pattern to prevent answer collisions when multiple exercises contribute a local `"q1"`.
+
+### Non-Blocking Follow-Ups
+
+- **NQ-1:** Band threshold SME sign-off (current values placeholders only)
+- **NQ-3, NQ-5:** Reading mock + IELTS Academic/General Training split (V2)
+- **PQ-3:** `/api/test-prep/[exam]/progress` route (client component doesn't need it today)
+- **Admin nav i18n:** Migrate entire admin nav from hardcoded labels to `nav.*` namespace
+
+---
+
 ## 2026-06-04 — Sample Test + CEFR: auth-gated single-page rewrite
 
 The 10-Q sample test and 25-Q CEFR placement are no longer guest-accessible. The

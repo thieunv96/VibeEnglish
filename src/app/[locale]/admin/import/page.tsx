@@ -31,7 +31,9 @@ export default function AdminImportPage() {
           <p>
             Lesson fields: <code>slug, category, title, level (A1-C2), description?, transcript, segments[]</code>.
             <br />
-            Exercise fields: <code>slug, skill, title, level, type (mcq|fill|match), description?, questions[]</code>.
+            Exercise fields: <code>slug, skill, title, level, type (mcq|fill|match), description?, questions[], exam?</code>.
+            <br />
+            <code>exam</code> (optional): <code>&quot;toeic&quot; | &quot;toefl&quot; | &quot;ielts&quot; | &quot;oet&quot;</code> — tags the exercise for exam-prep mock tests. Omit to leave untagged.
           </p>
         </div>
       </details>

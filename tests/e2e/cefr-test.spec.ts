@@ -57,7 +57,7 @@ test.describe("25-Q CEFR Placement Test", () => {
     expect(levels.size).toBeGreaterThanOrEqual(3);
     for (const q of data.questions) {
       expect((q as Record<string, unknown>).answer).toBeUndefined();
-      if (q.pairs) for (const p of q.pairs) expect(p.right).toBe("");
+      if (q.pairs) for (const p of q.pairs) expect(p.right).toBeUndefined();
     }
   });
 
