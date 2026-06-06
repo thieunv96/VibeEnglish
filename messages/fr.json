@@ -242,7 +242,15 @@
   },
   "vocabPage": {
     "title": "Mon vocabulaire",
-    "sub": "{count, plural, =0 {Aucun mot enregistré} =1 {1 mot enregistré} other {# mots enregistrés}}"
+    "sub": "{count, plural, =0 {Aucun mot enregistré} =1 {1 mot enregistré} other {# mots enregistrés}}",
+    "word": "Mot",
+    "definition": "Définition",
+    "noDefinition": "—",
+    "edit": "Modifier",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "saveFailed": "Échec de l'enregistrement.",
+    "definitionPlaceholder": "Ajoutez une définition…"
   },
   "historyPage": {
     "title": "Historique",

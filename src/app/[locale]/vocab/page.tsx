@@ -39,10 +39,21 @@ export default async function VocabPage({ params }: PageProps) {
           initialItems={vocab.map((v) => ({
             id: v.id,
             word: v.word,
+            definition: v.definition,
             sourceLessonSlug: v.sourceLessonSlug,
             addedAt: v.addedAt.toISOString(),
           }))}
-          labelDelete={tDash("deleteVocab")}
+          labels={{
+            word: t("word"),
+            definition: t("definition"),
+            noDefinition: t("noDefinition"),
+            edit: t("edit"),
+            save: t("save"),
+            cancel: t("cancel"),
+            delete: tDash("deleteVocab"),
+            saveFailed: t("saveFailed"),
+            definitionPlaceholder: t("definitionPlaceholder"),
+          }}
         />
       )}
     </Container>

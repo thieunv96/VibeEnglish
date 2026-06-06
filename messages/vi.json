@@ -242,7 +242,15 @@
   },
   "vocabPage": {
     "title": "Quản lý kiến thức",
-    "sub": "{count, plural, other {# từ đã lưu}}"
+    "sub": "{count, plural, other {# từ đã lưu}}",
+    "word": "Từ",
+    "definition": "Định nghĩa",
+    "noDefinition": "—",
+    "edit": "Sửa",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "saveFailed": "Không thể lưu.",
+    "definitionPlaceholder": "Thêm định nghĩa…"
   },
   "historyPage": {
     "title": "Lịch sử học",

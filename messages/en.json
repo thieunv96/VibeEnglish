@@ -242,7 +242,15 @@
   },
   "vocabPage": {
     "title": "My vocabulary",
-    "sub": "{count, plural, =0 {No words saved yet} =1 {1 saved word} other {# saved words}}"
+    "sub": "{count, plural, =0 {No words saved yet} =1 {1 saved word} other {# saved words}}",
+    "word": "Word",
+    "definition": "Definition",
+    "noDefinition": "—",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "saveFailed": "Could not save.",
+    "definitionPlaceholder": "Add a definition…"
   },
   "historyPage": {
     "title": "Learning history",

@@ -242,7 +242,15 @@
   },
   "vocabPage": {
     "title": "Mi vocabulario",
-    "sub": "{count, plural, =0 {Sin palabras guardadas} =1 {1 palabra} other {# palabras}}"
+    "sub": "{count, plural, =0 {Sin palabras guardadas} =1 {1 palabra} other {# palabras}}",
+    "word": "Palabra",
+    "definition": "Definición",
+    "noDefinition": "—",
+    "edit": "Editar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "saveFailed": "No se pudo guardar.",
+    "definitionPlaceholder": "Añade una definición…"
   },
   "historyPage": {
     "title": "Historial",
